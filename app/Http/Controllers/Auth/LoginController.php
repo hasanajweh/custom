@@ -3,14 +3,19 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Network;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
-    public function showLoginForm()
+    public function showLoginForm(Request $request)
     {
+        if ($request->route('network')) {
+            return view('main-admin.login', ['network' => $request->route('network')]);
+        }
+
         return view('auth.login');
     }
 
@@ -24,7 +29,16 @@ class LoginController extends Controller
         // Check if user exists
         $user = \App\Models\User::where('email', $credentials['email'])->first();
 
+        /** @var Network|null $network */
+        $network = $request->route('network');
+
         if ($user) {
+            if ($user->isMainAdmin() && $network && $user->network_id !== $network->id) {
+                throw ValidationException::withMessages([
+                    'email' => __('messages.invalid_network_access'),
+                ]);
+            }
+
             // Check if user is active
             if (!$user->is_active) {
                 throw ValidationException::withMessages([
@@ -62,6 +76,7 @@ class LoginController extends Controller
         $school = $user->school;
 
         return match($user->role) {
+            'main_admin' => redirect()->route('main-admin.dashboard', $user->network?->slug),
             'admin' => redirect()->route('school.admin.dashboard', $school->slug),
             'teacher' => redirect()->route('teacher.files.index', $school->slug),
             'supervisor' => redirect()->route('supervisor.reviews.index', $school->slug),
@@ -76,6 +91,13 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        /** @var Network|null $network */
+        $network = $request->route('network') ?? $request->user()?->network;
+
+        if ($network) {
+            return redirect()->route('main-admin.login', $network->slug);
+        }
+
+        return redirect('/');
     }
 }

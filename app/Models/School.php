@@ -15,6 +15,8 @@ class School extends Model
     protected $fillable = [
         'name',
         'slug',
+        'network_id',
+        'city',
         'is_active',
         'storage_limit',
         'storage_used',
@@ -25,6 +27,11 @@ class School extends Model
         'storage_limit' => 'integer',
         'storage_used' => 'integer',
     ];
+
+    public function network()
+    {
+        return $this->belongsTo(Network::class);
+    }
 
     /**
      * Get all subscriptions for this school

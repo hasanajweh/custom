@@ -1171,6 +1171,21 @@ return [
     'my_files' => 'My Files',
     'view_files' => 'View your files',
     'go_to_dashboard' => 'Go to dashboard',
+    'network_overview' => 'Enterprise network overview across all branches.',
+    'city_not_set' => 'City not set',
+    'files_count' => 'Files',
+    'admins' => 'Admins',
+    'supervisors' => 'Supervisors',
+    'teachers' => 'Teachers',
+    'invalid_network_access' => 'You cannot access this network with the provided account.',
+    'plan' => 'Plan',
+    'branches_plan' => 'Branches Plan',
+    'main_admin' => 'Main Admin',
+    'log_in' => 'Log in',
+    'email' => 'Email',
+    'password' => 'Password',
+    'remember_me' => 'Remember me',
+    'forgot_password' => 'Forgot your password?',
 ];
 
 
