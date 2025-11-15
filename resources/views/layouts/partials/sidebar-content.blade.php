@@ -1,6 +1,6 @@
 <div class="flex h-16 shrink-0 items-center">
     @if(isset($school))
-        <a href="{{ route('dashboard', ['school' => $school->slug]) }}">
+        <a href="{{ tenant_route('dashboard', $school) }}">
             <x-application-logo class="h-8 w-auto" />
         </a>
     @else
@@ -16,7 +16,7 @@
             <ul role="list" class="-mx-2 space-y-1">
                 {{-- Tenant Links --}}
                 @if (isset($school))
-                    <li><x-nav-link :href="route('dashboard', ['school' => $school->slug])" :active="request()->routeIs('dashboard')">Dashboard</x-nav-link></li>
+                    <li><x-nav-link :href="tenant_route('dashboard', $school)" :active="request()->routeIs('dashboard')">Dashboard</x-nav-link></li>
                     @if (auth()->user()->role === 'teacher')
                         <li><x-nav-link :href="route('files.index', ['school' => $school->slug])" :active="request()->routeIs('files.*')">My Files</x-nav-link></li>
                         <li><x-nav-link :href="route('notifications.index', ['school' => $school->slug])" :active="request()->routeIs('notifications.*')" class="flex items-center">Notifications @if(auth()->user()->unreadNotifications->count() > 0)<span class="ml-auto w-6 min-w-max whitespace-nowrap rounded-full bg-red-500 px-2.5 py-0.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-red-500">{{ auth()->user()->unreadNotifications->count() }}</span>@endif</x-nav-link></li>

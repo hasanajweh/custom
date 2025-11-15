@@ -32,6 +32,7 @@ use App\Http\Controllers\Teacher\FileSubmissionController;
 use App\Http\Controllers\Teacher\TeacherDashboardController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\MainAdmin\DashboardController as MainAdminDashboardController;
+use App\Models\Network;
 use App\Models\School;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -156,6 +157,7 @@ Route::post('/impersonate/leave', [ImpersonationController::class, 'stop'])
 // ===========================
 Route::prefix('{network:slug}/main-admin')
     ->middleware(['setlocale'])
+    ->scopeBindings()
     ->group(function () {
         Route::middleware('guest')->group(function () {
             Route::get('login', [LoginController::class, 'showLoginForm'])->name('main-admin.login');
@@ -171,220 +173,238 @@ Route::prefix('{network:slug}/main-admin')
 // ===========================
 // TENANT (SCHOOL) ROUTES
 // ===========================
-Route::prefix('{school:slug}')
+Route::prefix('{network:slug}/{school:slug}')
     ->middleware(['setlocale'])
+    ->scopeBindings()
     ->group(function () {
+        Route::middleware(function (Request $request, $next) {
+            $network = $request->route('network');
+            $school = $request->route('school');
 
-        // ===========================
-        // GUEST ROUTES
-        // ===========================
-        Route::middleware('guest')->group(function () {
-            Route::get('/', function (School $school) {
-                return view('auth.login', ['school' => $school]);
-            })->name('home');
+            if ($network && $school && $school->network_id !== $network->id) {
+                abort(404);
+            }
 
-            Route::controller(RegisteredUserController::class)->group(function() {
-                Route::get('register', 'create')->name('register');
-                Route::post('register', 'store');
+            return $next($request);
+        })->group(function () {
+            // ===========================
+            // GUEST ROUTES
+            // ===========================
+            Route::middleware('guest')->group(function () {
+                Route::get('/', function (Network $network, School $school) {
+                    if ($school->network_id !== $network->id) {
+                        abort(404);
+                    }
+
+                    return view('auth.login', ['school' => $school]);
+                })->name('home');
+
+                Route::controller(RegisteredUserController::class)->group(function() {
+                    Route::get('register', 'create')->name('register');
+                    Route::post('register', 'store');
+                });
+
+                Route::controller(AuthenticatedSessionController::class)->group(function() {
+                    Route::get('login', 'create')->name('login');
+                    Route::post('login', 'store');
+                });
             });
 
-            Route::controller(AuthenticatedSessionController::class)->group(function() {
-                Route::get('login', 'create')->name('login');
-                Route::post('login', 'store');
+            // ===========================
+            // AUTHENTICATED ROUTES
+            // ===========================
+
+            Route::middleware(['auth', 'verify.tenant'])->group(function () {
+                // Dashboard (role-based)
+                Route::get('/dashboard', function (Network $network, School $school) {
+                    if ($school->network_id !== $network->id) {
+                        abort(404, 'Access denied to this network.');
+                    }
+
+                    $user = Auth::user();
+
+                    // Ensure user belongs to this school
+                    if ($user->school_id !== $school->id) {
+                        abort(403, 'Access denied to this school.');
+                    }
+
+                    return match($user->role) {
+                        'admin' => app(DashboardController::class)->index($school,request()),
+                        'teacher' => app(TeacherDashboardController::class)->index($school),
+                        'supervisor' => app(SupervisorDashboardController::class)->index($school),
+                        default => abort(403, 'Invalid user role.')
+                    };
+                })->name('dashboard');
+
+                // ===========================
+                // PROFILE ROUTES (ALL USERS)
+                // ===========================
+                Route::controller(ProfileController::class)
+                    ->prefix('profile')
+                    ->name('profile.')
+                    ->group(function () {
+                        Route::get('/', 'edit')->name('edit');
+                        Route::patch('/', 'update')->name('update');
+                        Route::patch('/password', 'updatePassword')->name('password.update');
+                        Route::patch('/language', 'updateLanguage')->name('language.update');
+                    });
+
+                // ===========================
+                // TEACHER ROUTES
+                // ===========================
+                Route::middleware('role:teacher')
+                    ->prefix('teacher')
+                    ->name('teacher.')
+                    ->group(function () {
+                        Route::controller(FileSubmissionController::class)
+                            ->prefix('files')
+                            ->name('files.')
+                            ->group(function () {
+                                Route::get('/', 'myFiles')->name('index');
+                                Route::get('/create', 'create')->name('create');
+                                Route::post('/', 'store')->name('store');
+                                Route::get('/{fileSubmission}', 'show')->name('show');
+                                Route::get('/{fileSubmission}/preview', 'preview')->name('preview');
+                                Route::get('/{fileSubmission}/download', 'download')->name('download');
+                                Route::delete('/{fileSubmission}', 'destroy')->name('destroy');
+                            });
+                    });
+
+                // ===========================
+                // SUPERVISOR ROUTES
+                // ===========================
+                Route::middleware('role:supervisor')
+                    ->prefix('supervisor')
+                    ->name('supervisor.')
+                    ->group(function () {
+                        // Review files
+                        Route::controller(ReviewController::class)
+                            ->prefix('review-files')
+                            ->name('reviews.')
+                            ->group(function () {
+                                Route::get('/', 'index')->name('index');
+                                Route::get('/{fileSubmission}', 'show')->name('show');
+                                Route::get('/{fileSubmission}/preview', 'preview')->name('preview');
+                                Route::get('/{fileSubmission}/download', 'download')->name('download');
+                            });
+
+                        // Supervisor file management
+                        Route::controller(SupervisorFileSubmissionController::class)
+                            ->prefix('files')
+                            ->name('files.')
+                            ->group(function () {
+                                Route::get('/', 'index')->name('index');
+                                Route::get('/create', 'create')->name('create');
+                                Route::post('/', 'store')->name('store');
+                            });
+
+                        // Supervisor specific files
+                        Route::get('/{supervisor}/files', [SupervisorController::class, 'files'])->name('files');
+                    });
+
+                // ===========================
+                // ADMIN ROUTES
+                // ===========================
+                Route::prefix('admin')
+                    ->middleware('role:admin')
+                    ->name('school.admin.')
+                    ->group(function () {
+
+                        Route::get('activity-logs', [SchoolActivityLogController::class, 'index'])
+                            ->name('activity-logs.index');
+
+                        // User Management
+                        Route::resource('users', SchoolUserController::class)->except(['show']);
+                        Route::post('users/store-ajax', [SchoolUserController::class, 'storeAjax'])->name('users.store-ajax');
+                        Route::patch('users/{user}/toggle-status', [SchoolUserController::class, 'toggleStatus'])->name('users.toggle-status');
+                        Route::get('users/archived', [SchoolUserController::class, 'archived'])->name('users.archived');
+                        Route::patch('users/archived/{user}/restore', [SchoolUserController::class, 'restore'])->name('users.restore');
+                        Route::delete('users/archived/{user}/force-delete', [SchoolUserController::class, 'forceDelete'])->name('users.force-delete');
+                        // Subject Management
+                        Route::controller(SubjectController::class)
+                            ->prefix('subjects')
+                            ->name('subjects.')
+                            ->group(function () {
+                                Route::get('/', 'index')->name('index');
+                                Route::post('/', 'store')->name('store');
+                                Route::patch('/{subject}/archive', 'archive')->name('archive');
+                                Route::patch('/{subject}/restore', 'restore')->name('restore');
+                            });
+
+                        // Grade Management
+                        Route::controller(GradeController::class)
+                            ->prefix('grades')
+                            ->name('grades.')
+                            ->group(function () {
+                                Route::get('/', 'index')->name('index');
+                                Route::post('/', 'store')->name('store');
+                                Route::patch('/{grade}/archive', 'archive')->name('archive');
+                                Route::patch('/{grade}/restore', 'restore')->name('restore');
+                            });
+
+                        // File Browser
+                        Route::controller(FileBrowserController::class)
+                            ->prefix('file-browser')
+                            ->name('file-browser.')
+                            ->group(function () {
+                                Route::get('/', 'index')->name('index');
+                                Route::get('/{file}', 'show')->name('show');
+                                Route::get('/{file}/download', 'download')->name('download');
+                                Route::get('/{file}/preview', 'preview')->name('preview');
+                                Route::get('/{file}/preview-data', 'previewData')->name('preview-data');
+                                Route::delete('/{file}', 'destroy')->name('destroy');
+                                Route::post('/bulk-download', 'bulkDownload')->name('bulk-download');
+                                Route::delete('/bulk-delete', 'bulkDelete')->name('bulk-delete');
+                            });
+
+                        // Plans Management
+                        Route::controller(PlansController::class)
+                            ->prefix('plans')
+                            ->name('plans.')
+                            ->group(function () {
+                                Route::get('/', 'index')->name('index');
+                                Route::get('/{plan}', 'show')->name('show');
+                                Route::get('/{plan}/download', 'download')->name('download');
+                            });
+
+                        // Plan Management (Approval)
+                        Route::controller(PlanManagementController::class)
+                            ->prefix('plan-management')
+                            ->name('plan-management.')
+                            ->group(function () {
+                                Route::get('/', 'index')->name('index');
+                                Route::get('/{plan}', 'show')->name('show');
+                                Route::get('/{plan}/download', 'download')->name('download');
+                                Route::post('/{plan}/approve', 'approve')->name('approve');
+                                Route::post('/{plan}/reject', 'reject')->name('reject');
+                            });
+
+                        // Supervisors Management
+                        Route::controller(SupervisorController::class)
+                            ->prefix('supervisors')
+                            ->name('supervisors.')
+                            ->group(function () {
+                                Route::get('/', 'index')->name('index');
+                                Route::get('/{supervisor}/files', 'files')->name('files');
+                            });
+                    });
+
+                // ===========================
+                // NOTIFICATIONS (ALL AUTHENTICATED USERS)
+                // ===========================
+                Route::controller(NotificationController::class)
+                    ->prefix('notifications')
+                    ->name('notifications.')
+                    ->group(function () {
+                        Route::get('/', 'index')->name('index');
+                        Route::post('/{notification}/read', 'markAsRead')->name('read');
+                        Route::post('/mark-all-read', 'markAllAsRead')->name('mark-all-read');
+                        Route::get('/unread-count', 'unreadCount')->name('unread-count');
+                    });
+
+                // Logout
+                Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
             });
-        });
-
-        // ===========================
-        // AUTHENTICATED ROUTES
-        // ===========================
-
-
-        Route::middleware(['auth', 'verify.tenant'])->group(function () {
-            // Dashboard (role-based)
-            Route::get('/dashboard', function (School $school) {
-                $user = Auth::user();
-
-                // Ensure user belongs to this school
-                if ($user->school_id !== $school->id) {
-                    abort(403, 'Access denied to this school.');
-                }
-
-                return match($user->role) {
-                    'admin' => app(DashboardController::class)->index($school,request()),
-                    'teacher' => app(TeacherDashboardController::class)->index($school),
-                    'supervisor' => app(SupervisorDashboardController::class)->index($school),
-                    default => abort(403, 'Invalid user role.')
-                };
-            })->name('dashboard');
-
-            // ===========================
-            // PROFILE ROUTES (ALL USERS)
-            // ===========================
-            Route::controller(ProfileController::class)
-                ->prefix('profile')
-                ->name('profile.')
-                ->group(function () {
-                    Route::get('/', 'edit')->name('edit');
-                    Route::patch('/', 'update')->name('update');
-                    Route::patch('/password', 'updatePassword')->name('password.update');
-                    Route::patch('/language', 'updateLanguage')->name('language.update');
-                });
-
-            // ===========================
-            // TEACHER ROUTES
-            // ===========================
-            Route::middleware('role:teacher')
-                ->prefix('teacher')
-                ->name('teacher.')
-                ->group(function () {
-                    Route::controller(FileSubmissionController::class)
-                        ->prefix('files')
-                        ->name('files.')
-                        ->group(function () {
-                            Route::get('/', 'myFiles')->name('index');
-                            Route::get('/create', 'create')->name('create');
-                            Route::post('/', 'store')->name('store');
-                            Route::get('/{fileSubmission}', 'show')->name('show');
-                            Route::get('/{fileSubmission}/preview', 'preview')->name('preview');
-                            Route::get('/{fileSubmission}/download', 'download')->name('download');
-                            Route::delete('/{fileSubmission}', 'destroy')->name('destroy');
-                        });
-                });
-
-            // ===========================
-            // SUPERVISOR ROUTES
-            // ===========================
-            Route::middleware('role:supervisor')
-                ->prefix('supervisor')
-                ->name('supervisor.')
-                ->group(function () {
-                    // Review files
-                    Route::controller(ReviewController::class)
-                        ->prefix('review-files')
-                        ->name('reviews.')
-                        ->group(function () {
-                            Route::get('/', 'index')->name('index');
-                            Route::get('/{fileSubmission}', 'show')->name('show');
-                            Route::get('/{fileSubmission}/preview', 'preview')->name('preview');
-                            Route::get('/{fileSubmission}/download', 'download')->name('download');
-                        });
-
-                    // Supervisor file management
-                    Route::controller(SupervisorFileSubmissionController::class)
-                        ->prefix('files')
-                        ->name('files.')
-                        ->group(function () {
-                            Route::get('/', 'index')->name('index');
-                            Route::get('/create', 'create')->name('create');
-                            Route::post('/', 'store')->name('store');
-                        });
-
-                    // Supervisor specific files
-                    Route::get('/{supervisor}/files', [SupervisorController::class, 'files'])->name('files');
-                });
-
-            // ===========================
-            // ADMIN ROUTES
-            // ===========================
-            Route::prefix('admin')
-                ->middleware('role:admin')
-                ->name('school.admin.')
-                ->group(function () {
-
-                    Route::get('activity-logs', [SchoolActivityLogController::class, 'index'])
-                        ->name('activity-logs.index');
-
-                    // User Management
-                    Route::resource('users', SchoolUserController::class)->except(['show']);
-                    Route::post('users/store-ajax', [SchoolUserController::class, 'storeAjax'])->name('users.store-ajax');
-                    Route::patch('users/{user}/toggle-status', [SchoolUserController::class, 'toggleStatus'])->name('users.toggle-status');
-                    Route::get('users/archived', [SchoolUserController::class, 'archived'])->name('users.archived');
-                    Route::patch('users/archived/{user}/restore', [SchoolUserController::class, 'restore'])->name('users.restore');
-                    Route::delete('users/archived/{user}/force-delete', [SchoolUserController::class, 'forceDelete'])->name('users.force-delete');
-                    // Subject Management
-                    Route::controller(SubjectController::class)
-                        ->prefix('subjects')
-                        ->name('subjects.')
-                        ->group(function () {
-                            Route::get('/', 'index')->name('index');
-                            Route::post('/', 'store')->name('store');
-                            Route::patch('/{subject}/archive', 'archive')->name('archive');
-                            Route::patch('/{subject}/restore', 'restore')->name('restore');
-                        });
-
-                    // Grade Management
-                    Route::controller(GradeController::class)
-                        ->prefix('grades')
-                        ->name('grades.')
-                        ->group(function () {
-                            Route::get('/', 'index')->name('index');
-                            Route::post('/', 'store')->name('store');
-                            Route::patch('/{grade}/archive', 'archive')->name('archive');
-                            Route::patch('/{grade}/restore', 'restore')->name('restore');
-                        });
-
-                    // File Browser
-                    Route::controller(FileBrowserController::class)
-                        ->prefix('file-browser')
-                        ->name('file-browser.')
-                        ->group(function () {
-                            Route::get('/', 'index')->name('index');
-                            Route::get('/{file}', 'show')->name('show');
-                            Route::get('/{file}/download', 'download')->name('download');
-                            Route::get('/{file}/preview', 'preview')->name('preview');
-                            Route::get('/{file}/preview-data', 'previewData')->name('preview-data');
-                            Route::delete('/{file}', 'destroy')->name('destroy');
-                            Route::post('/bulk-download', 'bulkDownload')->name('bulk-download');
-                            Route::delete('/bulk-delete', 'bulkDelete')->name('bulk-delete');
-                        });
-
-                    // Plans Management
-                    Route::controller(PlansController::class)
-                        ->prefix('plans')
-                        ->name('plans.')
-                        ->group(function () {
-                            Route::get('/', 'index')->name('index');
-                            Route::get('/{plan}', 'show')->name('show');
-                            Route::get('/{plan}/download', 'download')->name('download');
-                        });
-
-                    // Plan Management (Approval)
-                    Route::controller(PlanManagementController::class)
-                        ->prefix('plan-management')
-                        ->name('plan-management.')
-                        ->group(function () {
-                            Route::get('/', 'index')->name('index');
-                            Route::get('/{plan}', 'show')->name('show');
-                            Route::get('/{plan}/download', 'download')->name('download');
-                            Route::post('/{plan}/approve', 'approve')->name('approve');
-                            Route::post('/{plan}/reject', 'reject')->name('reject');
-                        });
-
-                    // Supervisors Management
-                    Route::controller(SupervisorController::class)
-                        ->prefix('supervisors')
-                        ->name('supervisors.')
-                        ->group(function () {
-                            Route::get('/', 'index')->name('index');
-                            Route::get('/{supervisor}/files', 'files')->name('files');
-                        });
-                });
-
-            // ===========================
-            // NOTIFICATIONS (ALL AUTHENTICATED USERS)
-            // ===========================
-            Route::controller(NotificationController::class)
-                ->prefix('notifications')
-                ->name('notifications.')
-                ->group(function () {
-                    Route::get('/', 'index')->name('index');
-                    Route::post('/{notification}/read', 'markAsRead')->name('read');
-                    Route::post('/mark-all-read', 'markAllAsRead')->name('mark-all-read');
-                    Route::get('/unread-count', 'unreadCount')->name('unread-count');
-                });
-
-            // Logout
-            Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
         });
     });
 
@@ -402,10 +422,10 @@ Route::get('/', [LandingController::class, 'index'])
 // PWA Manifest with Enhanced Desktop Support
 Route::get('/manifest.json', function (Request $request) {
     $schoolSlug = $request->query('school');
-    $school = School::where('slug', $schoolSlug)->first();
+    $school = School::with('network')->where('slug', $schoolSlug)->first();
     $locale = App::getLocale();
 
-    $slugPrefix = $school ? "/{$school->slug}" : '';
+    $slugPrefix = $school && $school->network ? "/{$school->network->slug}/{$school->slug}" : '';
 
     $manifest = [
         'name' => ($school ? $school->name : 'Scholder') . ' - ' . __('messages.educational_platform', [], $locale),
@@ -676,14 +696,27 @@ Route::get('/offline.html', function () {
 })->name('offline');
 
 // Install Instructions Page
-Route::get('/{school:slug}/install', function (School $school) {
-    return view('install-instructions', compact('school'));
-})->name('install.instructions')->middleware(['setlocale']);
+Route::prefix('{network:slug}/{school:slug}')
+    ->middleware(['setlocale'])
+    ->scopeBindings()
+    ->group(function () {
+        Route::get('/install', function (Network $network, School $school) {
+            if ($school->network_id !== $network->id) {
+                abort(404);
+            }
 
-// Desktop App Download Page
-Route::get('/{school:slug}/desktop', function (School $school) {
-    return view('desktop-app', compact('school'));
-})->name('desktop.app')->middleware(['setlocale']);
+            return view('install-instructions', compact('school'));
+        })->name('install.instructions');
+
+        // Desktop App Download Page
+        Route::get('/desktop', function (Network $network, School $school) {
+            if ($school->network_id !== $network->id) {
+                abort(404);
+            }
+
+            return view('desktop-app', compact('school'));
+        })->name('desktop.app');
+    });
 
 // Handle protocol for desktop
 Route::get('/handle-protocol', function (Request $request) {
@@ -700,7 +733,7 @@ Route::post('/share-target', function (Request $request) {
         session()->flash('shared_files', $request->file('files'));
 
         if (Auth::check() && Auth::user()->school) {
-            return redirect()->route('teacher.files.create', ['school' => Auth::user()->school->slug]);
+            return redirect()->to(tenant_route('teacher.files.create', Auth::user()->school));
         }
     }
 

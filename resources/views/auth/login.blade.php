@@ -71,7 +71,7 @@
                 </div>
 
                 <!-- Login Form -->
-                <form method="POST" action="{{ route('login', ['school' => $school->slug]) }}" class="space-y-6">
+                <form method="POST" action="{{ tenant_route('login', $school) }}" class="space-y-6">
                     @csrf
 
                     <!-- Email Field -->

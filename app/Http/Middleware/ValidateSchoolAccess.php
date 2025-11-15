@@ -34,7 +34,7 @@ class ValidateSchoolAccess
                         return $next($request);
                     }
 
-                    return redirect()->route('dashboard', $school->slug)
+                    return redirect()->to(tenant_route('dashboard', $school))
                         ->with('warning', 'School subscription is not active. Please contact your administrator.');
                 }
             }

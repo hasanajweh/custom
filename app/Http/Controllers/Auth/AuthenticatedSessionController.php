@@ -83,7 +83,7 @@ class AuthenticatedSessionController extends Controller
                 // Keep user logged in for 30 days
                 Auth::login($user, true);
 
-                return redirect()->intended(route('dashboard', ['school' => $school->slug]));
+                return redirect()->intended(tenant_route('dashboard', $school));
             }
 
             Auth::logout();
@@ -108,7 +108,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('superadmin.dashboard');
         }
 
-        return redirect()->intended(route('dashboard', ['school' => $school->slug]));
+        return redirect()->intended(tenant_route('dashboard', $school));
     }
 
     /**
@@ -123,6 +123,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect()->route('login', ['school' => $school->slug]);
+        return redirect()->to(tenant_route('login', $school));
     }
 }

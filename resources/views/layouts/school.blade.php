@@ -1290,7 +1290,7 @@
 
     <div class="sidebar-content">
         <nav class="space-y-1">
-            <a href="{{ route('dashboard', $school->slug) }}"
+            <a href="{{ tenant_route('dashboard', $school) }}"
                class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <i class="ri-dashboard-3-line"></i>
                 <span class="sidebar-text">{{ __('messages.navigation.dashboard') }}</span>

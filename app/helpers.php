@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\School;
+use InvalidArgumentException;
+
 /**
  * Helper functions for the Scholder application
  */
@@ -23,6 +26,29 @@ if (!function_exists('formatBytes')) {
         $bytes /= (1 << (10 * $pow));
 
         return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+}
+
+if (!function_exists('tenant_route')) {
+    /**
+     * Generate a tenant-aware route with network and school parameters.
+     */
+    function tenant_route(string $name, School $school, array $parameters = [], bool $absolute = true): string
+    {
+        $network = $school->network;
+
+        if (! $network) {
+            throw new InvalidArgumentException('School must belong to a network to generate tenant routes.');
+        }
+
+        return route(
+            $name,
+            array_merge([
+                'network' => $network->slug,
+                'school' => $school->slug,
+            ], $parameters),
+            $absolute,
+        );
     }
 }
 

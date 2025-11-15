@@ -27,6 +27,11 @@ class Network extends Model
         return $this->hasMany(School::class, 'network_id');
     }
 
+    public function schools(): HasMany
+    {
+        return $this->hasMany(School::class, 'network_id');
+    }
+
     public function mainAdmin(): HasOne
     {
         return $this->hasOne(User::class, 'network_id')->where('role', 'main_admin');
