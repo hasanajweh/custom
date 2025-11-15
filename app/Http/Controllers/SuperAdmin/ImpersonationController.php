@@ -26,7 +26,7 @@ class ImpersonationController extends Controller
         Auth::login($user);
 
         // Redirect to their dashboard.
-        return redirect()->route('dashboard', ['school' => $user->school->slug]);
+        return redirect()->to(tenant_route('dashboard', $user->school));
     }
 
     /**

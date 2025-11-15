@@ -25,10 +25,10 @@ class Authenticate extends Middleware
         }
 
         // If the route has a school parameter, redirect to that school's login
-         $school = SchoolResolver::resolve($request->route('school'));
+        $school = SchoolResolver::resolve($request->route('school'));
 
         if ($school) {
-            return route('login', ['school' => $school->slug]);
+            return tenant_route('login', $school);
         }
 
         // ⭐ SECURITY FIX: Don't redirect to random school

@@ -29,8 +29,11 @@ class RedirectIfAuthenticated
                 }
 
                 // Otherwise, it's a regular user, redirect to their school's dashboard.
-                $schoolSlug = $user->school->slug;
-                return redirect(route('dashboard', ['school' => $schoolSlug]));
+                $school = $user->school;
+
+                if ($school) {
+                    return redirect(tenant_route('dashboard', $school));
+                }
             }
         }
 
