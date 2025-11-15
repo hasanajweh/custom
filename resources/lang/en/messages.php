@@ -1186,6 +1186,18 @@ return [
     'password' => 'Password',
     'remember_me' => 'Remember me',
     'forgot_password' => 'Forgot your password?',
+    'total_branches' => 'Total branches',
+    'total_files_across_branches' => 'Files across branches',
+    'plans_across_branches' => 'Plans across branches',
+    'team_distribution' => 'Team distribution',
+    'recent_uploads_72h' => 'Uploads (72h)',
+    'recent_branch_uploads' => 'Recent branch uploads',
+    'no_recent_uploads' => 'No uploads in the last 72 hours.',
+    'branch' => 'Branch',
+    'user' => 'User',
+    'submitted_at' => 'Submitted at',
+    'plans_label' => 'Plans',
+    'last_72_hours_label' => 'Last 72 hours',
 ];
 
 
