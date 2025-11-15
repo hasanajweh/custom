@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->foreignId('network_id')->nullable()->after('school_id')->constrained('networks')->nullOnDelete();
-            $table->boolean('is_main_admin')->default(false)->after('is_super_admin');
+            $table->boolean('is_main_admin')->default(false)->after('role');
         });
     }
 
