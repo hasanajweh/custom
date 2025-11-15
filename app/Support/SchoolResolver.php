@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\Network;
 use App\Models\School;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -26,6 +27,18 @@ class SchoolResolver
             $query->whereKey($value);
         } else {
             $query->where('slug', $value);
+        }
+
+        $network = request()->route('network');
+
+        if ($network instanceof Network) {
+            $query->where('network_id', $network->id);
+        } elseif (is_string($network)) {
+            $networkModel = Network::where('slug', $network)->first();
+
+            if ($networkModel) {
+                $query->where('network_id', $networkModel->id);
+            }
         }
 
         $school = $query->first();

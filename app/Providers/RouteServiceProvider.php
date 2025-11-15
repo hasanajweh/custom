@@ -36,13 +36,27 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/web.php'));
         });
 
-        // Fix route model binding for school
-        Route::bind('school', function ($value) {
-            return School::where('slug', $value)->firstOrFail();
-        });
-
         Route::bind('network', function ($value) {
             return Network::where('slug', $value)->firstOrFail();
+        });
+
+        // Fix route model binding for school with network context
+        Route::bind('school', function ($value) {
+            $network = request()->route('network');
+
+            $query = School::query()->where('slug', $value);
+
+            if ($network instanceof Network) {
+                $query->where('network_id', $network->id);
+            } elseif (is_string($network)) {
+                $networkModel = Network::where('slug', $network)->first();
+
+                if ($networkModel) {
+                    $query->where('network_id', $networkModel->id);
+                }
+            }
+
+            return $query->firstOrFail();
         });
     }
 }
