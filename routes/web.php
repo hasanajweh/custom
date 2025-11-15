@@ -177,16 +177,7 @@ Route::prefix('{network:slug}/{school:slug}')
     ->middleware(['setlocale'])
     ->scopeBindings()
     ->group(function () {
-        Route::middleware(function (Request $request, $next) {
-            $network = $request->route('network');
-            $school = $request->route('school');
-
-            if ($network && $school && $school->network_id !== $network->id) {
-                abort(404);
-            }
-
-            return $next($request);
-        })->group(function () {
+        Route::middleware('match.school.network')->group(function () {
             // ===========================
             // GUEST ROUTES
             // ===========================
