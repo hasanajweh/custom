@@ -17,8 +17,9 @@ class GradeController extends Controller
         }
 
         $grades = $school->grades()->orderBy('name')->get();
+        $archivedGrades = $school->grades()->onlyTrashed()->orderBy('name')->get();
 
-        return view('school.grades.index', compact('grades', 'school'));
+        return view('school.grades.index', compact('grades', 'archivedGrades', 'school'));
     }
 
     public function store(Request $request)
@@ -32,10 +33,10 @@ class GradeController extends Controller
 
         $school->grades()->create($request->only('name'));
 
-        return redirect()->back()->with('success', 'Grade created successfully.');
+        return redirect()->back()->with('success', __('messages.grades.grade_created'));
     }
 
-    public function destroy(Request $request, Grade $grade)
+    public function archive(Request $request, Grade $grade)
     {
         $school = $request->route('school');
         if (is_string($school)) {
@@ -48,6 +49,22 @@ class GradeController extends Controller
 
         $grade->delete();
 
-        return redirect()->back()->with('success', 'Grade deleted successfully.');
+        return redirect()->back()->with('success', __('messages.grades.grade_archived'));
+    }
+
+    public function restore(Request $request, $gradeId)
+    {
+        $school = $request->route('school');
+        if (is_string($school)) {
+            $school = School::where('slug', $school)->firstOrFail();
+        }
+
+        $grade = Grade::withTrashed()
+            ->where('school_id', $school->id)
+            ->findOrFail($gradeId);
+
+        $grade->restore();
+
+        return redirect()->back()->with('success', __('messages.grades.grade_restored'));
     }
 }

@@ -67,6 +67,8 @@ return [
         'log_in_again' => 'Log In Again',
         'apply_filters' => 'Apply Filters',
         'review' => 'Review',
+        'archive' => 'Archive',
+        'restore' => 'Restore',
     ],
 
     // Common Status & States
@@ -369,7 +371,7 @@ return [
                 'description' => 'Archived users are safely stored with all their data intact. You can restore them at any time or permanently delete them if needed.',
             ],
             'search_placeholder' => 'Search archived users...',
-            'archived_on' => 'Archived On',
+            'archived_on' => 'Archived :date',
             'restore' => 'Restore User',
             'delete' => 'Permanently Delete',
             'restore_confirm' => 'Restore this user? They will be able to log in again.',
@@ -378,6 +380,8 @@ return [
                 'title' => 'No archived users',
                 'subtitle' => 'All users are currently active',
             ],
+            'total' => '{0} No archived items|{1} :count archived item|[2,*] :count archived items',
+            'none' => 'No archived items available',
         ],
 
     ],
@@ -569,6 +573,8 @@ return [
         'subject_created' => 'Subject created successfully',
         'subject_updated' => 'Subject updated successfully',
         'subject_deleted' => 'Subject deleted successfully',
+        'subject_archived' => 'Subject archived successfully',
+        'subject_restored' => 'Subject restored successfully',
         'create_subject' => 'Create Subject',
         'all_subjects' => 'All Subjects',
         'select_subject' => 'Select a subject',
@@ -576,6 +582,7 @@ return [
         'subject_placeholder' => 'e.g., Mathematics, Science, History',
         'code_placeholder' => 'e.g., MATH101, SCI201',
         'total_subjects' => 'subject|subjects',
+        'archived_subjects' => 'Archived Subjects',
     ],
 
     // Grades Management
@@ -596,12 +603,15 @@ return [
         'grade_created' => 'Grade created successfully',
         'grade_updated' => 'Grade updated successfully',
         'grade_deleted' => 'Grade deleted successfully',
+        'grade_archived' => 'Grade archived successfully',
+        'grade_restored' => 'Grade restored successfully',
         'create_grade' => 'Create Grade',
         'all_grades' => 'All Grades',
         'select_grade' => 'Select a grade',
         'not_specified' => 'Not specified',
         'grade_placeholder' => 'e.g., Grade 1, Grade 2, KG',
         'total_grades' => 'grade|grades',
+        'archived_grades' => 'Archived Grades',
     ],
 
 

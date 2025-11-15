@@ -17,8 +17,9 @@ class SubjectController extends Controller
         }
 
         $subjects = $school->subjects()->orderBy('name')->get();
+        $archivedSubjects = $school->subjects()->onlyTrashed()->orderBy('name')->get();
 
-        return view('school.subjects.index', compact('subjects', 'school'));
+        return view('school.subjects.index', compact('subjects', 'archivedSubjects', 'school'));
     }
 
     public function store(Request $request)
@@ -32,10 +33,10 @@ class SubjectController extends Controller
 
         $school->subjects()->create($request->only('name'));
 
-        return redirect()->back()->with('success', 'Subject created successfully.');
+        return redirect()->back()->with('success', __('messages.subjects.subject_created'));
     }
 
-    public function destroy(Request $request, Subject $subject)
+    public function archive(Request $request, Subject $subject)
     {
         $school = $request->route('school');
         if (is_string($school)) {
@@ -48,6 +49,22 @@ class SubjectController extends Controller
 
         $subject->delete();
 
-        return redirect()->back()->with('success', 'Subject deleted successfully.');
+        return redirect()->back()->with('success', __('messages.subjects.subject_archived'));
+    }
+
+    public function restore(Request $request, $subjectId)
+    {
+        $school = $request->route('school');
+        if (is_string($school)) {
+            $school = School::where('slug', $school)->firstOrFail();
+        }
+
+        $subject = Subject::withTrashed()
+            ->where('school_id', $school->id)
+            ->findOrFail($subjectId);
+
+        $subject->restore();
+
+        return redirect()->back()->with('success', __('messages.subjects.subject_restored'));
     }
 }

@@ -66,6 +66,8 @@ return [
         'log_out' => 'تسجيل الخروج',
         'log_in_again' => 'تسجيل الدخول مرة أخرى',
         'apply_filters' => 'تطبيق الفلاتر',
+        'archive' => 'أرشفة',
+        'restore' => 'استعادة',
 
     ],
 
@@ -398,7 +400,7 @@ return [
                 'description' => 'يتم حفظ المستخدمين المؤرشفين بأمان مع جميع بياناتهم. يمكنك استعادتها في أي وقت أو حذفها نهائيًا إذا لزم الأمر.',
             ],
             'search_placeholder' => 'ابحث في المستخدمين المؤرشفين...',
-            'archived_on' => 'تاريخ الأرشفة',
+            'archived_on' => 'تمت الأرشفة بتاريخ :date',
             'restore' => 'استعادة المستخدم',
             'delete' => 'حذف نهائي',
             'restore_confirm' => 'هل تريد استعادة هذا المستخدم؟ سيتمكن من تسجيل الدخول مرة أخرى.',
@@ -407,6 +409,8 @@ return [
                 'title' => 'لا يوجد مستخدمون مؤرشفون',
                 'subtitle' => 'جميع المستخدمين نشطون حاليًا',
             ],
+            'total' => '{0} لا توجد عناصر مؤرشفة|{1} عنصر مؤرشف واحد|[2,*] :count عناصر مؤرشفة',
+            'none' => 'لا توجد عناصر مؤرشفة متاحة',
         ],
 
     ],
@@ -604,6 +608,8 @@ return [
         'subject_created' => 'تم إنشاء المادة بنجاح',
         'subject_updated' => 'تم تحديث المادة بنجاح',
         'subject_deleted' => 'تم حذف المادة بنجاح',
+        'subject_archived' => 'تم أرشفة المادة بنجاح',
+        'subject_restored' => 'تم استعادة المادة بنجاح',
         'create_subject' => 'إنشاء مادة',
         'all_subjects' => 'جميع المواد',
         'select_subject' => 'اختر مادة',
@@ -611,6 +617,7 @@ return [
         'subject_placeholder' => 'مثال: الرياضيات، العلوم، التاريخ',
         'code_placeholder' => 'مثال: MATH101، SCI201',
         'total_subjects' => 'مادة|مواد',
+        'archived_subjects' => 'المواد المؤرشفة',
     ],
 
     // Grades Management
@@ -631,12 +638,15 @@ return [
         'grade_created' => 'تم إنشاء الصف بنجاح',
         'grade_updated' => 'تم تحديث الصف بنجاح',
         'grade_deleted' => 'تم حذف الصف بنجاح',
+        'grade_archived' => 'تم أرشفة الصف بنجاح',
+        'grade_restored' => 'تم استعادة الصف بنجاح',
         'create_grade' => 'إنشاء صف',
         'all_grades' => 'جميع الصفوف',
         'select_grade' => 'اختر صف',
         'not_specified' => 'غير محدد',
         'grade_placeholder' => 'مثال: الصف الأول، الصف الثاني، روضة',
         'total_grades' => 'صف|صفوف',
+        'archived_grades' => 'الصفوف المؤرشفة',
     ],
     
     'schools' => [
