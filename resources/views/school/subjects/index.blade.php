@@ -52,9 +52,14 @@
                     </svg>
                     {{ __('messages.subjects.current_subjects') }}
                 </h3>
-                <span class="bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1 rounded-full">
-                    {{ trans_choice('messages.subjects.total_subjects', $subjects->count(), ['count' => $subjects->count()]) }}
-                </span>
+                <div class="flex items-center space-x-2">
+                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1 rounded-full">
+                        {{ trans_choice('messages.subjects.total_subjects', $subjects->count(), ['count' => $subjects->count()]) }}
+                    </span>
+                    <span class="bg-gray-100 text-gray-700 text-xs font-medium px-3 py-1 rounded-full">
+                        {{ trans_choice('messages.archived.total', $archivedSubjects->count(), ['count' => $archivedSubjects->count()]) }}
+                    </span>
+                </div>
             </div>
 
             <div class="p-6">
@@ -79,7 +84,7 @@
                                 </div>
 
                                 <div class="relative z-50" :class="{'text-right': '{{ app()->getLocale() == 'ar' }}'}">
-                                    <!-- Delete Trigger -->
+                                    <!-- Archive Trigger -->
                                     <button type="button"
                                         @click="
                                             confirmOpen = true;
@@ -90,11 +95,11 @@
                                                 if(countdown === 0) clearInterval(interval);
                                             }, 1000);
                                         "
-                                        class="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition duration-200"
-                                        title="{{ __('messages.actions.delete') }}">
+                                        class="text-amber-600 hover:text-amber-800 p-2 rounded-lg hover:bg-amber-50 transition duration-200"
+                                        title="{{ __('messages.actions.archive') ?? 'Archive' }}">
                                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                d="M20 13V7a2 2 0 00-2-2h-3l-1-1h-4l-1 1H6a2 2 0 00-2 2v6m16 0v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2m16 0H4"></path>
                                         </svg>
                                     </button>
 
@@ -123,14 +128,14 @@
                                                 {{ __('messages.actions.cancel') }}
                                             </button>
                                             <form method="POST"
-                                                action="{{ route('school.admin.subjects.destroy', ['school' => $school->slug, 'subject' => $subject->id]) }}">
+                                                action="{{ route('school.admin.subjects.archive', ['school' => $school->slug, 'subject' => $subject->id]) }}">
                                                 @csrf
-                                                @method('DELETE')
+                                                @method('PATCH')
                                                 <button type="submit"
                                                     :disabled="countdown > 0"
                                                     class="px-3 py-1.5 text-sm rounded-lg text-white transition duration-200"
-                                                    :class="countdown > 0 ? 'bg-red-300 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'">
-                                                    {{ __('messages.confirmations.confirm_delete') }}
+                                                    :class="countdown > 0 ? 'bg-amber-300 cursor-not-allowed' : 'bg-amber-600 hover:bg-amber-700'">
+                                                    {{ __('messages.actions.archive') ?? __('messages.actions.delete') }}
                                                 </button>
                                             </form>
                                         </div>
@@ -142,6 +147,57 @@
                 @else
                     <div class="text-center py-12 text-gray-500">
                         {{ __('messages.subjects.no_subjects_message') }}
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <!-- Archived Subjects -->
+    <div class="lg:col-span-3">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-visible">
+            <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <svg class="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 012-2h6" />
+                    </svg>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ __('messages.subjects.archived_subjects') }}</h3>
+                </div>
+                <span class="bg-gray-100 text-gray-700 text-xs font-medium px-3 py-1 rounded-full">
+                    {{ trans_choice('messages.archived.total', $archivedSubjects->count(), ['count' => $archivedSubjects->count()]) }}
+                </span>
+            </div>
+            <div class="p-6">
+                @if($archivedSubjects->count() > 0)
+                    <div class="grid gap-4">
+                        @foreach ($archivedSubjects as $subject)
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <div class="flex items-center space-x-3">
+                                    <div class="h-10 w-10 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
+                                        <svg class="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 012-2h6" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-900">{{ $subject->name }}</h4>
+                                        <p class="text-sm text-gray-500">
+                                            {{ __('messages.archived.archived_on', ['date' => $subject->deleted_at->diffForHumans()]) }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <form method="POST" action="{{ route('school.admin.subjects.restore', ['school' => $school->slug, 'subject' => $subject->id]) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="px-3 py-1.5 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition duration-200">
+                                        {{ __('messages.actions.restore') ?? 'Restore' }}
+                                    </button>
+                                </form>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-8 text-gray-500">
+                        {{ __('messages.archived.none') }}
                     </div>
                 @endif
             </div>

@@ -308,7 +308,8 @@ Route::prefix('{school:slug}')
                         ->group(function () {
                             Route::get('/', 'index')->name('index');
                             Route::post('/', 'store')->name('store');
-                            Route::delete('/{subject}', 'destroy')->name('destroy');
+                            Route::patch('/{subject}/archive', 'archive')->name('archive');
+                            Route::patch('/{subject}/restore', 'restore')->name('restore');
                         });
 
                     // Grade Management
@@ -318,7 +319,8 @@ Route::prefix('{school:slug}')
                         ->group(function () {
                             Route::get('/', 'index')->name('index');
                             Route::post('/', 'store')->name('store');
-                            Route::delete('/{grade}', 'destroy')->name('destroy');
+                            Route::patch('/{grade}/archive', 'archive')->name('archive');
+                            Route::patch('/{grade}/restore', 'restore')->name('restore');
                         });
 
                     // File Browser
