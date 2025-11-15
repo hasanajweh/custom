@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\School;
-use InvalidArgumentException;
 
 /**
  * Helper functions for the Scholder application
@@ -38,7 +37,7 @@ if (!function_exists('tenant_route')) {
         $network = $school->network;
 
         if (! $network) {
-            throw new InvalidArgumentException('School must belong to a network to generate tenant routes.');
+            throw new \InvalidArgumentException('School must belong to a network to generate tenant routes.');
         }
 
         return route(
