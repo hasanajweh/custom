@@ -24,9 +24,11 @@ class User extends Authenticatable
         'password',
         'role',
         'school_id',
+        'network_id',
         'subject',
         'grade',
         'is_super_admin',
+        'is_main_admin',
         'is_active',
         'deactivated_at',
         'email_verified_at',
@@ -44,6 +46,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_super_admin' => 'boolean',
+            'is_main_admin' => 'boolean',
             'is_active' => 'boolean',
             'last_login_at' => 'datetime',
             'deactivated_at' => 'datetime',
@@ -167,6 +170,11 @@ class User extends Authenticatable
         return $this->belongsTo(School::class);
     }
 
+    public function network(): BelongsTo
+    {
+        return $this->belongsTo(Network::class);
+    }
+
     public function grades(): BelongsToMany
     {
         return $this->belongsToMany(Grade::class)
@@ -221,6 +229,11 @@ class User extends Authenticatable
     public function isSuperAdmin(): bool
     {
         return $this->is_super_admin === true;
+    }
+
+    public function isMainAdmin(): bool
+    {
+        return $this->role === 'main_admin' || $this->is_main_admin;
     }
 
     public function isAdmin(): bool

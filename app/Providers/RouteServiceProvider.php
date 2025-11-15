@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use App\Models\School;
+use App\Models\Network;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -38,6 +39,10 @@ class RouteServiceProvider extends ServiceProvider
         // Fix route model binding for school
         Route::bind('school', function ($value) {
             return School::where('slug', $value)->firstOrFail();
+        });
+
+        Route::bind('network', function ($value) {
+            return Network::where('slug', $value)->firstOrFail();
         });
     }
 }

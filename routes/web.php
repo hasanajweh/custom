@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
@@ -30,6 +31,7 @@ use App\Http\Controllers\Supervisor\FileSubmissionController as SupervisorFileSu
 use App\Http\Controllers\Teacher\FileSubmissionController;
 use App\Http\Controllers\Teacher\TeacherDashboardController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\MainAdmin\DashboardController as MainAdminDashboardController;
 use App\Models\School;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -148,6 +150,23 @@ Route::prefix('superadmin')
 Route::post('/impersonate/leave', [ImpersonationController::class, 'stop'])
     ->middleware(['auth'])
     ->name('impersonate.leave');
+
+// ===========================
+// MAIN ADMIN ROUTES
+// ===========================
+Route::prefix('{network:slug}/main-admin')
+    ->middleware(['setlocale'])
+    ->group(function () {
+        Route::middleware('guest')->group(function () {
+            Route::get('login', [LoginController::class, 'showLoginForm'])->name('main-admin.login');
+            Route::post('login', [LoginController::class, 'login']);
+        });
+
+        Route::middleware(['auth', 'role:main_admin'])->group(function () {
+            Route::get('dashboard', [MainAdminDashboardController::class, 'index'])->name('main-admin.dashboard');
+            Route::post('logout', [LoginController::class, 'logout'])->name('main-admin.logout');
+        });
+    });
 
 // ===========================
 // TENANT (SCHOOL) ROUTES
