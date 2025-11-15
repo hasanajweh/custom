@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
             'superadmin' => \App\Http\Middleware\EnsureIsSuperAdmin::class,
             'active' => \App\Http\Middleware\CheckUserActive::class,
+            'match.school.network' => \App\Http\Middleware\EnsureSchoolNetworkMatch::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
