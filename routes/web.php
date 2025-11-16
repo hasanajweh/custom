@@ -498,8 +498,8 @@ Route::get('/manifest.json', function (Request $request) {
                 'icons' => [['src' => '/Scholder-192.png', 'sizes' => '192x192']]
             ],
             [
-                'name' => __('messages.dashboard', [], $locale),
-                'short_name' => __('messages.dashboard', [], $locale),
+                'name' => __('messages.dashboard.dashboard', [], $locale),
+                'short_name' => __('messages.dashboard.dashboard', [], $locale),
                 'description' => __('messages.go_to_dashboard', [], $locale),
                 'url' => "{$slugPrefix}/dashboard",
                 'icons' => [['src' => '/Scholder-192.png', 'sizes' => '192x192']]
