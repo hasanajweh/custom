@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Logging\SecurityLogger;
+use App\Models\Network;
 use App\Models\School;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
@@ -17,7 +18,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(School $school): View
+    public function create(Network $network, School $school): View
     {
         return view('auth.login', [
             'school' => $school
@@ -27,7 +28,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request, School $school): RedirectResponse
+    public function store(LoginRequest $request, Network $network, School $school): RedirectResponse
     {
         // Attempt authentication
         try {
@@ -131,7 +132,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request, School $school): RedirectResponse
+    public function destroy(Request $request, Network $network, School $school): RedirectResponse
     {
         // Simply logout without logging (method doesn't exist)
         Auth::guard('web')->logout();
