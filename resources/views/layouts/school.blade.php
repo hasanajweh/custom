@@ -1070,7 +1070,7 @@
 <!-- Chrome/Edge/Brave/Opera Install Banner -->
 <div id="pwaInstallBanner" class="pwa-install-banner">
     <div>
-        <div class="font-bold mb-1">Install {{ $school->name }}</div>
+        <div class="font-bold mb-1">Install {{ $schoolName }}</div>
         <div class="text-sm opacity-90">Quick access from your home screen or desktop</div>
     </div>
     <button id="pwaInstallBtn" class="pwa-install-btn">
@@ -1087,7 +1087,7 @@
         <div class="ios-share-icon">
             <i class="ri-share-box-line"></i>
         </div>
-        <div class="font-bold text-lg mb-2">Install {{ $school->name }}</div>
+        <div class="font-bold text-lg mb-2">Install {{ $schoolName }}</div>
         <div class="text-sm opacity-90 mb-3">
             Tap <strong>Share</strong> <i class="ri-share-box-line mx-1"></i> then <strong>"Add to Home Screen"</strong>
         </div>
@@ -1130,7 +1130,7 @@
                     <img src="/WayUp.png" alt="{{ __('messages.app.name') }}" class="logo-img">
                     <div class="brand-text">
                         <h1 class="brand-name font-heading">{{ __('messages.app.name') }}</h1>
-                        <span class="school-name">{{ $school->name }}</span>
+                        <span class="school-name">{{ $schoolName }}</span>
                     </div>
                 </div>
             </div>
@@ -1244,19 +1244,19 @@
 
                         <!-- Menu Items -->
                         <div class="py-1">
-                            <a href="{{ route('profile.edit', $school->slug) }}"
+                            <a href="{{ route('profile.edit', $schoolSlug) }}"
                                class="dropdown-item">
                                 <i class="ri-user-line text-gray-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
                                 <span>{{ __('messages.navigation.profile') }}</span>
                             </a>
 
                             @if(Auth::user()->role === 'admin')
-                                <a href="{{ route('school.admin.plan-management.index', $school->slug) }}"
+                                <a href="{{ route('school.admin.plan-management.index', $schoolSlug) }}"
                                    class="dropdown-item">
                                     <i class="ri-vip-crown-line text-yellow-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
                                     <span>{{ __('messages.subscription.current_plan') }}</span>
                                 </a>
-                                <a href="{{ route('school.admin.activity-logs.index', $school->slug) }}"
+                                <a href="{{ route('school.admin.activity-logs.index', $schoolSlug) }}"
                                    class="dropdown-item">
                                     <i class="ri-history-line text-indigo-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
                                     <span>{{ __('messages.navigation.activity_logs') }}</span>
@@ -1265,7 +1265,7 @@
 
                             <div class="border-t border-gray-100 my-1"></div>
 
-                            <form method="POST" action="{{ route('logout', $school->slug) }}">
+                            <form method="POST" action="{{ route('logout', $schoolSlug) }}">
                                 @csrf
                                 <button type="submit" class="dropdown-item text-red-600 w-full">
                                     <i class="ri-logout-box-line {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
@@ -1295,32 +1295,32 @@
 
     <div class="sidebar-content">
         <nav class="space-y-1">
-            <a href="{{ tenant_route('dashboard', $school) }}"
+            <a href="{{ tenant_route('dashboard', $schoolSlug) }}"
                class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <i class="ri-dashboard-3-line"></i>
                 <span class="sidebar-text">{{ __('messages.navigation.dashboard') }}</span>
             </span></a>
 
             @if(Auth::user()->role === 'admin')
-                <a href="{{ route('school.admin.users.index', $school->slug) }}"
+                <a href="{{ route('school.admin.users.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.users.*') ? 'active' : '' }}">
                     <i class="ri-team-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.manage_users') }}</span>
                 </span></a>
 
-                <a href="{{ route('school.admin.file-browser.index', $school->slug) }}"
+                <a href="{{ route('school.admin.file-browser.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.file-browser.*') ? 'active' : '' }}">
                     <i class="ri-folder-3-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.file_browser') }}</span>
                 </span></a>
 
-                <a href="{{ route('school.admin.plans.index', $school->slug) }}"
+                <a href="{{ route('school.admin.plans.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.plans.*') ? 'active' : '' }}">
                     <i class="ri-calendar-check-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.plans') }}</span>
                 </span></a>
 
-                <a href="{{ route('school.admin.supervisors.index', $school->slug) }}"
+                <a href="{{ route('school.admin.supervisors.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.supervisors.*') ? 'active' : '' }}">
                     <i class="ri-user-star-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.supervisors') }}</span>
@@ -1333,39 +1333,39 @@
                     </div>
                 </div>
 
-                <a href="{{ route('school.admin.subjects.index', $school->slug) }}"
+                <a href="{{ route('school.admin.subjects.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.subjects.*') ? 'active' : '' }}">
                     <i class="ri-book-2-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.subjects') }}</span>
                 </span></a>
 
-                <a href="{{ route('school.admin.grades.index', $school->slug) }}"
+                <a href="{{ route('school.admin.grades.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.grades.*') ? 'active' : '' }}">
                     <i class="ri-graduation-cap-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.grades') }}</span>
                 </span></a>
 
             @elseif(Auth::user()->role === 'teacher')
-                <a href="{{ route('teacher.files.index', $school->slug) }}"
+                <a href="{{ route('teacher.files.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('teacher.files.index') || request()->routeIs('teacher.files.show') ? 'active' : '' }}">
                     <i class="ri-file-list-3-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.my_files') }}</span>
                 </span></a>
 
-                <a href="{{ route('teacher.files.create', $school->slug) }}"
+                <a href="{{ route('teacher.files.create', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('teacher.files.create') ? 'active' : '' }}">
                     <i class="ri-upload-cloud-2-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.upload_file') }}</span>
                 </span></a>
 
             @elseif(Auth::user()->role === 'supervisor')
-                <a href="{{ route('supervisor.reviews.index', $school->slug) }}"
+                <a href="{{ route('supervisor.reviews.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('supervisor.reviews.*') ? 'active' : '' }}">
                     <i class="ri-file-search-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.review_files') }}</span>
                 </span></a>
 
-                <a href="{{ route('supervisor.files.create', $school->slug) }}"
+                <a href="{{ route('supervisor.files.create', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('supervisor.files.create') ? 'active' : '' }}">
                     <i class="ri-upload-cloud-2-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.upload_file') }}</span>
