@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Network;
+use App\Support\SchoolResolver;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,9 +16,16 @@ class EnsureSchoolNetworkMatch
     public function handle(Request $request, Closure $next): Response
     {
         $network = $request->route('network');
-        $school = $request->route('school');
+        $school = SchoolResolver::resolve($request->route('school'));
 
-        if ($network && $school && $school->network_id !== $network->id) {
+        $networkModel = $network instanceof Network
+            ? $network
+            : Network::where(
+                is_numeric($network) ? 'id' : 'slug',
+                $network
+            )->first();
+
+        if ($networkModel && $school && $school->network_id !== $networkModel->id) {
             abort(404);
         }
 
