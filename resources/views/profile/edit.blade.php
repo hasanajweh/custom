@@ -51,7 +51,7 @@
                         <p class="text-sm text-gray-600 mt-1">{{ __('messages.profile.update_profile_info') }}</p>
                     </div>
 
-                    <form method="POST" action="{{ route('profile.update', ['network' => $networkSlug, 'school' => $school->slug]) }}" class="p-6 space-y-6">
+                    <form method="POST" action="{{ route('profile.update', ['school' => $school->slug]) }}" class="p-6 space-y-6">
                         @csrf
                         @method('PATCH')
 
@@ -101,7 +101,7 @@
                         <p class="text-sm text-gray-600 mt-1">{{ __('messages.profile.ensure_long_password') }}</p>
                     </div>
 
-                    <form method="POST" action="{{ route('profile.password.update', ['network' => $networkSlug, 'school' => $school->slug]) }}" class="p-6 space-y-6">
+                    <form method="POST" action="{{ route('profile.password.update', ['school' => $school->slug]) }}" class="p-6 space-y-6">
                         @csrf
                         @method('PATCH')
 

@@ -14,31 +14,19 @@ class ProfileController extends Controller
     public function edit(Request $request)
     {
         $schoolSlug = $request->route('school');
-        $networkParam = $request->route('network');
-
         $school = is_string($schoolSlug)
             ? School::where('slug', $schoolSlug)->firstOrFail()
             : $schoolSlug;
 
-        $networkSlug = is_string($networkParam)
-            ? $networkParam
-            : $networkParam->slug;
-
-        return view('profile.edit', compact('school', 'networkSlug'));
+        return view('profile.edit', compact('school'));
     }
 
     public function update(Request $request)
     {
         $schoolSlug = $request->route('school');
-        $networkParam = $request->route('network');
-
         $school = is_string($schoolSlug)
             ? School::where('slug', $schoolSlug)->firstOrFail()
             : $schoolSlug;
-
-        $networkSlug = is_string($networkParam)
-            ? $networkParam
-            : $networkParam->slug;
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -51,25 +39,16 @@ class ProfileController extends Controller
             'email' => $request->email,
         ]);
 
-        return redirect()->route('profile.edit', [
-            'network' => $networkSlug,
-            'school' => $school->slug,
-        ])
+        return redirect()->route('profile.edit', ['school' => $school->slug])
             ->with('success', 'Profile updated successfully.');
     }
 
     public function updatePassword(Request $request)
     {
         $schoolSlug = $request->route('school');
-        $networkParam = $request->route('network');
-
         $school = is_string($schoolSlug)
             ? School::where('slug', $schoolSlug)->firstOrFail()
             : $schoolSlug;
-
-        $networkSlug = is_string($networkParam)
-            ? $networkParam
-            : $networkParam->slug;
 
         $request->validate([
             'current_password' => ['required', 'current_password'],
@@ -80,10 +59,7 @@ class ProfileController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        return redirect()->route('profile.edit', [
-            'network' => $networkSlug,
-            'school' => $school->slug,
-        ])
+        return redirect()->route('profile.edit', ['school' => $school->slug])
             ->with('success', 'Password updated successfully.');
     }
 }
