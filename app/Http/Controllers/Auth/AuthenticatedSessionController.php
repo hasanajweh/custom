@@ -43,6 +43,23 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
+        if ($user->role === 'main_admin') {
+            if ($user->network_id !== $school->network_id) {
+                Auth::logout();
+
+                return back()->withErrors([
+                    'email' => 'This account does not manage the selected network.',
+                ])->withInput($request->only('email'));
+            }
+
+            SecurityLogger::logSuccessfulLogin($user);
+            $user->updateLastLogin();
+            $request->session()->regenerate();
+            Auth::login($user, true);
+
+            return redirect()->route('main-admin.dashboard', $user->network?->slug);
+        }
+
         // Check if user belongs to this school
         if ($user->school_id !== $school->id) {
             SecurityLogger::logTenantIsolationBreach($school->id, $user->school_id);

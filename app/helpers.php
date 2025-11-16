@@ -28,6 +28,24 @@ if (!function_exists('formatBytes')) {
     }
 }
 
+if (!function_exists('getInitials')) {
+    /**
+     * Get the initials from a full name string
+     */
+    function getInitials(string $name): string
+    {
+        $parts = preg_split('/\s+/', trim($name));
+
+        if (!$parts) {
+            return '';
+        }
+
+        $initials = array_map(fn ($part) => mb_substr($part, 0, 1), $parts);
+
+        return mb_strtoupper(implode('', array_slice($initials, 0, 2)));
+    }
+}
+
 if (!function_exists('tenant_route')) {
     /**
      * Generate a tenant-aware route with network and school parameters.

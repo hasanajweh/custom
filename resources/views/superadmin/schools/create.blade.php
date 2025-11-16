@@ -24,6 +24,123 @@
         <form method="POST" action="{{ route('superadmin.schools.store') }}" id="createSchoolForm">
             @csrf
 
+            <!-- Network Details -->
+            <div class="glass rounded-lg p-6 mb-6">
+                <h2 class="text-xl font-semibold text-white mb-6 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9-4 9 4-9 4-9-4zm0 0v10l9 4 9-4V7" />
+                    </svg>
+                    Network
+                </h2>
+
+                <div class="space-y-4" id="networkSection">
+                    <div class="flex flex-wrap gap-4">
+                        <label class="flex items-center space-x-2 text-gray-200">
+                            <input type="radio" name="network_mode" value="existing"
+                                   {{ old('network_mode', $networks->isNotEmpty() ? 'existing' : 'new') === 'existing' ? 'checked' : '' }}
+                                   {{ $networks->isEmpty() ? 'disabled' : '' }}
+                                   class="text-indigo-500 border-gray-600 bg-gray-800 focus:ring-indigo-500">
+                            <span>Use existing network</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-200">
+                            <input type="radio" name="network_mode" value="new"
+                                   {{ old('network_mode', $networks->isNotEmpty() ? 'existing' : 'new') === 'new' ? 'checked' : '' }}
+                                   class="text-indigo-500 border-gray-600 bg-gray-800 focus:ring-indigo-500">
+                            <span>Create new network</span>
+                        </label>
+                    </div>
+
+                    <div class="existing-network space-y-3 {{ old('network_mode', $networks->isNotEmpty() ? 'existing' : 'new') === 'existing' ? '' : 'hidden' }}">
+                        <label for="network_id" class="block text-sm font-medium text-gray-300">Select Network</label>
+                        <select name="network_id" id="network_id"
+                                class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500">
+                            <option value="">-- Choose network --</option>
+                            @foreach($networks as $network)
+                                <option value="{{ $network->id }}" {{ old('network_id') == $network->id ? 'selected' : '' }}>
+                                    {{ $network->name }} ({{ $network->slug }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('network_id')
+                        <p class="text-sm text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="new-network space-y-4 {{ old('network_mode', $networks->isNotEmpty() ? 'existing' : 'new') === 'new' ? '' : 'hidden' }}">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="network_name" class="block text-sm font-medium text-gray-300 mb-2">
+                                    Network Name <span class="text-red-400">*</span>
+                                </label>
+                                <input type="text" name="network_name" id="network_name" value="{{ old('network_name') }}"
+                                       placeholder="Latin Schools"
+                                       class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500">
+                                @error('network_name')
+                                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="network_slug" class="block text-sm font-medium text-gray-300 mb-2">
+                                    Network Slug <span class="text-red-400">*</span>
+                                </label>
+                                <input type="text" name="network_slug" id="network_slug" value="{{ old('network_slug') }}"
+                                       placeholder="latin"
+                                       class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500">
+                                <p class="text-xs text-gray-500 mt-1">Used in the main admin login URL.</p>
+                                @error('network_slug')
+                                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="main_admin_name" class="block text-sm font-medium text-gray-300 mb-2">
+                                    Main Admin Name <span class="text-red-400">*</span>
+                                </label>
+                                <input type="text" name="main_admin_name" id="main_admin_name" value="{{ old('main_admin_name') }}"
+                                       placeholder="Network Owner"
+                                       class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500">
+                                @error('main_admin_name')
+                                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="main_admin_email" class="block text-sm font-medium text-gray-300 mb-2">
+                                    Main Admin Email <span class="text-red-400">*</span>
+                                </label>
+                                <input type="email" name="main_admin_email" id="main_admin_email" value="{{ old('main_admin_email') }}"
+                                       placeholder="owner@network.com"
+                                       class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500">
+                                @error('main_admin_email')
+                                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="main_admin_password" class="block text-sm font-medium text-gray-300 mb-2">
+                                    Main Admin Password <span class="text-red-400">*</span>
+                                </label>
+                                <input type="password" name="main_admin_password" id="main_admin_password"
+                                       class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500">
+                                @error('main_admin_password')
+                                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="main_admin_password_confirmation" class="block text-sm font-medium text-gray-300 mb-2">
+                                    Confirm Password <span class="text-red-400">*</span>
+                                </label>
+                                <input type="password" name="main_admin_password_confirmation" id="main_admin_password_confirmation"
+                                       class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- School Details -->
             <div class="glass rounded-lg p-6 mb-6">
                 <h2 class="text-xl font-semibold text-white mb-6 flex items-center">
@@ -71,71 +188,24 @@
                 </div>
             </div>
 
-            <!-- Plan Selection -->
+            <!-- Plan Details -->
             <div class="glass rounded-lg p-6 mb-6">
                 <h2 class="text-xl font-semibold text-white mb-4 flex items-center">
                     <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                     </svg>
-                    Subscription Plan <span class="text-red-400 ml-1">*</span>
+                    Branches Plan (auto-assigned)
                 </h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @forelse($plans as $plan)
-                        <label for="plan_{{ $plan->id }}"
-                               class="plan-option block border-2 rounded-lg transition cursor-pointer {{ $loop->first ? 'border-indigo-500 bg-indigo-900 bg-opacity-20' : 'border-gray-700 hover:border-gray-600' }}">
-                            <div class="p-4">
-                                <div class="flex items-center justify-between mb-3">
-                                    <input type="radio"
-                                           name="plan_id"
-                                           id="plan_{{ $plan->id }}"
-                                           value="{{ $plan->id }}"
-                                           {{ old('plan_id') == $plan->id ? 'checked' : ($loop->first && !old('plan_id') ? 'checked' : '') }}
-                                           required
-                                           class="w-5 h-5 text-indigo-600 bg-gray-800 border-gray-600 focus:ring-indigo-500">
-                                    <div class="check-icon {{ $loop->first ? '' : 'hidden' }}">
-                                        <svg class="w-6 h-6 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-
-                                <h3 class="text-lg font-bold text-white mb-1">{{ $plan->name }}</h3>
-                                <p class="text-sm text-gray-400 mb-3">{{ $plan->storage_limit_in_gb }} GB Storage</p>
-
-                                <div class="text-2xl font-bold text-indigo-400 mb-1">
-                                    ${{ number_format($plan->price_monthly / 100, 2) }}
-                                </div>
-                                <p class="text-xs text-gray-400">per month</p>
-
-                                @if($plan->features && is_array($plan->features) && count($plan->features) > 0)
-                                    <div class="mt-3 space-y-1">
-                                        @foreach(array_slice($plan->features, 0, 2) as $feature)
-                                            <div class="flex items-center text-xs text-gray-300">
-                                                <svg class="w-3 h-3 mr-1 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                                </svg>
-                                                <span>{{ $feature }}</span>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
-                            </div>
-                        </label>
-                    @empty
-                        <div class="col-span-full text-center py-8 bg-red-900/20 border border-red-500 rounded-lg">
-                            <p class="text-red-300 mb-4">No plans available. Please create a plan first.</p>
-                            <a href="{{ route('superadmin.plans.create') }}"
-                               class="inline-block px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg">
-                                Create Plan
-                            </a>
+                <div class="p-4 border border-gray-700 rounded-lg bg-gray-800/60">
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <h3 class="text-lg font-bold text-white">{{ $plan->name }}</h3>
+                            <p class="text-sm text-gray-400">{{ $plan->storage_limit_in_gb }} GB Storage</p>
                         </div>
-                    @endforelse
+                        <span class="px-3 py-1 rounded-full bg-green-900 text-green-200 text-xs">Included</span>
+                    </div>
+                    <p class="text-sm text-gray-300">This school will automatically use the Branches Plan for unlimited branch creation.</p>
                 </div>
-
-                @error('plan_id')
-                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
-                @enderror
             </div>
 
             <!-- Admin User Credentials -->
@@ -272,39 +342,32 @@
         document.addEventListener('DOMContentLoaded', function() {
             const nameInput = document.getElementById('school_name');
             const slugInput = document.getElementById('school_slug');
-            const planRadios = document.querySelectorAll('input[name="plan_id"]');
+            const networkNameInput = document.getElementById('network_name');
+            const networkSlugInput = document.getElementById('network_slug');
+            const modeRadios = document.querySelectorAll('input[name="network_mode"]');
+            const existingBlock = document.querySelector('.existing-network');
+            const newBlock = document.querySelector('.new-network');
 
-            // Auto-generate slug from name
+            const toSlug = (value) => value
+                .toLowerCase()
+                .trim()
+                .replace(/[^\w\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-');
+
             nameInput.addEventListener('input', function(e) {
-                const slug = e.target.value
-                    .toLowerCase()
-                    .trim()
-                    .replace(/[^\w\s-]/g, '')
-                    .replace(/\s+/g, '-')
-                    .replace(/-+/g, '-');
-                slugInput.value = slug;
+                slugInput.value = toSlug(e.target.value);
             });
 
-            // Plan selection visual feedback
-            planRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    // Remove selection from all
-                    document.querySelectorAll('.plan-option').forEach(option => {
-                        option.classList.remove('border-indigo-500', 'bg-indigo-900', 'bg-opacity-20');
-                        option.classList.add('border-gray-700');
-                        option.querySelector('.check-icon')?.classList.add('hidden');
-                    });
+            networkNameInput?.addEventListener('input', function(e) {
+                networkSlugInput.value = toSlug(e.target.value);
+            });
 
-                    // Add to selected
-                    const selected = this.closest('.plan-option');
-                    if (selected) {
-                        selected.classList.add('border-indigo-500', 'bg-indigo-900', 'bg-opacity-20');
-                        selected.classList.remove('border-gray-700');
-                        const checkIcon = selected.querySelector('.check-icon');
-                        if (checkIcon) {
-                            checkIcon.classList.remove('hidden');
-                        }
-                    }
+            modeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const isExisting = this.value === 'existing';
+                    existingBlock.classList.toggle('hidden', !isExisting);
+                    newBlock.classList.toggle('hidden', isExisting);
                 });
             });
         });
