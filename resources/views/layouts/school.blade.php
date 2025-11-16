@@ -4,7 +4,16 @@
     @php
         $school ??= Auth::user()->school ?? null;
         $schoolName = $school->name ?? config('app.name');
-        $schoolSlug = $school->slug ?? '';
+
+        // Ensure tenant parameters are always available, even if the user or school
+        // context is not fully hydrated when this layout renders.
+        $schoolSlug = $school->slug
+            ?? request()->route('school')
+            ?? '';
+
+        $networkSlug = $school->network->slug
+            ?? request()->route('network')
+            ?? '';
     @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
@@ -1244,7 +1253,13 @@
 
                         <!-- Menu Items -->
                         <div class="py-1">
-                            <a href="{{ route('profile.edit', $schoolSlug) }}"
+                            @php
+                                $profileEditUrl = ($networkSlug !== '' && $schoolSlug !== '')
+                                    ? route('profile.edit', ['network' => $networkSlug, 'school' => $schoolSlug])
+                                    : '#';
+                            @endphp
+
+                            <a href="{{ $profileEditUrl }}"
                                class="dropdown-item">
                                 <i class="ri-user-line text-gray-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
                                 <span>{{ __('messages.navigation.profile') }}</span>
