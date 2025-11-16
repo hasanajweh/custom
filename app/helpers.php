@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Network;
 use App\Models\School;
 
 /**
@@ -50,8 +51,34 @@ if (!function_exists('tenant_route')) {
     /**
      * Generate a tenant-aware route with network and school parameters.
      */
-    function tenant_route(string $name, $school, array $parameters = [], bool $absolute = true): string
+    function tenant_route(string $name, $school = null, array $parameters = [], bool $absolute = true): string
     {
+        $user = auth()->user();
+
+        // Main Admin routes only need the network slug
+        if ($user && $user->isMainAdmin()) {
+            $network = match (true) {
+                $school instanceof Network => $school,
+                is_string($school) => Network::where('slug', $school)->first(),
+                default => $user->network,
+            };
+
+            if (! $network) {
+                throw new \InvalidArgumentException('Network is required to generate main admin routes.');
+            }
+
+            return route(
+                $name,
+                array_merge([
+                    'network' => $network->slug,
+                ], $parameters),
+                $absolute,
+            );
+        }
+
+        // Branch users must always include both network and school
+        $school = $school ?: $user?->school;
+
         if (is_string($school)) {
             $school = School::where('slug', $school)->firstOrFail();
         }
@@ -60,7 +87,7 @@ if (!function_exists('tenant_route')) {
             throw new \InvalidArgumentException('Invalid school object or slug.');
         }
 
-        $network = $school->network;
+        $network = $school->network ?? $user?->network;
 
         if (! $network) {
             throw new \InvalidArgumentException('School must belong to a network to generate tenant routes.');

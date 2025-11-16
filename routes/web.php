@@ -156,17 +156,18 @@ Route::post('/impersonate/leave', [ImpersonationController::class, 'stop'])
 // MAIN ADMIN ROUTES
 // ===========================
 Route::prefix('{network:slug}/main-admin')
+    ->as('main-admin.')
     ->middleware(['setlocale'])
     ->scopeBindings()
     ->group(function () {
         Route::middleware('guest')->group(function () {
-            Route::get('login', [LoginController::class, 'showLoginForm'])->name('main-admin.login');
+            Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
             Route::post('login', [LoginController::class, 'login']);
         });
 
         Route::middleware(['auth', 'role:main_admin'])->group(function () {
-            Route::get('dashboard', [MainAdminDashboardController::class, 'index'])->name('main-admin.dashboard');
-            Route::post('logout', [LoginController::class, 'logout'])->name('main-admin.logout');
+            Route::get('dashboard', [MainAdminDashboardController::class, 'index'])->name('dashboard');
+            Route::post('logout', [LoginController::class, 'logout'])->name('logout');
         });
     });
 

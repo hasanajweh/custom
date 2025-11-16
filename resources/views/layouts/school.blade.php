@@ -5,7 +5,8 @@
         $school ??= Auth::user()->school ?? null;
         $schoolName = $school->name ?? config('app.name');
         $schoolSlug = $school->slug ?? '';
-        $networkSlug = $school->network->slug ?? '';
+        $networkSlug = $school->network->slug ?? Auth::user()?->network?->slug ?? '';
+        $isMainAdmin = Auth::user()?->isMainAdmin();
     @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
@@ -1246,8 +1247,13 @@
                         <!-- Menu Items -->
                         <div class="py-1">
                             @php
-                                $profileUrl = $school ? tenant_route('profile.edit', $school) : '#';
-                                $logoutUrl = $school ? tenant_route('logout', $school) : '#';
+                                if ($isMainAdmin) {
+                                    $profileUrl = tenant_route('main-admin.dashboard');
+                                    $logoutUrl = route('main-admin.logout', $networkSlug);
+                                } else {
+                                    $profileUrl = $school ? tenant_route('profile.edit', $school) : '#';
+                                    $logoutUrl = $school ? tenant_route('logout', $school) : '#';
+                                }
                             @endphp
                             <a href="{{ $profileUrl }}"
                                class="dropdown-item">
@@ -1300,7 +1306,12 @@
 
     <div class="sidebar-content">
         <nav class="space-y-1">
-            <a href="{{ tenant_route('dashboard', $schoolSlug) }}"
+            @php
+                $dashboardUrl = $isMainAdmin
+                    ? tenant_route('main-admin.dashboard')
+                    : tenant_route('dashboard', $schoolSlug);
+            @endphp
+            <a href="{{ $dashboardUrl }}"
                class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <i class="ri-dashboard-3-line"></i>
                 <span class="sidebar-text">{{ __('messages.navigation.dashboard') }}</span>
