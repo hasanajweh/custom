@@ -39,7 +39,7 @@ class ProfileController extends Controller
             'email' => $request->email,
         ]);
 
-        return redirect()->route('profile.edit', ['school' => $school->slug])
+        return redirect()->to(tenant_route('profile.edit', $school))
             ->with('success', 'Profile updated successfully.');
     }
 
@@ -59,7 +59,7 @@ class ProfileController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        return redirect()->route('profile.edit', ['school' => $school->slug])
+        return redirect()->to(tenant_route('profile.edit', $school))
             ->with('success', 'Password updated successfully.');
     }
 }
