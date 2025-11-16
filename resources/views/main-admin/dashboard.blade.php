@@ -1,6 +1,6 @@
 @extends('layouts.school')
 
-@section('title', __('messages.dashboard'))
+@section('title', __('messages.dashboard.dashboard'))
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
