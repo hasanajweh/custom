@@ -19,6 +19,10 @@ class EnsureUserHasRole
 
         $allowedRoles = $this->normalizeRoles($roles);
 
+        if (in_array('admin', $allowedRoles, true) && $user->role === 'main_admin') {
+            return $next($request);
+        }
+
         if (empty($allowedRoles) || ! in_array($user->role, $allowedRoles, true)) {
             abort(403);
         }

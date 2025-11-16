@@ -23,8 +23,11 @@ class ValidateSchoolAccess
                     abort(403, 'This school is currently inactive.');
                 }
 
-                // Check if user belongs to this school (unless super admin)
-                if ($user && !$user->is_super_admin && $user->school_id !== $school->id) {
+                if ($user && $user->role === 'main_admin') {
+                    if ($user->network_id !== $school->network_id) {
+                        abort(403, 'You do not manage this network.');
+                    }
+                } elseif ($user && !$user->is_super_admin && $user->school_id !== $school->id) {
                     abort(403, 'You do not have access to this school.');
                 }
 

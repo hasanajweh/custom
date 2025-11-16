@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'mainadmin@example.com'],
             [
                 'name' => 'Latin Main Admin',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('12345678'),
                 'role' => 'main_admin',
                 'network_id' => $network->id,
                 'is_main_admin' => true,
@@ -80,7 +80,7 @@ class DatabaseSeeder extends Seeder
                 ['email' => $branchData['slug'] . '@example.com'],
                 [
                     'name' => $branchData['name'] . ' Admin',
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make('12345678'),
                     'role' => 'admin',
                     'school_id' => $school->id,
                     'network_id' => $network->id,

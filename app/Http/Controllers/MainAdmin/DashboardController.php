@@ -7,11 +7,14 @@ use App\Models\FileSubmission;
 use App\Models\Network;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\App;
 
 class DashboardController extends Controller
 {
     public function index(Network $network): View
     {
+        App::setLocale('ar');
+
         $branches = $network->branches()->withCount([
             'users as admins_count' => function ($query) {
                 $query->where('role', 'admin');
