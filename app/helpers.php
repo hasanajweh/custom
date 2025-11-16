@@ -95,6 +95,23 @@ if (!function_exists('getAvatarColor')) {
     }
 }
 
+if (!function_exists('getRoleBadgeClass')) {
+    /**
+     * Get consistent Tailwind classes for displaying role badges
+     */
+    function getRoleBadgeClass(string $role): string
+    {
+        $roleStyles = [
+            'admin' => 'bg-purple-900 text-purple-200',
+            'teacher' => 'bg-blue-900 text-blue-200',
+            'supervisor' => 'bg-green-900 text-green-200',
+            'secretary' => 'bg-amber-900 text-amber-200',
+        ];
+
+        return $roleStyles[$role] ?? 'bg-gray-800 text-gray-200';
+    }
+}
+
 if (!function_exists('isRtl')) {
     /**
      * Check if current locale is RTL
