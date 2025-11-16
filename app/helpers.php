@@ -50,8 +50,16 @@ if (!function_exists('tenant_route')) {
     /**
      * Generate a tenant-aware route with network and school parameters.
      */
-    function tenant_route(string $name, School $school, array $parameters = [], bool $absolute = true): string
+    function tenant_route(string $name, $school, array $parameters = [], bool $absolute = true): string
     {
+        if (is_string($school)) {
+            $school = School::where('slug', $school)->firstOrFail();
+        }
+
+        if (! $school instanceof School) {
+            throw new \InvalidArgumentException('Invalid school object or slug.');
+        }
+
         $network = $school->network;
 
         if (! $network) {
