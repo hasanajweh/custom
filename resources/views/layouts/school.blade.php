@@ -5,6 +5,7 @@
         $school ??= Auth::user()->school ?? null;
         $schoolName = $school->name ?? config('app.name');
         $schoolSlug = $school->slug ?? '';
+        $networkSlug = $school->network->slug ?? '';
     @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
@@ -1244,7 +1245,7 @@
 
                         <!-- Menu Items -->
                         <div class="py-1">
-                            <a href="{{ route('profile.edit', $schoolSlug) }}"
+                            <a href="{{ route('profile.edit', ['network' => $networkSlug, 'school' => $schoolSlug]) }}"
                                class="dropdown-item">
                                 <i class="ri-user-line text-gray-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
                                 <span>{{ __('messages.navigation.profile') }}</span>
