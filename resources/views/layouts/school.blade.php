@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" class="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
+    @php
+        $school ??= Auth::user()->school ?? null;
+        $schoolName = $school->name ?? config('app.name');
+        $schoolSlug = $school->slug ?? '';
+    @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -11,12 +16,12 @@
 
     <!-- Core PWA -->
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="{{ $school->name }}">
+    <meta name="application-name" content="{{ $schoolName }}">
 
     <!-- iOS Safari - CRITICAL FOR iOS PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="{{ $school->name }}">
+    <meta name="apple-mobile-web-app-title" content="{{ $schoolName }}">
     <meta name="apple-touch-fullscreen" content="yes">
 
     <!-- iOS Splash Screens - iPhone (Most Common Models) -->
@@ -45,10 +50,10 @@
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1E40AF">
 
     <!-- Description & Keywords -->
-    <meta name="description" content="Educational platform for {{ $school->name }} - Manage files, assignments, and resources">
-    <meta name="keywords" content="education, {{ $school->name }}, learning, teaching, resources">
+    <meta name="description" content="Educational platform for {{ $schoolName }} - Manage files, assignments, and resources">
+    <meta name="keywords" content="education, {{ $schoolName }}, learning, teaching, resources">
 
-    <title>@yield('title', $school->name . ' - ' . __('messages.app.name'))</title>
+    <title>@yield('title', $schoolName . ' - ' . __('messages.app.name'))</title>
 
     <!-- ============================================ -->
     <!-- ICONS - ALL PLATFORMS & SIZES -->
@@ -79,7 +84,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="/Scholder-512.png">
 
     <!-- Web App Manifest - UNIVERSAL -->
-    <link rel="manifest" href="{{ url('/manifest.json?school=' . Auth::user()->school->slug) }}">
+    <link rel="manifest" href="{{ url('/manifest.json' . ($schoolSlug ? '?school=' . $schoolSlug : '')) }}">
 
     <!-- Enhanced Font Loading with Language Support -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
