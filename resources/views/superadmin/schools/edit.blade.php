@@ -4,8 +4,7 @@
 
 @section('content')
     <div class="max-w-5xl mx-auto space-y-6" x-data="{
-    storageGB: {{ old('storage_limit_gb', $school->storage_limit / 1073741824) }},
-    selectedPlan: {{ old('plan_id', $currentSubscription?->plan_id ?? 'null') }}
+    storageGB: {{ old('storage_limit_gb', $school->storage_limit / 1073741824) }}
 }">
         <!-- Page Header -->
         <div>
@@ -105,6 +104,21 @@
                 </div>
 
                 <div class="mt-6">
+                    <label for="network_id" class="block text-sm font-medium text-gray-300 mb-2">Network</label>
+                    <select name="network_id" id="network_id"
+                            class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500">
+                        @foreach($networks as $network)
+                            <option value="{{ $network->id }}" {{ old('network_id', $school->network_id) == $network->id ? 'selected' : '' }}>
+                                {{ $network->name }} ({{ $network->slug }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('network_id')
+                    <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mt-6">
                     <label class="flex items-center p-3 rounded-lg border border-gray-700 hover:bg-gray-800 transition cursor-pointer">
                         <input type="checkbox"
                                name="is_active"
@@ -191,42 +205,17 @@
                     </div>
                 @endif
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    @foreach($plans as $plan)
-                        <label @click="selectedPlan = {{ $plan->id }}"
-                               :class="{ 'ring-2 ring-indigo-500 border-indigo-500': selectedPlan === {{ $plan->id }} }"
-                               class="relative flex flex-col cursor-pointer rounded-xl border border-gray-700 bg-gray-800 p-4 hover:border-gray-600 transition-all">
-                            <input type="radio" name="plan_id" value="{{ $plan->id }}" class="sr-only" x-model="selectedPlan">
-
-                            <div x-show="selectedPlan === {{ $plan->id }}"
-                                 class="absolute -top-2 -right-2 bg-indigo-600 text-white rounded-full p-1.5">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-
-                            <h3 class="text-base font-bold text-white mb-2">{{ $plan->name }}</h3>
-
-                            <div class="mb-3">
-                                <div class="flex items-baseline">
-                                    <span class="text-2xl font-bold text-white">${{ number_format($plan->price_monthly / 100, 2) }}</span>
-                                    <span class="text-gray-400 ml-1 text-xs">/mo</span>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center text-xs text-gray-400">
-                                <svg class="w-4 h-4 text-indigo-400 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7"></path>
-                                </svg>
-                                {{ $plan->storage_limit_in_gb }} GB
-                            </div>
-                        </label>
-                    @endforeach
+                <div class="p-4 border border-gray-700 rounded-lg bg-gray-800/60">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-400">Assigned Plan</p>
+                            <p class="text-lg font-semibold text-white">{{ $currentSubscription?->plan?->name ?? $plans->first()->name }}</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-green-900 text-green-200 text-xs">Branches Plan</span>
+                    </div>
+                    <p class="text-sm text-gray-300 mt-3">Plan changes are locked to the Branches Plan to keep all branches consistent.</p>
+                    <input type="hidden" name="plan_id" value="{{ $plans->first()->id }}">
                 </div>
-
-                <p class="mt-4 text-sm text-gray-500">
-                    Changing the plan will update the subscription. The new plan will take effect immediately.
-                </p>
             </div>
 
             <!-- Actions -->
