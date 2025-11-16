@@ -68,7 +68,10 @@
                             </form>
                         @elseif (isset($school))
                             {{-- Tenant User Links --}}
-                            <x-dropdown-link :href="route('profile.edit', ['school' => $school->slug])">
+                            <x-dropdown-link :href="route('profile.edit', [
+                                'network' => $school->network->slug,
+                                'school' => $school->slug,
+                            ])">
                                 {{ __('My Profile') }}
                             </x-dropdown-link>
                             <form method="POST" action="{{ route('logout', ['school' => $school->slug]) }}">
