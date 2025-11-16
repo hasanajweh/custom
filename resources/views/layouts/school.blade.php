@@ -1245,7 +1245,11 @@
 
                         <!-- Menu Items -->
                         <div class="py-1">
-                            <a href="{{ route('profile.edit', ['network' => $networkSlug, 'school' => $schoolSlug]) }}"
+                            @php
+                                $profileUrl = $school ? tenant_route('profile.edit', $school) : '#';
+                                $logoutUrl = $school ? tenant_route('logout', $school) : '#';
+                            @endphp
+                            <a href="{{ $profileUrl }}"
                                class="dropdown-item">
                                 <i class="ri-user-line text-gray-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
                                 <span>{{ __('messages.navigation.profile') }}</span>
@@ -1266,7 +1270,7 @@
 
                             <div class="border-t border-gray-100 my-1"></div>
 
-                            <form method="POST" action="{{ route('logout', $schoolSlug) }}">
+                            <form method="POST" action="{{ $logoutUrl }}">
                                 @csrf
                                 <button type="submit" class="dropdown-item text-red-600 w-full">
                                     <i class="ri-logout-box-line {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>

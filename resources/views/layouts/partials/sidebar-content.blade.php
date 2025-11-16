@@ -68,12 +68,16 @@
                             </form>
                         @elseif (isset($school))
                             {{-- Tenant User Links --}}
-                            <x-dropdown-link :href="route('profile.edit', ['school' => $school->slug])">
+                            @php
+                                $profileUrl = $school ? tenant_route('profile.edit', $school) : '#';
+                                $logoutUrl = $school ? tenant_route('logout', $school) : '#';
+                            @endphp
+                            <x-dropdown-link :href="$profileUrl">
                                 {{ __('My Profile') }}
                             </x-dropdown-link>
-                            <form method="POST" action="{{ route('logout', ['school' => $school->slug]) }}">
+                            <form method="POST" action="{{ $logoutUrl }}">
                                 @csrf
-                                <x-dropdown-link :href="route('logout', ['school' => $school->slug])" onclick="event.preventDefault(); this.closest('form').submit();">
+                                <x-dropdown-link :href="$logoutUrl" onclick="event.preventDefault(); this.closest('form').submit();">
                                     {{ __('Log Out') }}
                                 </x-dropdown-link>
                             </form>
