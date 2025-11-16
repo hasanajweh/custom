@@ -30,6 +30,18 @@ class VerifyTenantAccess
 
         $networkId = $network instanceof Network ? $network->id : null;
 
+        if ($user && $user->role === 'main_admin') {
+            if ($networkId && $user->network_id !== $networkId) {
+                abort(403, 'Unauthorized access to this network.');
+            }
+
+            if ($school && $school->network_id !== $user->network_id) {
+                abort(403, 'Unauthorized access to this school.');
+            }
+
+            return $next($request);
+        }
+
         if ($network && $school && $school->network_id !== $networkId) {
             abort(404);
         }
