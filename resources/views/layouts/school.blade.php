@@ -1312,12 +1312,37 @@
                     : tenant_route('dashboard', $schoolSlug);
             @endphp
             <a href="{{ $dashboardUrl }}"
-               class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+               class="sidebar-item {{ request()->routeIs('dashboard') || request()->routeIs('main-admin.dashboard') ? 'active' : '' }}">
                 <i class="ri-dashboard-3-line"></i>
                 <span class="sidebar-text">{{ __('messages.navigation.dashboard') }}</span>
             </span></a>
 
-            @if(Auth::user()->role === 'admin')
+            @if($isMainAdmin)
+                <div class="sidebar-divider">
+                    <div class="sidebar-divider-line"></div>
+                    <div class="sidebar-divider-title">
+                        {{ __('messages.main_admin.navigation.section') }}
+                    </div>
+                </div>
+
+                <a href="{{ tenant_route('main-admin.users.index') }}"
+                   class="sidebar-item {{ request()->routeIs('main-admin.users.*') ? 'active' : '' }}">
+                    <i class="ri-team-line"></i>
+                    <span class="sidebar-text">{{ __('messages.main_admin.navigation.users') }}</span>
+                </span></a>
+
+                <a href="{{ tenant_route('main-admin.hierarchy') }}"
+                   class="sidebar-item {{ request()->routeIs('main-admin.hierarchy') ? 'active' : '' }}">
+                    <i class="ri-git-branch-line"></i>
+                    <span class="sidebar-text">{{ __('messages.main_admin.navigation.hierarchy') }}</span>
+                </span></a>
+
+                <a href="{{ tenant_route('main-admin.subjects-grades') }}"
+                   class="sidebar-item {{ request()->routeIs('main-admin.subjects-grades*') ? 'active' : '' }}">
+                    <i class="ri-book-2-line"></i>
+                    <span class="sidebar-text">{{ __('messages.main_admin.navigation.subjects_grades') }}</span>
+                </span></a>
+            @elseif(Auth::user()->role === 'admin')
                 <a href="{{ route('school.admin.users.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.users.*') ? 'active' : '' }}">
                     <i class="ri-team-line"></i>
