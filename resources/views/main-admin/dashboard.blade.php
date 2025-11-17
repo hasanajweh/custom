@@ -40,7 +40,7 @@
                         <p class="text-sm text-gray-500">{{ $branch->city ?? __('messages.city_not_set') }}</p>
                     </div>
                     <span class="px-2 py-1 text-xs rounded-full {{ $branch->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600' }}">
-                        {{ $branch->is_active ? __('messages.active') : __('messages.archived') }}
+                        {{ $branch->is_active ? __('messages.status.active') : __('messages.status.archived') }}
                     </span>
                 </div>
 

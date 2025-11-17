@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Subject extends Model {
     use HasFactory, BelongsToTenant, SoftDeletes;
 
-    protected $fillable = ['name', 'school_id']; // Make sure school_id is fillable
+    protected $fillable = ['name', 'school_id', 'network_id']; // Make sure school_id is fillable
 
     /**
      * Get all file submissions for this subject
@@ -29,5 +29,15 @@ class Subject extends Model {
         return $this->belongsToMany(User::class)
             ->withPivot('school_id')
             ->withTimestamps();
+    }
+
+    public function schools(): BelongsToMany
+    {
+        return $this->belongsToMany(School::class, 'subject_school')->withTimestamps();
+    }
+
+    public function networks(): BelongsToMany
+    {
+        return $this->belongsToMany(Network::class, 'subject_network')->withTimestamps();
     }
 }

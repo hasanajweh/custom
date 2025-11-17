@@ -1134,6 +1134,7 @@ return [
         'name' => 'الاسم',
         'email' => 'البريد الإلكتروني',
         'password' => 'كلمة المرور',
+        'password_confirmation' => 'تأكيد كلمة المرور',
         'title' => 'العنوان',
         'description' => 'الوصف',
         'content' => 'المحتوى',
@@ -1234,4 +1235,45 @@ return [
     'submitted_at' => 'تاريخ الرفع',
     'plans_label' => 'الخطط',
     'last_72_hours_label' => 'آخر 72 ساعة',
+
+    'main_admin' => [
+        'navigation' => [
+            'section' => 'إدارة الشبكة',
+            'users' => 'مستخدمو الشبكة',
+            'hierarchy' => 'هيكل الشبكة',
+            'subjects_grades' => 'المواد والمراحل',
+        ],
+        'common' => [
+            'all' => 'الكل',
+            'confirm_archive' => 'هل أنت متأكد من أرشفة هذا العنصر؟',
+        ],
+        'users' => [
+            'title' => 'مستخدمو الشبكة',
+            'heading' => 'مستخدمو الشبكة',
+            'subtitle' => 'إدارة المستخدمين عبر جميع الفروع في هذه الشبكة.',
+            'add' => 'إضافة مستخدم',
+            'branch' => 'الفرع',
+            'role' => 'الدور',
+            'subject_grade_title' => 'المواد والمراحل (للمعلمين والمشرفين)',
+            'subjects_label' => 'المواد',
+            'grades_label' => 'المراحل الدراسية',
+            'create_title' => 'إنشاء مستخدم',
+            'edit_title' => 'تعديل المستخدم',
+            'empty' => 'لا يوجد مستخدمون.',
+        ],
+        'hierarchy' => [
+            'title' => 'هيكل الشبكة',
+            'heading' => 'الهيكل',
+        ],
+        'subjects_grades' => [
+            'title' => 'المواد والمراحل',
+            'heading' => 'المواد والمراحل',
+            'subtitle' => 'إدارة المواد والمراحل المشتركة عبر الفروع.',
+            'create_title' => 'إنشاء مادة أو مرحلة',
+            'type' => 'النوع',
+            'assign' => 'تعيين للفروع',
+            'existing_subjects' => 'المواد المتاحة',
+            'existing_grades' => 'المراحل المتاحة',
+        ],
+    ],
 ];

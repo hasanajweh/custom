@@ -1104,6 +1104,7 @@ return [
         'name' => 'Name',
         'email' => 'Email',
         'password' => 'Password',
+        'password_confirmation' => 'Confirm password',
         'title' => 'Title',
         'description' => 'Description',
         'content' => 'Content',
@@ -1208,6 +1209,47 @@ return [
     'submitted_at' => 'Submitted at',
     'plans_label' => 'Plans',
     'last_72_hours_label' => 'Last 72 hours',
+
+    'main_admin' => [
+        'navigation' => [
+            'section' => 'Network management',
+            'users' => 'Network users',
+            'hierarchy' => 'Network hierarchy',
+            'subjects_grades' => 'Subjects & grades',
+        ],
+        'common' => [
+            'all' => 'All',
+            'confirm_archive' => 'Are you sure you want to archive this item?',
+        ],
+        'users' => [
+            'title' => 'Network users',
+            'heading' => 'Network users',
+            'subtitle' => 'Manage users across all branches in this network.',
+            'add' => 'Add user',
+            'branch' => 'Branch',
+            'role' => 'Role',
+            'subject_grade_title' => 'Subjects and grades (for teachers and supervisors)',
+            'subjects_label' => 'Subjects',
+            'grades_label' => 'Grades',
+            'create_title' => 'Create user',
+            'edit_title' => 'Edit user',
+            'empty' => 'No users found.',
+        ],
+        'hierarchy' => [
+            'title' => 'Network hierarchy',
+            'heading' => 'Hierarchy',
+        ],
+        'subjects_grades' => [
+            'title' => 'Subjects & Grades',
+            'heading' => 'Subjects & Grades',
+            'subtitle' => 'Manage shared subjects and grades across branches.',
+            'create_title' => 'Create subject or grade',
+            'type' => 'Type',
+            'assign' => 'Assign to branches',
+            'existing_subjects' => 'Existing subjects',
+            'existing_grades' => 'Existing grades',
+        ],
+    ],
 ];
 
 
