@@ -23,15 +23,15 @@ return new class extends Migration
 
         if (Schema::hasColumn('subjects', 'network_id')) {
             DB::table('subjects')
-                ->whereNull('network_id')
                 ->join('schools', 'subjects.school_id', '=', 'schools.id')
+                ->whereNull('subjects.network_id')
                 ->update(['subjects.network_id' => DB::raw('schools.network_id')]);
         }
 
         if (Schema::hasColumn('grades', 'network_id')) {
             DB::table('grades')
-                ->whereNull('network_id')
                 ->join('schools', 'grades.school_id', '=', 'schools.id')
+                ->whereNull('grades.network_id')
                 ->update(['grades.network_id' => DB::raw('schools.network_id')]);
         }
     }
