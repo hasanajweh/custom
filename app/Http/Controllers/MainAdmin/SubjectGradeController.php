@@ -64,7 +64,7 @@ class SubjectGradeController extends Controller
             $grade->schools()->sync($branches);
         }
 
-        return back()->with('status', __('Item saved successfully.'));
+        return back()->with('status', __('messages.main_admin.subjects_grades.saved'));
     }
 
     public function update(Network $network, string $type, int $id): RedirectResponse
@@ -91,7 +91,7 @@ class SubjectGradeController extends Controller
             $item->schools()->sync($branches);
         }
 
-        return back()->with('status', __('Item updated successfully.'));
+        return back()->with('status', __('messages.main_admin.subjects_grades.updated'));
     }
 
     public function destroy(Network $network, string $type, int $id): RedirectResponse
@@ -104,6 +104,6 @@ class SubjectGradeController extends Controller
 
         $item->delete();
 
-        return back()->with('status', __('Item archived successfully.'));
+        return back()->with('status', __('messages.main_admin.subjects_grades.archived'));
     }
 }

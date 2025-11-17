@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('grades', function (Blueprint $table) {
             $table->id();
             $table->foreignId('school_id')->constrained('schools')->onDelete('cascade');
+            $table->foreignId('network_id')->nullable()->constrained('networks')->nullOnDelete();
             $table->string('name'); // e.g., "Grade 1", "10th Grade"
             $table->timestamps();
         });

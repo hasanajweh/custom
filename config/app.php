@@ -60,8 +60,8 @@ return [
     'timezone' => 'UTC',
 
     'locale' => 'ar',
-    'fallback_locale' => 'ar',
-    'available_locales' => ['ar'],
+    'fallback_locale' => 'en',
+    'available_locales' => ['ar', 'en'],
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*3
