@@ -32,6 +32,9 @@ use App\Http\Controllers\Teacher\FileSubmissionController;
 use App\Http\Controllers\Teacher\TeacherDashboardController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\MainAdmin\DashboardController as MainAdminDashboardController;
+use App\Http\Controllers\MainAdmin\HierarchyController;
+use App\Http\Controllers\MainAdmin\SubjectGradeController;
+use App\Http\Controllers\MainAdmin\UserController as MainAdminUserController;
 use App\Models\Network;
 use App\Models\School;
 use Illuminate\Http\Request;
@@ -167,6 +170,14 @@ Route::prefix('{network:slug}/main-admin')
 
         Route::middleware(['auth', 'role:main_admin'])->group(function () {
             Route::get('dashboard', [MainAdminDashboardController::class, 'index'])->name('dashboard');
+            Route::get('hierarchy', [HierarchyController::class, 'index'])->name('hierarchy');
+            Route::get('subjects-grades', [SubjectGradeController::class, 'index'])->name('subjects-grades');
+            Route::post('subjects-grades', [SubjectGradeController::class, 'store'])->name('subjects-grades.store');
+            Route::put('subjects-grades/{type}/{id}', [SubjectGradeController::class, 'update'])->name('subjects-grades.update');
+            Route::delete('subjects-grades/{type}/{id}', [SubjectGradeController::class, 'destroy'])->name('subjects-grades.destroy');
+
+            Route::resource('users', MainAdminUserController::class)->except(['show']);
+            Route::post('users/{user}/restore', [MainAdminUserController::class, 'restore'])->name('users.restore');
             Route::post('logout', [LoginController::class, 'logout'])->name('logout');
         });
     });

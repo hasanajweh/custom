@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Grade extends Model {
     use HasFactory, BelongsToTenant, SoftDeletes;
 
-    protected $fillable = ['name', 'school_id']; // Make sure school_id is fillable
+    protected $fillable = ['name', 'school_id', 'network_id']; // Make sure school_id is fillable
 
     /**
      * Get all file submissions for this grade
@@ -28,5 +28,15 @@ class Grade extends Model {
         return $this->belongsToMany(User::class)
             ->withPivot('school_id')
             ->withTimestamps();
+    }
+
+    public function schools(): BelongsToMany
+    {
+        return $this->belongsToMany(School::class, 'grade_school')->withTimestamps();
+    }
+
+    public function networks(): BelongsToMany
+    {
+        return $this->belongsToMany(Network::class, 'grade_network')->withTimestamps();
     }
 }
