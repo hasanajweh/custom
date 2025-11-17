@@ -42,26 +42,36 @@ class SubjectGradeController extends Controller
         $data = request()->validate([
             'type' => ['required', 'in:subject,grade'],
             'name' => ['required', 'string', 'max:255'],
-            'branches' => ['array'],
+            'branches' => ['required', 'array', 'min:1'],
             'branches.*' => ['exists:schools,id'],
         ]);
 
         $branches = School::where('network_id', $network->id)
-            ->whereIn('id', $data['branches'] ?? [])
+            ->whereIn('id', $data['branches'])
             ->pluck('id');
+
+        if ($branches->isEmpty()) {
+            return back()->withErrors([
+                'branches' => __('messages.main_admin.subjects_grades.invalid_branch_selection')
+                    ?? __('messages.validation.select_at_least_one_school')
+                    ?? 'Please select at least one school from this network.',
+            ])->withInput();
+        }
+
+        $primarySchool = $branches->first();
 
         if ($data['type'] === 'subject') {
             $subject = Subject::create([
                 'name' => $data['name'],
                 'network_id' => $network->id,
-                'school_id' => null,
+                'school_id' => $primarySchool,
             ]);
             $subject->schools()->sync($branches);
         } else {
             $grade = Grade::create([
                 'name' => $data['name'],
                 'network_id' => $network->id,
-                'school_id' => null,
+                'school_id' => $primarySchool,
             ]);
             $grade->schools()->sync($branches);
         }
@@ -75,13 +85,21 @@ class SubjectGradeController extends Controller
 
         $data = request()->validate([
             'name' => ['required', 'string', 'max:255'],
-            'branches' => ['array'],
+            'branches' => ['required', 'array', 'min:1'],
             'branches.*' => ['exists:schools,id'],
         ]);
 
         $branches = School::where('network_id', $network->id)
-            ->whereIn('id', $data['branches'] ?? [])
+            ->whereIn('id', $data['branches'])
             ->pluck('id');
+
+        if ($branches->isEmpty()) {
+            return back()->withErrors([
+                'branches' => __('messages.main_admin.subjects_grades.invalid_branch_selection')
+                    ?? __('messages.validation.select_at_least_one_school')
+                    ?? 'Please select at least one school from this network.',
+            ])->withInput();
+        }
 
         if ($type === 'subject') {
             $item = Subject::where('network_id', $network->id)->findOrFail($id);
