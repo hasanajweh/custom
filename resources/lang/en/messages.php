@@ -1248,6 +1248,9 @@ return [
             'assign' => 'Assign to branches',
             'existing_subjects' => 'Existing subjects',
             'existing_grades' => 'Existing grades',
+            'saved' => 'Item saved successfully.',
+            'updated' => 'Item updated successfully.',
+            'archived' => 'Item archived successfully.',
         ],
     ],
 ];
