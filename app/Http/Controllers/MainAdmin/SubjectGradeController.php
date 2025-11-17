@@ -54,12 +54,14 @@ class SubjectGradeController extends Controller
             $subject = Subject::create([
                 'name' => $data['name'],
                 'network_id' => $network->id,
+                'school_id' => null,
             ]);
             $subject->schools()->sync($branches);
         } else {
             $grade = Grade::create([
                 'name' => $data['name'],
                 'network_id' => $network->id,
+                'school_id' => null,
             ]);
             $grade->schools()->sync($branches);
         }
