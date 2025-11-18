@@ -1,4 +1,4 @@
-@extends('layouts.school')
+@extends('layouts.network')
 
 @section('title', __('messages.dashboard.dashboard'))
 

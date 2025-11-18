@@ -10,27 +10,31 @@ use App\Models\Subject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
-class SubjectGradeController extends Controller
+class MainAdminSubjectsGradesController extends Controller
 {
     public function index(Network $network): View
     {
-        $branches = $network->branches()->get();
+        $userNetwork = auth()->user()?->network;
+
+        abort_unless($userNetwork && $userNetwork->is($network), 404);
+
+        $branches = $userNetwork->schools()->get();
         $subjects = Subject::with(['schools'])
-            ->where(function ($query) use ($network) {
-                $query->where('network_id', $network->id)
+            ->where(function ($query) use ($userNetwork) {
+                $query->where('network_id', $userNetwork->id)
                     ->orWhereNull('school_id');
             })
             ->get();
 
         $grades = Grade::with(['schools'])
-            ->where(function ($query) use ($network) {
-                $query->where('network_id', $network->id)
+            ->where(function ($query) use ($userNetwork) {
+                $query->where('network_id', $userNetwork->id)
                     ->orWhereNull('school_id');
             })
             ->get();
 
         return view('main-admin.subjects-grades', [
-            'network' => $network,
+            'network' => $userNetwork,
             'branches' => $branches,
             'subjects' => $subjects,
             'grades' => $grades,
@@ -39,6 +43,10 @@ class SubjectGradeController extends Controller
 
     public function store(Network $network): RedirectResponse
     {
+        $userNetwork = auth()->user()?->network;
+
+        abort_unless($userNetwork && $userNetwork->is($network), 404);
+
         $data = request()->validate([
             'type' => ['required', 'in:subject,grade'],
             'name' => ['required', 'string', 'max:255'],
@@ -46,7 +54,7 @@ class SubjectGradeController extends Controller
             'branches.*' => ['exists:schools,id'],
         ]);
 
-        $branches = School::where('network_id', $network->id)
+        $branches = School::where('network_id', $userNetwork->id)
             ->whereIn('id', $data['branches'])
             ->pluck('id');
 
@@ -63,14 +71,14 @@ class SubjectGradeController extends Controller
         if ($data['type'] === 'subject') {
             $subject = Subject::create([
                 'name' => $data['name'],
-                'network_id' => $network->id,
+                'network_id' => $userNetwork->id,
                 'school_id' => $primarySchool,
             ]);
             $subject->schools()->sync($branches);
         } else {
             $grade = Grade::create([
                 'name' => $data['name'],
-                'network_id' => $network->id,
+                'network_id' => $userNetwork->id,
                 'school_id' => $primarySchool,
             ]);
             $grade->schools()->sync($branches);
@@ -81,6 +89,9 @@ class SubjectGradeController extends Controller
 
     public function update(Network $network, string $type, int $id): RedirectResponse
     {
+        $userNetwork = auth()->user()?->network;
+
+        abort_unless($userNetwork && $userNetwork->is($network), 404);
         abort_unless(in_array($type, ['subject', 'grade']), 404);
 
         $data = request()->validate([
@@ -89,7 +100,7 @@ class SubjectGradeController extends Controller
             'branches.*' => ['exists:schools,id'],
         ]);
 
-        $branches = School::where('network_id', $network->id)
+        $branches = School::where('network_id', $userNetwork->id)
             ->whereIn('id', $data['branches'])
             ->pluck('id');
 
@@ -102,12 +113,12 @@ class SubjectGradeController extends Controller
         }
 
         if ($type === 'subject') {
-            $item = Subject::where('network_id', $network->id)->findOrFail($id);
-            $item->update(['name' => $data['name'], 'network_id' => $network->id]);
+            $item = Subject::where('network_id', $userNetwork->id)->findOrFail($id);
+            $item->update(['name' => $data['name'], 'network_id' => $userNetwork->id]);
             $item->schools()->sync($branches);
         } else {
-            $item = Grade::where('network_id', $network->id)->findOrFail($id);
-            $item->update(['name' => $data['name'], 'network_id' => $network->id]);
+            $item = Grade::where('network_id', $userNetwork->id)->findOrFail($id);
+            $item->update(['name' => $data['name'], 'network_id' => $userNetwork->id]);
             $item->schools()->sync($branches);
         }
 
@@ -116,11 +127,14 @@ class SubjectGradeController extends Controller
 
     public function destroy(Network $network, string $type, int $id): RedirectResponse
     {
+        $userNetwork = auth()->user()?->network;
+
+        abort_unless($userNetwork && $userNetwork->is($network), 404);
         abort_unless(in_array($type, ['subject', 'grade']), 404);
 
         $item = $type === 'subject'
-            ? Subject::where('network_id', $network->id)->findOrFail($id)
-            : Grade::where('network_id', $network->id)->findOrFail($id);
+            ? Subject::where('network_id', $userNetwork->id)->findOrFail($id)
+            : Grade::where('network_id', $userNetwork->id)->findOrFail($id);
 
         $item->delete();
 

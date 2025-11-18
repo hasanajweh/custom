@@ -9,29 +9,23 @@ use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\App;
 
-class DashboardController extends Controller
+class MainAdminDashboardController extends Controller
 {
     public function index(Network $network): View
     {
+        $userNetwork = auth()->user()?->network;
+
+        abort_unless($userNetwork && $userNetwork->is($network), 404);
+
         App::setLocale('ar');
 
-        $branches = $network->branches()->withCount([
-            'users as admins_count' => function ($query) {
-                $query->where('role', 'admin');
-            },
-            'users as supervisors_count' => function ($query) {
-                $query->where('role', 'supervisor');
-            },
-            'users as teachers_count' => function ($query) {
-                $query->where('role', 'teacher');
-            },
+        $branches = $userNetwork->schools()->withCount([
+            'users as admins_count' => fn ($query) => $query->where('role', 'admin'),
+            'users as supervisors_count' => fn ($query) => $query->where('role', 'supervisor'),
+            'users as teachers_count' => fn ($query) => $query->where('role', 'teacher'),
             'fileSubmissions',
-            'fileSubmissions as recent_files_count' => function ($query) {
-                $query->where('created_at', '>=', now()->subHours(72));
-            },
-            'fileSubmissions as plans_count' => function ($query) {
-                $query->where('submission_type', 'plan');
-            },
+            'fileSubmissions as recent_files_count' => fn ($query) => $query->where('created_at', '>=', now()->subHours(72)),
+            'fileSubmissions as plans_count' => fn ($query) => $query->where('submission_type', 'plan'),
         ])->get();
 
         $branchIds = $branches->pluck('id');
@@ -59,7 +53,7 @@ class DashboardController extends Controller
         ];
 
         return view('main-admin.dashboard', [
-            'network' => $network,
+            'network' => $userNetwork,
             'branches' => $branches,
             'summary' => $summary,
             'recentUploads' => $recentUploads,
