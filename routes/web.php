@@ -185,8 +185,8 @@ Route::prefix('{network:slug}/main-admin')
 // ===========================
 // TENANT (SCHOOL) ROUTES
 // ===========================
-Route::prefix('{network:slug}/{school:slug}')
-    ->middleware(['setlocale'])
+Route::prefix('{network:slug}/{branch:slug}')
+    ->middleware(['setlocale', 'setNetwork', 'setBranch'])
     ->scopeBindings()
     ->group(function () {
         Route::middleware('match.school.network')->group(function () {
@@ -194,12 +194,12 @@ Route::prefix('{network:slug}/{school:slug}')
             // GUEST ROUTES
             // ===========================
             Route::middleware('guest')->group(function () {
-                Route::get('/', function (Network $network, School $school) {
-                    if ($school->network_id !== $network->id) {
+                Route::get('/', function (Network $network, School $branch) {
+                    if ($branch->network_id !== $network->id) {
                         abort(404);
                     }
 
-                    return view('auth.login', ['school' => $school]);
+                    return view('auth.login', ['school' => $branch]);
                 })->name('home');
 
                 Route::controller(RegisteredUserController::class)->group(function() {
@@ -219,22 +219,22 @@ Route::prefix('{network:slug}/{school:slug}')
 
             Route::middleware(['auth', 'verify.tenant'])->group(function () {
                 // Dashboard (role-based)
-                Route::get('/dashboard', function (Network $network, School $school) {
-                    if ($school->network_id !== $network->id) {
+                Route::get('/dashboard', function (Network $network, School $branch) {
+                    if ($branch->network_id !== $network->id) {
                         abort(404, 'Access denied to this network.');
                     }
 
                     $user = Auth::user();
 
                     // Ensure user belongs to this school
-                    if ($user->school_id !== $school->id) {
+                    if ($user->school_id !== $branch->id) {
                         abort(403, 'Access denied to this school.');
                     }
 
                     return match($user->role) {
-                        'admin' => redirect()->to(tenant_route('school.admin.dashboard', $school)),
-                        'teacher' => redirect()->to(tenant_route('teacher.dashboard', $school)),
-                        'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $school)),
+                        'admin' => redirect()->to(tenant_route('school.admin.dashboard', $network, $branch)),
+                        'teacher' => redirect()->to(tenant_route('teacher.dashboard', $network, $branch)),
+                        'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $network, $branch)),
                         default => abort(403, 'Invalid user role.')
                     };
                 })->name('dashboard');
@@ -708,25 +708,25 @@ Route::get('/offline.html', function () {
 })->name('offline');
 
 // Install Instructions Page
-Route::prefix('{network:slug}/{school:slug}')
-    ->middleware(['setlocale'])
+Route::prefix('{network:slug}/{branch:slug}')
+    ->middleware(['setlocale', 'setNetwork', 'setBranch'])
     ->scopeBindings()
     ->group(function () {
-        Route::get('/install', function (Network $network, School $school) {
-            if ($school->network_id !== $network->id) {
+        Route::get('/install', function (Network $network, School $branch) {
+            if ($branch->network_id !== $network->id) {
                 abort(404);
             }
 
-            return view('install-instructions', compact('school'));
+            return view('install-instructions', ['school' => $branch]);
         })->name('install.instructions');
 
         // Desktop App Download Page
-        Route::get('/desktop', function (Network $network, School $school) {
-            if ($school->network_id !== $network->id) {
+        Route::get('/desktop', function (Network $network, School $branch) {
+            if ($branch->network_id !== $network->id) {
                 abort(404);
             }
 
-            return view('desktop-app', compact('school'));
+            return view('desktop-app', ['school' => $branch]);
         })->name('desktop.app');
     });
 
