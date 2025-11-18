@@ -32,7 +32,7 @@ class RedirectIfAuthenticated
                 $school = $user->school;
 
                 if ($school) {
-                    return redirect(tenant_route('dashboard', $school));
+                    return redirect(tenant_dashboard_route($school, $user));
                 }
             }
         }

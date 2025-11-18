@@ -1309,10 +1309,12 @@
             @php
                 $dashboardUrl = $isMainAdmin
                     ? tenant_route('main-admin.dashboard')
-                    : tenant_route('dashboard', $schoolSlug);
+                    : (Auth::user()->role === 'admin'
+                        ? tenant_route('school.admin.dashboard', $schoolSlug)
+                        : tenant_route('dashboard', $schoolSlug));
             @endphp
             <a href="{{ $dashboardUrl }}"
-               class="sidebar-item {{ request()->routeIs('dashboard') || request()->routeIs('main-admin.dashboard') ? 'active' : '' }}">
+               class="sidebar-item {{ request()->routeIs('dashboard') || request()->routeIs('main-admin.dashboard') || request()->routeIs('school.admin.dashboard') ? 'active' : '' }}">
                 <i class="ri-dashboard-3-line"></i>
                 <span class="sidebar-text">{{ __('messages.navigation.dashboard') }}</span>
             </span></a>
