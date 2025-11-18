@@ -233,8 +233,8 @@ Route::prefix('{network:slug}/{school:slug}')
 
                     return match($user->role) {
                         'admin' => redirect()->to(tenant_route('school.admin.dashboard', $school)),
-                        'teacher' => app(TeacherDashboardController::class)->index($school),
-                        'supervisor' => app(SupervisorDashboardController::class)->index($school),
+                        'teacher' => redirect()->to(tenant_route('teacher.dashboard', $school)),
+                        'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $school)),
                         default => abort(403, 'Invalid user role.')
                     };
                 })->name('dashboard');
@@ -259,6 +259,9 @@ Route::prefix('{network:slug}/{school:slug}')
                     ->prefix('teacher')
                     ->name('teacher.')
                     ->group(function () {
+                        Route::get('/dashboard', [TeacherDashboardController::class, 'index'])
+                            ->name('dashboard');
+
                         Route::controller(FileSubmissionController::class)
                             ->prefix('files')
                             ->name('files.')
@@ -280,6 +283,9 @@ Route::prefix('{network:slug}/{school:slug}')
                     ->prefix('supervisor')
                     ->name('supervisor.')
                     ->group(function () {
+                        Route::get('/dashboard', [SupervisorDashboardController::class, 'index'])
+                            ->name('dashboard');
+
                         // Review files
                         Route::controller(ReviewController::class)
                             ->prefix('review-files')
