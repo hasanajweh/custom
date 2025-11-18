@@ -104,6 +104,22 @@ if (!function_exists('tenant_route')) {
     }
 }
 
+if (!function_exists('tenant_dashboard_route')) {
+    /**
+     * Generate the correct dashboard route for the current tenant based on user role.
+     */
+    function tenant_dashboard_route($school, $user = null, array $parameters = [], bool $absolute = true): string
+    {
+        $user = $user ?: auth()->user();
+
+        if ($user && $user->role === 'admin') {
+            return tenant_route('school.admin.dashboard', $school, $parameters, $absolute);
+        }
+
+        return tenant_route('dashboard', $school, $parameters, $absolute);
+    }
+}
+
 if (!function_exists('getAvatarColor')) {
     /**
      * Get a consistent color gradient for user avatars based on their name

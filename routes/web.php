@@ -232,7 +232,7 @@ Route::prefix('{network:slug}/{school:slug}')
                     }
 
                     return match($user->role) {
-                        'admin' => app(DashboardController::class)->index($school,request()),
+                        'admin' => redirect()->to(tenant_route('school.admin.dashboard', $school)),
                         'teacher' => app(TeacherDashboardController::class)->index($school),
                         'supervisor' => app(SupervisorDashboardController::class)->index($school),
                         default => abort(403, 'Invalid user role.')
@@ -312,6 +312,9 @@ Route::prefix('{network:slug}/{school:slug}')
                     ->middleware('role:admin')
                     ->name('school.admin.')
                     ->group(function () {
+
+                        Route::get('dashboard', [DashboardController::class, 'index'])
+                            ->name('dashboard');
 
                         Route::get('activity-logs', [SchoolActivityLogController::class, 'index'])
                             ->name('activity-logs.index');
