@@ -31,10 +31,11 @@ use App\Http\Controllers\Supervisor\FileSubmissionController as SupervisorFileSu
 use App\Http\Controllers\Teacher\FileSubmissionController;
 use App\Http\Controllers\Teacher\TeacherDashboardController;
 use App\Http\Controllers\LandingController;
-use App\Http\Controllers\MainAdmin\DashboardController as MainAdminDashboardController;
-use App\Http\Controllers\MainAdmin\HierarchyController;
-use App\Http\Controllers\MainAdmin\SubjectGradeController;
-use App\Http\Controllers\MainAdmin\UserController as MainAdminUserController;
+use App\Http\Controllers\MainAdmin\MainAdminDashboardController;
+use App\Http\Controllers\MainAdmin\MainAdminHierarchyController;
+use App\Http\Controllers\MainAdmin\MainAdminSubjectsGradesController;
+use App\Http\Controllers\MainAdmin\MainAdminUsersController;
+use App\Http\Controllers\MainAdmin\MainAdminFileBrowserController;
 use App\Models\Network;
 use App\Models\School;
 use Illuminate\Http\Request;
@@ -168,16 +169,20 @@ Route::prefix('{network:slug}/main-admin')
             Route::post('login', [LoginController::class, 'login']);
         });
 
-        Route::middleware(['auth', 'role:main_admin'])->group(function () {
+        Route::middleware(['auth', 'ensure.main.admin'])->group(function () {
             Route::get('dashboard', [MainAdminDashboardController::class, 'index'])->name('dashboard');
-            Route::get('hierarchy', [HierarchyController::class, 'index'])->name('hierarchy');
-            Route::get('subjects-grades', [SubjectGradeController::class, 'index'])->name('subjects-grades');
-            Route::post('subjects-grades', [SubjectGradeController::class, 'store'])->name('subjects-grades.store');
-            Route::put('subjects-grades/{type}/{id}', [SubjectGradeController::class, 'update'])->name('subjects-grades.update');
-            Route::delete('subjects-grades/{type}/{id}', [SubjectGradeController::class, 'destroy'])->name('subjects-grades.destroy');
+            Route::get('hierarchy', [MainAdminHierarchyController::class, 'index'])->name('hierarchy');
+            Route::get('subjects-grades', [MainAdminSubjectsGradesController::class, 'index'])->name('subjects-grades');
+            Route::post('subjects-grades', [MainAdminSubjectsGradesController::class, 'store'])->name('subjects-grades.store');
+            Route::put('subjects-grades/{type}/{id}', [MainAdminSubjectsGradesController::class, 'update'])->name('subjects-grades.update');
+            Route::delete('subjects-grades/{type}/{id}', [MainAdminSubjectsGradesController::class, 'destroy'])->name('subjects-grades.destroy');
 
-            Route::resource('users', MainAdminUserController::class)->except(['show']);
-            Route::post('users/{user}/restore', [MainAdminUserController::class, 'restore'])->name('users.restore');
+            Route::get('file-browser', [MainAdminFileBrowserController::class, 'index'])->name('file-browser.index');
+            Route::get('file-browser/{file}/preview', [MainAdminFileBrowserController::class, 'preview'])->name('file-browser.preview');
+            Route::get('file-browser/{file}/download', [MainAdminFileBrowserController::class, 'download'])->name('file-browser.download');
+
+            Route::resource('users', MainAdminUsersController::class)->except(['show']);
+            Route::post('users/{user}/restore', [MainAdminUsersController::class, 'restore'])->name('users.restore');
             Route::post('logout', [LoginController::class, 'logout'])->name('logout');
         });
     });

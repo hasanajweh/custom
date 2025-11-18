@@ -19,6 +19,10 @@ class SetBranch
         }
 
         $branchParam = $request->route('branch') ?? $request->route('school');
+        if (! $branchParam) {
+            return $next($request);
+        }
+
         $branch = $branchParam instanceof Branch
             ? $branchParam
             : Branch::where('slug', $branchParam)->first();
