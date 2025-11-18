@@ -29,7 +29,7 @@
 
             <!-- Compact Filters Section -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <form method="GET" action="{{ route('school.admin.file-browser.index', $school->slug) }}">
+                <form method="GET" action="{{ tenant_route('school.admin.file-browser.index', $school->network, $school) }}">
                     <!-- Search Bar - Full Width -->
                     <div class="mb-4">
                         <div class="relative">
@@ -131,7 +131,7 @@
                             <span>{{ __('messages.actions.apply_filters') }}</span>
                         </button>
 
-                        <a href="{{ route('school.admin.file-browser.index', $school->slug) }}"
+                        <a href="{{ tenant_route('school.admin.file-browser.index', $school->network, $school) }}"
                            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors">
                             <i class="ri-refresh-line"></i>
                             <span>{{ __('messages.actions.reset') }}</span>
@@ -239,7 +239,7 @@
                                     <div class="flex items-center justify-center {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }} space-x-2">
                                         {{-- Preview Button --}}
                                         @if($canPreview)
-                                            <a href="{{ route('school.admin.file-browser.preview', [$school->slug, $file->id]) }}"
+                                            <a href="{{ tenant_route('school.admin.file-browser.preview', $school->network, $school, ['file' => $file->id]) }}"
                                                target="_blank"
                                                class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
                                                title="{{ __('messages.files.preview_file') }}">
@@ -254,7 +254,7 @@
                                         @endif
 
                                         {{-- Download Button - Always Active --}}
-                                        <a href="{{ route('school.admin.file-browser.download', [$school->slug, $file->id]) }}"
+                                        <a href="{{ tenant_route('school.admin.file-browser.download', $school->network, $school, ['file' => $file->id]) }}"
                                            class="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-150"
                                            title="{{ __('messages.files.download_file') }}">
                                             <i class="ri-download-line text-lg"></i>
@@ -262,7 +262,7 @@
 
                                         {{-- Print Button --}}
                                         @if($canPreview)
-                                            <button onclick="printFile('{{ route('school.admin.file-browser.preview', [$school->slug, $file->id]) }}', '{{ $file->title }}', '{{ $file->user->name ?? 'Unknown' }}', '{{ $file->created_at->format('M d, Y') }}')"
+                                            <button onclick="printFile('{{ tenant_route('school.admin.file-browser.preview', $school->network, $school, ['file' => $file->id]) }}', '{{ $file->title }}', '{{ $file->user->name ?? 'Unknown' }}', '{{ $file->created_at->format('M d, Y') }}')"
                                                     class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
                                                     title="{{ __('messages.files.print_file') }}">
                                                 <i class="ri-printer-line text-lg"></i>

@@ -125,14 +125,14 @@
 
                                 <!-- Action Buttons -->
                                 <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                                    <a href="{{ route('school.admin.supervisors.files', [$school->slug, $supervisor->id]) }}"
+                                    <a href="{{ tenant_route('school.admin.supervisors.files', $school->network, $school, ['supervisor' => $supervisor->id]) }}"
                                        class="inline-flex items-center px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-lg transition-colors group-hover:shadow-md">
                                         <i class="ri-folder-line mr-1"></i>
                                         {{ __('messages.files.view_file') }}
                                     </a>
 
                                     <div class="flex items-center space-x-2">
-                                        <a href="{{ route('school.admin.users.edit', [$school->slug, $supervisor->id]) }}"
+                                        <a href="{{ tenant_route('school.admin.users.edit', $school->network, $school, ['user' => $supervisor->id]) }}"
                                            class="p-1.5 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                                            title="{{ __('messages.users.edit_user') }}">
                                             <i class="ri-edit-line"></i>
@@ -151,7 +151,7 @@
                     </div>
                     <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('messages.users.no_users_found') }}</h3>
                     <p class="text-gray-500 mb-6">{{ __('messages.users.try_adjusting_search') }}</p>
-                    <a href="{{ route('school.admin.users.create', $school->slug) }}?role=supervisor"
+                    <a href="{{ tenant_route('school.admin.users.create', $school->network, $school) }}?role=supervisor"
                        class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors">
                         <i class="ri-user-add-line mr-2"></i>
                         {{ __('messages.users.add_user') }}

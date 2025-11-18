@@ -1345,25 +1345,25 @@
                     <span class="sidebar-text">{{ __('messages.main_admin.navigation.subjects_grades') }}</span>
                 </span></a>
             @elseif(Auth::user()->role === 'admin')
-                <a href="{{ tenant_route('school.admin.users.index', $schoolSlug) }}"
+                <a href="{{ tenant_route('school.admin.users.index', $networkSlug, $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.users.*') ? 'active' : '' }}">
                     <i class="ri-team-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.manage_users') }}</span>
                 </span></a>
 
-                <a href="{{ tenant_route('school.admin.file-browser.index', $schoolSlug) }}"
+                <a href="{{ tenant_route('school.admin.file-browser.index', $networkSlug, $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.file-browser.*') ? 'active' : '' }}">
                     <i class="ri-folder-3-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.file_browser') }}</span>
                 </span></a>
 
-                <a href="{{ tenant_route('school.admin.plans.index', $schoolSlug) }}"
+                <a href="{{ tenant_route('school.admin.plans.index', $networkSlug, $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.plans.*') ? 'active' : '' }}">
                     <i class="ri-calendar-check-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.plans') }}</span>
                 </span></a>
 
-                <a href="{{ tenant_route('school.admin.supervisors.index', $schoolSlug) }}"
+                <a href="{{ tenant_route('school.admin.supervisors.index', $networkSlug, $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.supervisors.*') ? 'active' : '' }}">
                     <i class="ri-user-star-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.supervisors') }}</span>
@@ -1376,13 +1376,13 @@
                     </div>
                 </div>
 
-                <a href="{{ tenant_route('school.admin.subjects.index', $schoolSlug) }}"
+                <a href="{{ tenant_route('school.admin.subjects.index', $networkSlug, $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.subjects.*') ? 'active' : '' }}">
                     <i class="ri-book-2-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.subjects') }}</span>
                 </span></a>
 
-                <a href="{{ tenant_route('school.admin.grades.index', $schoolSlug) }}"
+                <a href="{{ tenant_route('school.admin.grades.index', $networkSlug, $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.grades.*') ? 'active' : '' }}">
                     <i class="ri-graduation-cap-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.grades') }}</span>
@@ -1837,7 +1837,7 @@
         button.innerHTML = '<i class="ri-loader-4-line animate-spin text-lg"></i>';
         button.disabled = true;
 
-        fetch(`/${schoolSlug}/admin/file-browser/${fileId}/preview-data`)
+        fetch(`/${networkSlug}/${schoolSlug}/admin/file-browser/${fileId}/preview-data`)
             .then(response => response.json())
             .then(data => {
                 button.innerHTML = originalHTML;
