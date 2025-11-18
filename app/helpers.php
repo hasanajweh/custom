@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Branch;
 use App\Models\Network;
 use App\Models\School;
 
@@ -57,6 +58,7 @@ if (!function_exists('tenant_route')) {
 
         $networkModel = match (true) {
             $network instanceof Network => $network,
+            $network instanceof Branch => $network->network,
             $network instanceof School => $network->network,
             $network === null && $user && $user->network => $user->network,
             is_string($network) => Network::where('slug', $network)->first(),
@@ -64,6 +66,7 @@ if (!function_exists('tenant_route')) {
         };
 
         $branchModel = match (true) {
+            $branch instanceof Branch => $branch,
             $branch instanceof School => $branch,
             $branch instanceof Network => null,
             $branch === null && $user && $user->school => $user->school,
