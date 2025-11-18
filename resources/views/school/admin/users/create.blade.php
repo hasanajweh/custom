@@ -4,6 +4,13 @@
 @section('title', __('messages.users.add_new_user') . ' - ' . __('messages.app.name'))
 
 @section('content')
+@php
+    $tenantParams = [
+        'network' => $school->network->slug,
+        'branch' => $school->slug,
+        'school' => $school->slug,
+    ];
+@endphp
 <div class="max-w-3xl mx-auto">
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
@@ -14,7 +21,7 @@
             <p class="text-sm text-gray-600 mt-1">{{ __('messages.users.create_new_account') }}</p>
         </div>
 
-        <form method="POST" action="{{ tenant_route('school.admin.users.store', $school->network, $school) }}" class="p-6 space-y-6">
+        <form method="POST" action="{{ tenant_route('school.admin.users.store', $tenantParams) }}" class="p-6 space-y-6">
             @csrf
 
             <!-- Name -->
@@ -150,7 +157,7 @@
 
             <!-- Actions -->
             <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200">
-                <a href="{{ tenant_route('school.admin.users.index', $school->network, $school) }}"
+                <a href="{{ tenant_route('school.admin.users.index', $tenantParams) }}"
                    class="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition-colors">
                     {{ __('messages.actions.cancel') }}
                 </a>

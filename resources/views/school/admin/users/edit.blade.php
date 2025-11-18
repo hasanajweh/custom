@@ -4,6 +4,13 @@
 @section('title', __('messages.users.edit_user') . ' - ' . __('messages.app.name'))
 
 @section('content')
+@php
+    $tenantParams = [
+        'network' => $school->network->slug,
+        'branch' => $school->slug,
+        'school' => $school->slug,
+    ];
+@endphp
 <div class="max-w-3xl mx-auto">
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
@@ -14,7 +21,7 @@
             <p class="text-sm text-gray-600 mt-1">{{ __('messages.users.update_user_info') }}</p>
         </div>
 
-        <form method="POST" action="{{ tenant_route('school.admin.users.update', $school->network, $school, ['user' => $user->id]) }}" class="p-6 space-y-6">
+        <form method="POST" action="{{ tenant_route('school.admin.users.update', array_merge($tenantParams, ['user' => $user->id])) }}" class="p-6 space-y-6">
             @csrf
             @method('PATCH')
 
@@ -142,7 +149,7 @@
 
             <!-- Actions -->
             <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200">
-                <a href="{{ tenant_route('school.admin.users.index', $school->network, $school) }}" class="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition-colors">
+                <a href="{{ tenant_route('school.admin.users.index', $tenantParams) }}" class="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition-colors">
                     {{ __('messages.actions.cancel') }}
                 </a>
                 <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors flex items-center">
