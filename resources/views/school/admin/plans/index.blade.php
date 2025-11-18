@@ -3,6 +3,13 @@
 @section('title', __('messages.plans.title') . ' - ' . __('messages.app.name'))
 
 @section('content')
+    @php
+        $tenantParams = [
+            'network' => $school->network->slug,
+            'branch' => $school->slug,
+            'school' => $school->slug,
+        ];
+    @endphp
     <div class="min-h-screen bg-gray-50 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
             <!-- Page Header -->
@@ -73,7 +80,7 @@
                     <p class="text-gray-600">{{ __('messages.plans.use_filters') }}</p>
                 </div>
 
-                <form method="GET" action="{{ route('school.admin.plans.index', ['school' => $school->slug]) }}" class="space-y-6">
+                <form method="GET" action="{{ tenant_route('school.admin.plans.index', $tenantParams) }}" class="space-y-6">
                     <!-- Search Bar -->
                     <div class="w-full">
                         <label for="search" class="block text-sm font-medium text-gray-700 mb-3">{{ __('messages.plans.search_plans') }}</label>
@@ -220,7 +227,7 @@
                                     <div class="flex items-center justify-center space-x-2">
                                         {{-- Preview Button --}}
                                         @if($canPreview)
-                                            <a href="{{ route('school.admin.plans.show', [$school->slug, $plan->id]) }}"
+                                            <a href="{{ tenant_route('school.admin.plans.show', array_merge($tenantParams, ['plan' => $plan->id])) }}"
                                                target="_blank"
                                                class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
                                                title="{{ __('messages.files.preview_file') }}">
@@ -235,7 +242,7 @@
                                         @endif
 
                                         {{-- Download Button - Always Active --}}
-                                        <a href="{{ route('school.admin.plans.download', [$school->slug, $plan->id]) }}"
+                                        <a href="{{ tenant_route('school.admin.plans.download', array_merge($tenantParams, ['plan' => $plan->id])) }}"
                                            class="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-150"
                                            title="{{ __('messages.files.download_file') }}">
                                             <i class="ri-download-line text-lg"></i>
@@ -243,7 +250,7 @@
 
                                         {{-- Print Button --}}
                                         @if($canPreview)
-                                            <button onclick="printFile('{{ route('school.admin.plans.show', [$school->slug, $plan->id]) }}', '{{ $plan->title }}', '{{ $plan->user->name }}', '{{ $plan->created_at->format('M d, Y') }}')"
+                                            <button onclick="printFile('{{ tenant_route('school.admin.plans.show', array_merge($tenantParams, ['plan' => $plan->id])) }}', '{{ $plan->title }}', '{{ $plan->user->name }}', '{{ $plan->created_at->format('M d, Y') }}')"
                                                     class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
                                                     title="{{ __('messages.files.print_file') }}">
                                                 <i class="ri-printer-line text-lg"></i>

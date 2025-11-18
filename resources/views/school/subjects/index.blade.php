@@ -2,6 +2,13 @@
 @section('title', __('messages.subjects.title') . ' - ' . __('messages.app.name'))
 
 @section('content')
+@php
+    $tenantParams = [
+        'network' => $school->network->slug,
+        'branch' => $school->slug,
+        'school' => $school->slug,
+    ];
+@endphp
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -19,7 +26,7 @@
                 <p class="text-sm text-gray-600 mt-1">{{ __('messages.subjects.create_subjects_for_grades') }}</p>
             </div>
             <div class="p-6">
-                <form method="POST" action="{{ route('school.admin.subjects.store', ['school' => $school->slug]) }}" class="space-y-6">
+                <form method="POST" action="{{ tenant_route('school.admin.subjects.store', $tenantParams) }}" class="space-y-6">
                     @csrf
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
@@ -128,7 +135,7 @@
                                                 {{ __('messages.actions.cancel') }}
                                             </button>
                                             <form method="POST"
-                                                action="{{ route('school.admin.subjects.archive', ['school' => $school->slug, 'subject' => $subject->id]) }}">
+                                                action="{{ tenant_route('school.admin.subjects.archive', array_merge($tenantParams, ['subject' => $subject->id])) }}">
                                                 @csrf
                                                 @method('PATCH')
                                                 <button type="submit"
@@ -185,7 +192,7 @@
                                         </p>
                                     </div>
                                 </div>
-                                <form method="POST" action="{{ route('school.admin.subjects.restore', ['school' => $school->slug, 'subject' => $subject->id]) }}">
+                                <form method="POST" action="{{ tenant_route('school.admin.subjects.restore', array_merge($tenantParams, ['subject' => $subject->id])) }}">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="px-3 py-1.5 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition duration-200">

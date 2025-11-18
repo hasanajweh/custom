@@ -14,6 +14,12 @@
         'deleted' => __('messages.activity_logs.event_labels.deleted'),
     ];
 
+    $tenantParams = [
+        'network' => $school->network->slug,
+        'branch' => $school->slug,
+        'school' => $school->slug,
+    ];
+
     $metricCards = [
         [
             'value' => number_format($stats['total_activities'] ?? 0),
@@ -90,7 +96,7 @@
                                 {{ __('messages.activity_logs.filters.subtitle') }}
                             </p>
                         </div>
-                        <form method="GET" action="{{ route('school.admin.activity-logs.index', $school->slug) }}" class="w-full lg:w-auto">
+                        <form method="GET" action="{{ tenant_route('school.admin.activity-logs.index', $tenantParams) }}" class="w-full lg:w-auto">
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                                 <div class="space-y-1">
                                     <label for="user_id" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -136,7 +142,7 @@
                                     <i class="ri-filter-3-line text-base"></i>
                                     {{ __('messages.actions.apply_filters') }}
                                 </button>
-                                <a href="{{ route('school.admin.activity-logs.index', $school->slug) }}" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50">
+                                <a href="{{ tenant_route('school.admin.activity-logs.index', $tenantParams) }}" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50">
                                     <i class="ri-refresh-line text-base"></i>
                                     {{ __('messages.actions.reset') }}
                                 </a>

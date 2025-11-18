@@ -4,6 +4,13 @@
 @section('title', __('messages.files.title') . ' - ' . __('messages.app.name'))
 
 @section('content')
+    @php
+        $tenantParams = [
+            'network' => $school->network->slug,
+            'branch' => $school->slug,
+            'school' => $school->slug,
+        ];
+    @endphp
     <div class="min-h-screen bg-gray-50 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
             <!-- Page Header -->
@@ -29,7 +36,7 @@
 
             <!-- Compact Filters Section -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <form method="GET" action="{{ tenant_route('school.admin.file-browser.index', $school->network, $school) }}">
+                <form method="GET" action="{{ tenant_route('school.admin.file-browser.index', $tenantParams) }}">
                     <!-- Search Bar - Full Width -->
                     <div class="mb-4">
                         <div class="relative">
@@ -131,7 +138,7 @@
                             <span>{{ __('messages.actions.apply_filters') }}</span>
                         </button>
 
-                        <a href="{{ tenant_route('school.admin.file-browser.index', $school->network, $school) }}"
+                        <a href="{{ tenant_route('school.admin.file-browser.index', $tenantParams) }}"
                            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors">
                             <i class="ri-refresh-line"></i>
                             <span>{{ __('messages.actions.reset') }}</span>
@@ -238,13 +245,13 @@
                                 <td class="px-8 py-6">
                                     <div class="flex items-center justify-center {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }} space-x-2">
                                         {{-- Preview Button --}}
-                                        @if($canPreview)
-                                            <a href="{{ tenant_route('school.admin.file-browser.preview', $school->network, $school, ['file' => $file->id]) }}"
-                                               target="_blank"
-                                               class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
-                                               title="{{ __('messages.files.preview_file') }}">
-                                                <i class="ri-eye-line text-lg"></i>
-                                            </a>
+                                          @if($canPreview)
+                                              <a href="{{ tenant_route('school.admin.file-browser.preview', array_merge($tenantParams, ['file' => $file->id])) }}"
+                                                 target="_blank"
+                                                 class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
+                                                 title="{{ __('messages.files.preview_file') }}">
+                                                  <i class="ri-eye-line text-lg"></i>
+                                              </a>
                                         @else
                                             <button disabled
                                                     class="p-2 text-gray-400 rounded-lg cursor-not-allowed action-disabled"
@@ -254,18 +261,18 @@
                                         @endif
 
                                         {{-- Download Button - Always Active --}}
-                                        <a href="{{ tenant_route('school.admin.file-browser.download', $school->network, $school, ['file' => $file->id]) }}"
-                                           class="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-150"
-                                           title="{{ __('messages.files.download_file') }}">
-                                            <i class="ri-download-line text-lg"></i>
-                                        </a>
+                                          <a href="{{ tenant_route('school.admin.file-browser.download', array_merge($tenantParams, ['file' => $file->id])) }}"
+                                             class="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-150"
+                                             title="{{ __('messages.files.download_file') }}">
+                                              <i class="ri-download-line text-lg"></i>
+                                          </a>
 
                                         {{-- Print Button --}}
-                                        @if($canPreview)
-                                            <button onclick="printFile('{{ tenant_route('school.admin.file-browser.preview', $school->network, $school, ['file' => $file->id]) }}', '{{ $file->title }}', '{{ $file->user->name ?? 'Unknown' }}', '{{ $file->created_at->format('M d, Y') }}')"
-                                                    class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
-                                                    title="{{ __('messages.files.print_file') }}">
-                                                <i class="ri-printer-line text-lg"></i>
+                                          @if($canPreview)
+                                              <button onclick="printFile('{{ tenant_route('school.admin.file-browser.preview', array_merge($tenantParams, ['file' => $file->id])) }}', '{{ $file->title }}', '{{ $file->user->name ?? 'Unknown' }}', '{{ $file->created_at->format('M d, Y') }}')"
+                                                      class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
+                                                      title="{{ __('messages.files.print_file') }}">
+                                                  <i class="ri-printer-line text-lg"></i>
                                             </button>
                                         @else
                                             <button disabled
