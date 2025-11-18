@@ -80,7 +80,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         // Check if school is active
-        if (!$school->is_active) {
+        if (!$school->isActiveWithNetwork()) {
             Auth::logout();
             return back()->withErrors([
                 'email' => 'This school is currently inactive. Please contact support.',

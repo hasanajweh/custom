@@ -28,6 +28,11 @@ class School extends Model
         'storage_used' => 'integer',
     ];
 
+    public function isActiveWithNetwork(): bool
+    {
+        return $this->is_active || (bool) $this->network?->is_active;
+    }
+
     public function network()
     {
         return $this->belongsTo(Network::class);
@@ -88,6 +93,10 @@ class School extends Model
      */
     public function hasActiveSubscription(): bool
     {
+        if ($this->network?->is_active) {
+            return true;
+        }
+
         return $this->subscriptions()
             ->where('status', 'active')
             ->where('ends_at', '>', now())
