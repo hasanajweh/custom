@@ -19,7 +19,7 @@ class ValidateSchoolAccess
         if ($school) {
             // Ensure school is active
             if ($school instanceof School) {
-                if (!$school->is_active) {
+                if (!$school->isActiveWithNetwork()) {
                     abort(403, 'This school is currently inactive.');
                 }
 

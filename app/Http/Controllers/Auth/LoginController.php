@@ -91,8 +91,13 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        /** @var Network|null $network */
+        /** @var Network|string|null $network */
         $network = $request->route('network') ?? $request->user()?->network;
+
+        // Route model binding guarantees an object, but guard against plain slug strings
+        if (is_string($network)) {
+            $network = Network::where('slug', $network)->first();
+        }
 
         if ($network) {
             return redirect()->route('main-admin.login', $network->slug);
