@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class Branch extends School
+use Illuminate\Database\Eloquent\Model;
+
+class Branch extends Model
 {
     protected $table = 'schools';
 
@@ -23,6 +25,6 @@ class Branch extends School
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'branch_user', 'branch_id', 'user_id');
+        return $this->hasMany(User::class);
     }
 }

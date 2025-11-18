@@ -57,14 +57,6 @@ class School extends Model
     }
 
     /**
-     * Get all users belonging to this school
-     */
-    public function users(): HasMany
-    {
-        return $this->hasMany(User::class);
-    }
-
-    /**
      * Get all file submissions for this school
      */
     public function fileSubmissions(): HasMany
