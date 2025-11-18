@@ -1262,12 +1262,12 @@
                             </a>
 
                             @if(Auth::user()->role === 'admin')
-                                <a href="{{ route('school.admin.plan-management.index', $schoolSlug) }}"
+                                <a href="{{ tenant_route('school.admin.plan-management.index', $schoolSlug) }}"
                                    class="dropdown-item">
                                     <i class="ri-vip-crown-line text-yellow-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
                                     <span>{{ __('messages.subscription.current_plan') }}</span>
                                 </a>
-                                <a href="{{ route('school.admin.activity-logs.index', $schoolSlug) }}"
+                                <a href="{{ tenant_route('school.admin.activity-logs.index', $schoolSlug) }}"
                                    class="dropdown-item">
                                     <i class="ri-history-line text-indigo-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
                                     <span>{{ __('messages.navigation.activity_logs') }}</span>
@@ -1345,25 +1345,25 @@
                     <span class="sidebar-text">{{ __('messages.main_admin.navigation.subjects_grades') }}</span>
                 </span></a>
             @elseif(Auth::user()->role === 'admin')
-                <a href="{{ route('school.admin.users.index', $schoolSlug) }}"
+                <a href="{{ tenant_route('school.admin.users.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.users.*') ? 'active' : '' }}">
                     <i class="ri-team-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.manage_users') }}</span>
                 </span></a>
 
-                <a href="{{ route('school.admin.file-browser.index', $schoolSlug) }}"
+                <a href="{{ tenant_route('school.admin.file-browser.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.file-browser.*') ? 'active' : '' }}">
                     <i class="ri-folder-3-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.file_browser') }}</span>
                 </span></a>
 
-                <a href="{{ route('school.admin.plans.index', $schoolSlug) }}"
+                <a href="{{ tenant_route('school.admin.plans.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.plans.*') ? 'active' : '' }}">
                     <i class="ri-calendar-check-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.plans') }}</span>
                 </span></a>
 
-                <a href="{{ route('school.admin.supervisors.index', $schoolSlug) }}"
+                <a href="{{ tenant_route('school.admin.supervisors.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.supervisors.*') ? 'active' : '' }}">
                     <i class="ri-user-star-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.supervisors') }}</span>
@@ -1376,13 +1376,13 @@
                     </div>
                 </div>
 
-                <a href="{{ route('school.admin.subjects.index', $schoolSlug) }}"
+                <a href="{{ tenant_route('school.admin.subjects.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.subjects.*') ? 'active' : '' }}">
                     <i class="ri-book-2-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.subjects') }}</span>
                 </span></a>
 
-                <a href="{{ route('school.admin.grades.index', $schoolSlug) }}"
+                <a href="{{ tenant_route('school.admin.grades.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.grades.*') ? 'active' : '' }}">
                     <i class="ri-graduation-cap-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.grades') }}</span>

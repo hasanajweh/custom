@@ -77,9 +77,9 @@ class LoginController extends Controller
 
         return match($user->role) {
             'main_admin' => redirect()->route('main-admin.dashboard', $user->network?->slug),
-            'admin' => redirect()->route('school.admin.dashboard', $school->slug),
-            'teacher' => redirect()->route('teacher.files.index', $school->slug),
-            'supervisor' => redirect()->route('supervisor.reviews.index', $school->slug),
+            'admin' => redirect()->to(tenant_route('school.admin.dashboard', $school)),
+            'teacher' => redirect()->to(tenant_route('teacher.files.index', $school)),
+            'supervisor' => redirect()->to(tenant_route('supervisor.reviews.index', $school)),
             default => redirect()->route('home'),
         };
     }

@@ -25,9 +25,9 @@
                         <li><x-nav-link :href="route('reviews.index', ['school' => $school->slug])" :active="request()->routeIs('reviews.*')">Review Files</x-nav-link></li>
                     @endif
                     @if (auth()->user()->role === 'admin')
-                        <li><x-nav-link :href="route('school.admin.users.index', ['school' => $school->slug])" :active="request()->routeIs('school.admin.users.*')">Manage Users</x-nav-link></li>
-                        <li><x-nav-link :href="route('school.subjects.index', ['school' => $school->slug])" :active="request()->routeIs('school.admin.subjects.*')">Manage Subjects</x-nav-link></li>
-                        <li><x-nav-link :href="route('school.admin.grades.index', ['school' => $school->slug])" :active="request()->routeIs('school.admin.grades.*')">Manage Grades</x-nav-link></li>
+                        <li><x-nav-link :href="tenant_route('school.admin.users.index', $school)" :active="request()->routeIs('school.admin.users.*')">Manage Users</x-nav-link></li>
+                        <li><x-nav-link :href="tenant_route('school.admin.subjects.index', $school)" :active="request()->routeIs('school.admin.subjects.*')">Manage Subjects</x-nav-link></li>
+                        <li><x-nav-link :href="tenant_route('school.admin.grades.index', $school)" :active="request()->routeIs('school.admin.grades.*')">Manage Grades</x-nav-link></li>
                     @endif
                 @endif
 
