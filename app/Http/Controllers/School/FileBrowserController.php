@@ -5,10 +5,11 @@ namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
 use App\Traits\HandlesS3Storage;
+use App\Models\Branch;
 use App\Models\FileSubmission;
-use App\Models\School;
-use App\Models\Subject;
 use App\Models\Grade;
+use App\Models\Network;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
@@ -18,10 +19,10 @@ class FileBrowserController extends Controller
 {
     use HandlesS3Storage;
 
-    public function index(School $school, Request $request)
+    public function index(Request $request, Network $network, Branch $branch)
     {
         // ✅ EXCLUDE supervisor files and any plan-related files
-        $query = FileSubmission::where('school_id', $school->id)
+        $query = FileSubmission::where('school_id', $branch->id)
             ->whereIn('submission_type', ['exam', 'worksheet', 'summary']) // removed plans
             ->with(['user', 'subject', 'grade']);
 
@@ -79,25 +80,29 @@ class FileBrowserController extends Controller
         $files = $query->latest()->paginate(20);
 
         // Get filter data
-        $subjects = Subject::where('school_id', $school->id)->orderBy('name')->get();
-        $grades = Grade::where('school_id', $school->id)->orderBy('name')->get();
-        $teachers = User::where('school_id', $school->id)
+        $subjects = $branch->subjects()->orderBy('name')->get();
+        $grades = $branch->grades()->orderBy('name')->get();
+        $teachers = User::whereHas('branches', function ($q) use ($branch) {
+                $q->where('branches.id', $branch->id);
+            })
             ->where('role', 'teacher')
             ->orderBy('name')
             ->get();
 
         // ✅ Statistics updated (plans removed)
         $stats = [
-            'total_files' => FileSubmission::where('school_id', $school->id)
+            'total_files' => FileSubmission::where('school_id', $branch->id)
                 ->whereIn('submission_type', ['exam', 'worksheet', 'summary'])
                 ->count(),
-            'total_size' => FileSubmission::where('school_id', $school->id)
+            'total_size' => FileSubmission::where('school_id', $branch->id)
                 ->whereIn('submission_type', ['exam', 'worksheet', 'summary'])
                 ->sum('file_size'),
-            'total_downloads' => FileSubmission::where('school_id', $school->id)
+            'total_downloads' => FileSubmission::where('school_id', $branch->id)
                 ->whereIn('submission_type', ['exam', 'worksheet', 'summary'])
                 ->sum('download_count'),
-            'active_teachers' => User::where('school_id', $school->id)
+            'active_teachers' => User::whereHas('branches', function ($q) use ($branch) {
+                    $q->where('branches.id', $branch->id);
+                })
                 ->where('role', 'teacher')
                 ->whereHas('fileSubmissions', function ($q) {
                     $q->whereIn('submission_type', ['exam', 'worksheet', 'summary']);
@@ -106,7 +111,8 @@ class FileBrowserController extends Controller
         ];
 
         return view('school.admin.file-browser.index', compact(
-            'school',
+            'network',
+            'branch',
             'files',
             'subjects',
             'grades',
@@ -115,18 +121,22 @@ class FileBrowserController extends Controller
         ));
     }
 
-    public function show(School $school, $fileId)
+    public function show(Network $network, Branch $branch, $fileId)
     {
-        $file = FileSubmission::where('school_id', $school->id)
+        $file = FileSubmission::where('school_id', $branch->id)
             ->with(['user', 'subject', 'grade'])
             ->findOrFail($fileId);
 
-        return view('school.admin.file-browser.show', compact('school', 'file'));
+        return view('school.admin.file-browser.show', [
+            'network' => $network,
+            'branch' => $branch,
+            'file' => $file,
+        ]);
     }
 
-    public function preview(School $school, $fileId)
+    public function preview(Network $network, Branch $branch, $fileId)
     {
-        $file = FileSubmission::where('school_id', $school->id)->findOrFail($fileId);
+        $file = FileSubmission::where('school_id', $branch->id)->findOrFail($fileId);
 
         // Check if file can be previewed
         if (!$this->canPreviewInBrowser($file->original_filename)) {
@@ -155,9 +165,9 @@ class FileBrowserController extends Controller
         }
     }
 
-    public function download(School $school, $fileId)
+    public function download(Network $network, Branch $branch, $fileId)
     {
-        $file = FileSubmission::where('school_id', $school->id)->findOrFail($fileId);
+        $file = FileSubmission::where('school_id', $branch->id)->findOrFail($fileId);
         return $this->downloadFile($file);
     }
 }
