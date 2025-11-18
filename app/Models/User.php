@@ -165,6 +165,11 @@ class User extends Authenticatable
     }
 
     // Relationships
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
     public function school(): BelongsTo
     {
         return $this->belongsTo(School::class);
