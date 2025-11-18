@@ -3,7 +3,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\School;
+use App\Http\Controllers\Concerns\ResolvesSchoolFromRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -11,22 +11,18 @@ use Illuminate\Validation\Rules;
 
 class ProfileController extends Controller
 {
+    use ResolvesSchoolFromRequest;
+
     public function edit(Request $request)
     {
-        $schoolSlug = $request->route('school');
-        $school = is_string($schoolSlug)
-            ? School::where('slug', $schoolSlug)->firstOrFail()
-            : $schoolSlug;
+        $school = $this->resolveSchool($request);
 
         return view('profile.edit', compact('school'));
     }
 
     public function update(Request $request)
     {
-        $schoolSlug = $request->route('school');
-        $school = is_string($schoolSlug)
-            ? School::where('slug', $schoolSlug)->firstOrFail()
-            : $schoolSlug;
+        $school = $this->resolveSchool($request);
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -45,10 +41,7 @@ class ProfileController extends Controller
 
     public function updatePassword(Request $request)
     {
-        $schoolSlug = $request->route('school');
-        $school = is_string($schoolSlug)
-            ? School::where('slug', $schoolSlug)->firstOrFail()
-            : $schoolSlug;
+        $school = $this->resolveSchool($request);
 
         $request->validate([
             'current_password' => ['required', 'current_password'],

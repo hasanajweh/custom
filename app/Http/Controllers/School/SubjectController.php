@@ -3,18 +3,17 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\ResolvesSchoolFromRequest;
 use App\Models\Subject;
-use App\Models\School;
 use Illuminate\Http\Request;
 
 class SubjectController extends Controller
 {
+    use ResolvesSchoolFromRequest;
+
     public function index(Request $request)
     {
-        $school = $request->route('school');
-        if (is_string($school)) {
-            $school = School::where('slug', $school)->firstOrFail();
-        }
+        $school = $this->resolveSchool($request);
 
         $subjects = $school->subjects()->orderBy('name')->get();
         $archivedSubjects = $school->subjects()->onlyTrashed()->orderBy('name')->get();
@@ -24,10 +23,7 @@ class SubjectController extends Controller
 
     public function store(Request $request)
     {
-        $school = $request->route('school');
-        if (is_string($school)) {
-            $school = School::where('slug', $school)->firstOrFail();
-        }
+        $school = $this->resolveSchool($request);
 
         $request->validate(['name' => 'required|string|max:255']);
 
@@ -38,10 +34,7 @@ class SubjectController extends Controller
 
     public function archive(Request $request, Subject $subject)
     {
-        $school = $request->route('school');
-        if (is_string($school)) {
-            $school = School::where('slug', $school)->firstOrFail();
-        }
+        $school = $this->resolveSchool($request);
 
         if ($subject->school_id !== $school->id) {
             abort(403);
@@ -54,10 +47,7 @@ class SubjectController extends Controller
 
     public function restore(Request $request, $subjectId)
     {
-        $school = $request->route('school');
-        if (is_string($school)) {
-            $school = School::where('slug', $school)->firstOrFail();
-        }
+        $school = $this->resolveSchool($request);
 
         $subject = Subject::withTrashed()
             ->where('school_id', $school->id)

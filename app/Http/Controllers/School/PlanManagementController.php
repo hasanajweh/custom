@@ -3,22 +3,20 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\ResolvesSchoolFromRequest;
 use App\Traits\HandlesS3Storage;
 use App\Models\FileSubmission;
-use App\Models\School;
 use Illuminate\Http\Request;
 
 class PlanManagementController extends Controller
 {
 
     use HandlesS3Storage;
+    use ResolvesSchoolFromRequest;
 
     public function index(Request $request)
     {
-        $schoolSlug = $request->route('school');
-        $school = is_string($schoolSlug)
-            ? School::where('slug', $schoolSlug)->firstOrFail()
-            : $schoolSlug;
+        $school = $this->resolveSchool($request);
 
         $currentSubscription = $school->activeSubscription()->with('plan')->first();
 
@@ -28,10 +26,7 @@ class PlanManagementController extends Controller
 
     public function download(Request $request, FileSubmission $plan)
     {
-        $school = $request->route('school');
-        if (is_string($school)) {
-            $school = School::where('slug', $school)->firstOrFail();
-        }
+        $school = $this->resolveSchool($request);
 
         if ($plan->school_id !== $school->id || $plan->submission_type !== 'plan') {
             abort(404);

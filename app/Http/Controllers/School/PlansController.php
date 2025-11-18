@@ -1,12 +1,10 @@
 <?php
-// app/Http/Controllers/School/PlansController.php
-
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\ResolvesSchoolFromRequest;
 use App\Traits\HandlesS3Storage;
 use App\Models\FileSubmission;
-use App\Models\School;
 use App\Models\Subject;
 use App\Models\Grade;
 use App\Models\User;
@@ -15,13 +13,11 @@ use Illuminate\Http\Request;
 class PlansController extends Controller
 {
     use HandlesS3Storage;
+    use ResolvesSchoolFromRequest;
 
     public function index(Request $request)
     {
-        $schoolSlug = $request->route('school');
-        $school = is_string($schoolSlug)
-            ? School::where('slug', $schoolSlug)->firstOrFail()
-            : $schoolSlug;
+        $school = $this->resolveSchool($request);
 
         $query = FileSubmission::where('school_id', $school->id)
             ->whereIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan'])
@@ -113,10 +109,7 @@ class PlansController extends Controller
 
     public function show(Request $request, $school, FileSubmission $plan)
     {
-        $schoolSlug = $request->route('school');
-        $school = is_string($schoolSlug)
-            ? School::where('slug', $schoolSlug)->firstOrFail()
-            : $schoolSlug;
+        $school = $this->resolveSchool($request);
 
         if ($plan->school_id !== $school->id) {
             abort(404);
@@ -127,10 +120,7 @@ class PlansController extends Controller
 
     public function download(Request $request, $school, FileSubmission $plan)
     {
-        $schoolSlug = $request->route('school');
-        $school = is_string($schoolSlug)
-            ? School::where('slug', $schoolSlug)->firstOrFail()
-            : $schoolSlug;
+        $school = $this->resolveSchool($request);
 
         if ($plan->school_id !== $school->id) {
             abort(404);

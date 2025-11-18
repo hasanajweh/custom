@@ -3,18 +3,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\School;
+use App\Http\Controllers\Concerns\ResolvesSchoolFromRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
+    use ResolvesSchoolFromRequest;
+
     public function index(Request $request)
     {
-        $schoolSlug = $request->route('school');
-        $school = is_string($schoolSlug)
-            ? School::where('slug', $schoolSlug)->firstOrFail()
-            : $schoolSlug;
+        $school = $this->resolveSchool($request);
 
         $user = Auth::user();
 

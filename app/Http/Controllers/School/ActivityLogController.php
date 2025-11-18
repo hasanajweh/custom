@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
-use App\Models\School;
+use App\Http\Controllers\Concerns\ResolvesSchoolFromRequest;
 use App\Models\User;
 use App\Services\ActivityLoggerService;
 use Illuminate\Http\Request;
@@ -11,12 +11,11 @@ use Spatie\Activitylog\Models\Activity;
 
 class ActivityLogController extends Controller
 {
+    use ResolvesSchoolFromRequest;
+
     public function index(Request $request)
     {
-        $schoolSlug = $request->route('school');
-        $school = is_string($schoolSlug)
-            ? School::where('slug', $schoolSlug)->firstOrFail()
-            : $schoolSlug;
+        $school = $this->resolveSchool($request);
 
         $query = Activity::with(['causer'])
             ->where('school_id', $school->id)

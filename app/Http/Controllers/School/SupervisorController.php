@@ -4,8 +4,8 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\ResolvesSchoolFromRequest;
 use App\Models\User;
-use App\Models\School;
 use App\Models\FileSubmission;
 use App\Models\Subject;
 use App\Models\SupervisorSubject;
@@ -13,12 +13,11 @@ use Illuminate\Http\Request;
 
 class SupervisorController extends Controller
 {
+    use ResolvesSchoolFromRequest;
+
     public function index(Request $request)
     {
-        $schoolSlug = $request->route('school');
-        $school = is_string($schoolSlug)
-            ? School::where('slug', $schoolSlug)->firstOrFail()
-            : $schoolSlug;
+        $school = $this->resolveSchool($request);
 
         // ✅ Get all supervisors with their subjects from pivot table
         $supervisors = User::where('school_id', $school->id)
@@ -70,10 +69,7 @@ class SupervisorController extends Controller
 
     public function files(Request $request, $school, User $supervisor)
     {
-        $schoolSlug = $request->route('school');
-        $school = is_string($schoolSlug)
-            ? School::where('slug', $schoolSlug)->firstOrFail()
-            : $schoolSlug;
+        $school = $this->resolveSchool($request);
 
         // Verify supervisor belongs to school
         if ($supervisor->school_id !== $school->id || $supervisor->role !== 'supervisor') {
