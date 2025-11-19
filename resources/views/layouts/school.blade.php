@@ -2,11 +2,18 @@
 <html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" class="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     @php
-        $school = $school ?? (Auth::user()->school ?? null);
+        $school = $school ?? null;
+
+        if (Auth::check()) {
+            $school = $school ?? (Auth::user()->school ?? null);
+            $networkSlug = $school?->network?->slug ?? Auth::user()?->network?->slug ?? '';
+            $isMainAdmin = Auth::user()?->isMainAdmin();
+        }
+
         $schoolName = $school->name ?? config('app.name');
         $schoolSlug = $school?->slug ?? '';
-        $networkSlug = $school?->network?->slug ?? Auth::user()?->network?->slug ?? '';
-        $isMainAdmin = Auth::user()?->isMainAdmin();
+        $networkSlug = $networkSlug ?? '';
+        $isMainAdmin = $isMainAdmin ?? false;
     @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
@@ -1068,6 +1075,7 @@
 
 </head>
 <body class="bg-white {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
+@auth
 
 <!-- Chrome/Edge/Brave/Opera Install Banner -->
 <div id="pwaInstallBanner" class="pwa-install-banner">
@@ -1949,6 +1957,8 @@
 
 
 @stack('scripts')
+
+@endauth
 
 </body>
 </html>
