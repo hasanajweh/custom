@@ -136,9 +136,16 @@
 
                         <x-slot name="content">
                             @php
-                                $userSchool = Auth::user()->school;
-                                $profileUrl = $userSchool ? tenant_route('profile.edit', $userSchool) : '#';
-                                $logoutUrl = $userSchool ? tenant_route('logout', $userSchool) : '#';
+                                $user = Auth::user();
+                                $userSchool = $user?->school;
+                                if ($user && $user->role === 'main_admin') {
+                                    $networkSlug = $user->network?->slug;
+                                    $profileUrl = route('main-admin.dashboard', ['network' => $networkSlug]);
+                                    $logoutUrl = route('main-admin.logout', ['network' => $networkSlug]);
+                                } else {
+                                    $profileUrl = $userSchool ? tenant_route('profile.edit', $userSchool) : '#';
+                                    $logoutUrl = $userSchool ? tenant_route('logout', $userSchool) : '#';
+                                }
                             @endphp
                             <x-dropdown-link :href="$profileUrl">
                                 <svg class="mr-2 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
