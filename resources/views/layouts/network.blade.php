@@ -15,21 +15,21 @@
                 <p class="text-xs text-slate-500">@lang('messages.main_admin')</p>
             </div>
             <nav class="flex-1 px-4 py-6 space-y-2">
-                <a href="{{ tenant_route('main-admin.dashboard') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.dashboard') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
+                <a href="{{ route('main-admin.dashboard') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.dashboard') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
                     <span class="font-semibold">@lang('messages.dashboard.dashboard')</span>
                 </a>
-                <a href="{{ tenant_route('main-admin.users.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.users.*') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
+                <a href="{{ route('main-admin.users.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.users.*') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
                     <span class="font-semibold">@lang('messages.users.manage_users')</span>
                 </a>
-                <a href="{{ tenant_route('main-admin.hierarchy') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.hierarchy') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
+                <a href="{{ route('main-admin.hierarchy') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.hierarchy') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
                     <span class="font-semibold">@lang('messages.network_overview')</span>
                 </a>
-                <a href="{{ tenant_route('main-admin.subjects-grades') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.subjects-grades*') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
+                <a href="{{ route('main-admin.subjects-grades') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.subjects-grades*') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
                     <span class="font-semibold">@lang('messages.subjects_grades')</span>
                 </a>
             </nav>
             <div class="px-4 py-4 border-t border-slate-200">
-                <form method="POST" action="{{ route('main-admin.logout', ['network' => auth()->user()->network->slug ?? request('network')]) }}">
+                <form method="POST" action="{{ route('main-admin.logout') }}">
                     @csrf
                     <button type="submit" class="w-full px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700">
                         @lang('messages.log_out')

@@ -6,11 +6,11 @@ namespace App\Http\Controllers\School;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Concerns\ResolvesSchoolFromRequest;
 use App\Traits\HandlesS3Storage;
-use App\Models\Branch;
 use App\Models\FileSubmission;
 use App\Models\Grade;
 use App\Models\Network;
 use App\Models\Subject;
+use App\Models\School;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
@@ -21,7 +21,7 @@ class FileBrowserController extends Controller
     use HandlesS3Storage;
     use ResolvesSchoolFromRequest;
 
-    public function index(Request $request, Network $network, Branch $branch)
+    public function index(Request $request, Network $network, School $branch)
     {
         $school = $this->resolveSchool($request);
 
@@ -126,7 +126,7 @@ class FileBrowserController extends Controller
         ));
     }
 
-    public function show(Network $network, Branch $branch, $fileId)
+    public function show(Network $network, School $branch, $fileId)
     {
         $file = FileSubmission::where('school_id', $branch->id)
             ->with(['user', 'subject', 'grade'])
@@ -139,7 +139,7 @@ class FileBrowserController extends Controller
         ]);
     }
 
-    public function preview(Network $network, Branch $branch, $fileId)
+    public function preview(Network $network, School $branch, $fileId)
     {
         $file = FileSubmission::where('school_id', $branch->id)->findOrFail($fileId);
 
@@ -170,7 +170,7 @@ class FileBrowserController extends Controller
         }
     }
 
-    public function download(Network $network, Branch $branch, $fileId)
+    public function download(Network $network, School $branch, $fileId)
     {
         $file = FileSubmission::where('school_id', $branch->id)->findOrFail($fileId);
         return $this->downloadFile($file);

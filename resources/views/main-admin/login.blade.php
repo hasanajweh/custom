@@ -13,7 +13,7 @@
                 <h2 class="text-xl font-semibold text-gray-900 mb-4">@lang('messages.log_in')
                     <span class="text-sm text-gray-500">(@lang('messages.main_admin'))</span>
                 </h2>
-                <form method="POST" action="{{ route('main-admin.login', $network->slug) }}" class="space-y-4">
+                <form method="POST" action="{{ route('main-admin.login') }}" class="space-y-4">
                     @csrf
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1" for="email">@lang('messages.email')</label>
