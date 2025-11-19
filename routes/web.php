@@ -186,10 +186,10 @@ Route::prefix('{network:slug}/main-admin')
 // TENANT (SCHOOL) ROUTES
 // ===========================
 Route::prefix('{network:slug}/{branch:slug}')
-    ->middleware(['setlocale', 'setNetwork', 'setBranch'])
+    ->middleware(['setlocale', 'setNetwork'])
     ->scopeBindings()
     ->group(function () {
-        Route::middleware('match.school.network')->group(function () {
+        Route::middleware(['match.school.network', 'setBranch'])->group(function () {
             // ===========================
             // GUEST ROUTES
             // ===========================
@@ -212,112 +212,129 @@ Route::prefix('{network:slug}/{branch:slug}')
                     Route::post('login', 'store');
                 });
             });
+        });
+
+        // ===========================
+        // AUTHENTICATED TENANT ROUTES (ALL ROLES)
+        // ===========================
+        Route::middleware(['auth', 'match.school.network', 'verify.tenant', 'setBranch'])->group(function () {
+            // Dashboard (role-based)
+            Route::get('/dashboard', function (Network $network, School $branch) {
+                if ($branch->network_id !== $network->id) {
+                    abort(404, 'Access denied to this network.');
+                }
+
+                $user = Auth::user();
+
+                // Ensure user belongs to this school
+                if ($user->school_id !== $branch->id) {
+                    abort(403, 'Access denied to this school.');
+                }
+
+                return match($user->role) {
+                    'admin' => redirect()->to(tenant_route('school.admin.dashboard', $branch)),
+                    'teacher' => redirect()->to(tenant_route('teacher.dashboard', $branch)),
+                    'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $branch)),
+                    default => abort(403, 'Invalid user role.')
+                };
+            })->name('dashboard');
 
             // ===========================
-            // AUTHENTICATED ROUTES
+            // PROFILE ROUTES (ALL USERS)
             // ===========================
+            Route::controller(ProfileController::class)
+                ->prefix('profile')
+                ->name('profile.')
+                ->group(function () {
+                    Route::get('/', 'edit')->name('edit');
+                    Route::patch('/', 'update')->name('update');
+                    Route::patch('/password', 'updatePassword')->name('password.update');
+                    Route::patch('/language', 'updateLanguage')->name('language.update');
+                });
 
-            Route::middleware(['auth', 'verify.tenant'])->group(function () {
-                // Dashboard (role-based)
-                Route::get('/dashboard', function (Network $network, School $branch) {
-                    if ($branch->network_id !== $network->id) {
-                        abort(404, 'Access denied to this network.');
-                    }
+            // ===========================
+            // TEACHER ROUTES
+            // ===========================
+            Route::middleware('role:teacher')
+                ->prefix('teacher')
+                ->name('teacher.')
+                ->group(function () {
+                    Route::get('/dashboard', [TeacherDashboardController::class, 'index'])
+                        ->name('dashboard');
 
-                    $user = Auth::user();
+                    Route::controller(FileSubmissionController::class)
+                        ->prefix('files')
+                        ->name('files.')
+                        ->group(function () {
+                            Route::get('/', 'myFiles')->name('index');
+                            Route::get('/create', 'create')->name('create');
+                            Route::post('/', 'store')->name('store');
+                            Route::get('/{fileSubmission}', 'show')->name('show');
+                            Route::get('/{fileSubmission}/preview', 'preview')->name('preview');
+                            Route::get('/{fileSubmission}/download', 'download')->name('download');
+                            Route::delete('/{fileSubmission}', 'destroy')->name('destroy');
+                        });
+                });
 
-                    // Ensure user belongs to this school
-                    if ($user->school_id !== $branch->id) {
-                        abort(403, 'Access denied to this school.');
-                    }
+            // ===========================
+            // SUPERVISOR ROUTES
+            // ===========================
+            Route::middleware('role:supervisor')
+                ->prefix('supervisor')
+                ->name('supervisor.')
+                ->group(function () {
+                    Route::get('/dashboard', [SupervisorDashboardController::class, 'index'])
+                        ->name('dashboard');
 
-                    return match($user->role) {
-                        'admin' => redirect()->to(tenant_route('school.admin.dashboard', $branch)),
-                        'teacher' => redirect()->to(tenant_route('teacher.dashboard', $branch)),
-                        'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $branch)),
-                        default => abort(403, 'Invalid user role.')
-                    };
-                })->name('dashboard');
+                    // Review files
+                    Route::controller(ReviewController::class)
+                        ->prefix('review-files')
+                        ->name('reviews.')
+                        ->group(function () {
+                            Route::get('/', 'index')->name('index');
+                            Route::get('/{fileSubmission}', 'show')->name('show');
+                            Route::get('/{fileSubmission}/preview', 'preview')->name('preview');
+                            Route::get('/{fileSubmission}/download', 'download')->name('download');
+                        });
 
-                // ===========================
-                // PROFILE ROUTES (ALL USERS)
-                // ===========================
-                Route::controller(ProfileController::class)
-                    ->prefix('profile')
-                    ->name('profile.')
-                    ->group(function () {
-                        Route::get('/', 'edit')->name('edit');
-                        Route::patch('/', 'update')->name('update');
-                        Route::patch('/password', 'updatePassword')->name('password.update');
-                        Route::patch('/language', 'updateLanguage')->name('language.update');
-                    });
+                    // Supervisor file management
+                    Route::controller(SupervisorFileSubmissionController::class)
+                        ->prefix('files')
+                        ->name('files.')
+                        ->group(function () {
+                            Route::get('/', 'index')->name('index');
+                            Route::get('/create', 'create')->name('create');
+                            Route::post('/', 'store')->name('store');
+                        });
 
-                // ===========================
-                // TEACHER ROUTES
-                // ===========================
-                Route::middleware('role:teacher')
-                    ->prefix('teacher')
-                    ->name('teacher.')
-                    ->group(function () {
-                        Route::get('/dashboard', [TeacherDashboardController::class, 'index'])
-                            ->name('dashboard');
+                    // Supervisor specific files
+                    Route::get('/{supervisor}/files', [SupervisorController::class, 'files'])->name('files');
+                });
 
-                        Route::controller(FileSubmissionController::class)
-                            ->prefix('files')
-                            ->name('files.')
-                            ->group(function () {
-                                Route::get('/', 'myFiles')->name('index');
-                                Route::get('/create', 'create')->name('create');
-                                Route::post('/', 'store')->name('store');
-                                Route::get('/{fileSubmission}', 'show')->name('show');
-                                Route::get('/{fileSubmission}/preview', 'preview')->name('preview');
-                                Route::get('/{fileSubmission}/download', 'download')->name('download');
-                                Route::delete('/{fileSubmission}', 'destroy')->name('destroy');
-                            });
-                    });
+            // ===========================
+            // NOTIFICATIONS (ALL AUTHENTICATED USERS)
+            // ===========================
+            Route::controller(NotificationController::class)
+                ->prefix('notifications')
+                ->name('notifications.')
+                ->group(function () {
+                    Route::get('/', 'index')->name('index');
+                    Route::post('/{notification}/read', 'markAsRead')->name('read');
+                    Route::post('/mark-all-read', 'markAllAsRead')->name('mark-all-read');
+                    Route::get('/unread-count', 'unreadCount')->name('unread-count');
+                });
 
-                // ===========================
-                // SUPERVISOR ROUTES
-                // ===========================
-                Route::middleware('role:supervisor')
-                    ->prefix('supervisor')
-                    ->name('supervisor.')
-                    ->group(function () {
-                        Route::get('/dashboard', [SupervisorDashboardController::class, 'index'])
-                            ->name('dashboard');
+            // Logout
+            Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+        });
 
-                        // Review files
-                        Route::controller(ReviewController::class)
-                            ->prefix('review-files')
-                            ->name('reviews.')
-                            ->group(function () {
-                                Route::get('/', 'index')->name('index');
-                                Route::get('/{fileSubmission}', 'show')->name('show');
-                                Route::get('/{fileSubmission}/preview', 'preview')->name('preview');
-                                Route::get('/{fileSubmission}/download', 'download')->name('download');
-                            });
-
-                        // Supervisor file management
-                        Route::controller(SupervisorFileSubmissionController::class)
-                            ->prefix('files')
-                            ->name('files.')
-                            ->group(function () {
-                                Route::get('/', 'index')->name('index');
-                                Route::get('/create', 'create')->name('create');
-                                Route::post('/', 'store')->name('store');
-                            });
-
-                        // Supervisor specific files
-                        Route::get('/{supervisor}/files', [SupervisorController::class, 'files'])->name('files');
-                    });
-
-                // ===========================
-                // ADMIN ROUTES
-                // ===========================
-                Route::prefix('admin')
-                    ->middleware('role:admin')
-                    ->name('school.admin.')
-                    ->group(function () {
+        // ===========================
+        // BRANCH ADMIN ROUTES
+        // ===========================
+        Route::prefix('admin')
+            ->middleware(['auth', 'role:admin', 'match.school.network', 'verify.tenant', 'setBranch'])
+            ->name('school.admin.')
+            ->group(function () {
 
                         Route::get('dashboard', [DashboardController::class, 'index'])
                             ->name('dashboard');

@@ -1308,10 +1308,10 @@
         <nav class="space-y-1">
             @php
                 $dashboardUrl = $isMainAdmin
-                    ? route('main-admin.dashboard')
+                    ? route('main-admin.dashboard', ['network' => auth()->user()?->network?->slug])
                     : (Auth::user()->role === 'admin'
                         ? ($school ? tenant_route('school.admin.dashboard', $school) : '#')
-                        : tenant_route('dashboard', $schoolSlug));
+                        : ($school ? tenant_route('dashboard', $school) : '#'));
             @endphp
             <a href="{{ $dashboardUrl }}"
                class="sidebar-item {{ request()->routeIs('dashboard') || request()->routeIs('main-admin.dashboard') || request()->routeIs('school.admin.dashboard') ? 'active' : '' }}">
