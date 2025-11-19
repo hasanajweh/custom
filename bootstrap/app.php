@@ -15,7 +15,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\IdentifyTenant::class,
             \App\Http\Middleware\SetNetwork::class,
-            \App\Http\Middleware\SetBranch::class,
         ]);
 
         $middleware->alias([
@@ -25,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'setBranch' => \App\Http\Middleware\SetBranch::class,
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
+            'mainadmin' => \App\Http\Middleware\EnsureMainAdmin::class,
             'superadmin' => \App\Http\Middleware\EnsureIsSuperAdmin::class,
             'active' => \App\Http\Middleware\CheckUserActive::class,
             'match.school.network' => \App\Http\Middleware\EnsureSchoolNetworkMatch::class,

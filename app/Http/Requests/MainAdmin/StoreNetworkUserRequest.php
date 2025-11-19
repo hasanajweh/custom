@@ -18,12 +18,14 @@ class StoreNetworkUserRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role' => ['required', Rule::in(['admin', 'supervisor', 'teacher'])],
-            'school_id' => ['required', 'exists:schools,id'],
-            'subjects' => ['array'],
-            'subjects.*' => ['exists:subjects,id'],
-            'grades' => ['array'],
-            'grades.*' => ['exists:grades,id'],
+            'assignments' => ['required', 'array', 'min:1'],
+            'assignments.*.school_id' => ['required', 'exists:schools,id'],
+            'assignments.*.roles' => ['required', 'array', 'min:1'],
+            'assignments.*.roles.*' => ['required', Rule::in(['admin', 'supervisor', 'teacher'])],
+            'assignments.*.subjects' => ['array'],
+            'assignments.*.subjects.*' => ['exists:subjects,id'],
+            'assignments.*.grades' => ['array'],
+            'assignments.*.grades.*' => ['exists:grades,id'],
         ];
     }
 }
