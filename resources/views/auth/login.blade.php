@@ -71,7 +71,10 @@
                 </div>
 
                 <!-- Login Form -->
-                <form method="POST" action="{{ tenant_route('login', $school) }}" class="space-y-6">
+                @php
+                    $loginAction = isset($school) ? tenant_route('login', $school) : route('login');
+                @endphp
+                <form method="POST" action="{{ $loginAction }}" class="space-y-6">
                     @csrf
 
                     <!-- Email Field -->
