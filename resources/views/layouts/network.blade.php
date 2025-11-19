@@ -5,13 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Scholder') }} — @yield('title')</title>
+    @php
+        $network = Auth::check() ? Auth::user()->network : null;
+        $userName = Auth::check() ? Auth::user()->name : '';
+    @endphp
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-slate-100 text-slate-900 min-h-screen">
+    @auth
     <div class="flex min-h-screen">
         <aside class="w-72 bg-white border-r border-slate-200 hidden lg:flex flex-col">
             <div class="px-6 py-4 border-b border-slate-200">
-                <h1 class="text-lg font-semibold text-indigo-700">{{ auth()->user()->network->name ?? __('Network') }}</h1>
+                <h1 class="text-lg font-semibold text-indigo-700">{{ $network->name ?? __('Network') }}</h1>
                 <p class="text-xs text-slate-500">@lang('messages.main_admin')</p>
             </div>
             <nav class="flex-1 px-4 py-6 space-y-2">
@@ -44,7 +49,7 @@
                     <p class="text-sm text-slate-500">@lang('messages.main_admin')</p>
                 </div>
                 <div class="text-sm text-slate-600">
-                    {{ auth()->user()->name ?? '' }}
+                    {{ $userName }}
                 </div>
             </header>
             <main class="p-6">
@@ -53,5 +58,6 @@
         </div>
     </div>
     @stack('scripts')
+    @endauth
 </body>
 </html>

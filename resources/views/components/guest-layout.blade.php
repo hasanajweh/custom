@@ -1,5 +1,3 @@
-@extends('layouts.guest')
-
-@section('content')
+<x-layouts.guest>
     {{ $slot }}
-@endsection
+</x-layouts.guest>
