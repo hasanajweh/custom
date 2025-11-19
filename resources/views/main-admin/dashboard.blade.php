@@ -1,4 +1,4 @@
-@extends('layouts.school')
+@extends('layouts.network')
 
 @section('title', __('messages.dashboard.dashboard'))
 
@@ -28,6 +28,11 @@
             <p class="text-sm text-gray-700">@lang('messages.admins'): <span class="font-semibold">{{ $summary['admins'] }}</span></p>
             <p class="text-sm text-gray-700">@lang('messages.supervisors'): <span class="font-semibold">{{ $summary['supervisors'] }}</span></p>
             <p class="text-sm text-gray-700">@lang('messages.teachers'): <span class="font-semibold">{{ $summary['teachers'] }}</span></p>
+        </div>
+        <div class="bg-white shadow rounded-lg p-4 border border-gray-200">
+            <p class="text-sm text-gray-500 mb-1">@lang('messages.subjects_grades')</p>
+            <p class="text-sm text-gray-700">@lang('messages.subjects'): <span class="font-semibold">{{ $summary['subjects'] }}</span></p>
+            <p class="text-sm text-gray-700">@lang('messages.grades'): <span class="font-semibold">{{ $summary['grades'] }}</span></p>
         </div>
     </div>
 

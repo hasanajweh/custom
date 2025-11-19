@@ -50,48 +50,41 @@ if (!function_exists('getInitials')) {
 
 if (!function_exists('tenant_route')) {
     /**
-     * Generate a tenant-aware route with network and branch parameters.
+     * Generate a tenant-aware route with optional branch context.
+     *
+     * When no branch is provided, the route is resolved for the network-only
+     * (Main Admin) context using the authenticated user's network unless
+     * explicitly provided in the parameters.
      */
-    function tenant_route(string $name, $network = null, $branch = null, array $parameters = [], bool $absolute = true): string
+    function tenant_route(string $name, $school = null, array $parameters = [], bool $absolute = true): string
     {
         $user = auth()->user();
 
         $networkModel = match (true) {
-            $network instanceof Network => $network,
-            $network instanceof Branch => $network->network,
-            $network instanceof School => $network->network,
-            $network === null && $user && $user->network => $user->network,
-            is_string($network) => Network::where('slug', $network)->first(),
+            $school instanceof School => $school->network,
+            $user && $user->network => $user->network,
+            isset($parameters['network']) => Network::where('slug', $parameters['network'])->first(),
             default => null,
         };
-
-        $branchModel = match (true) {
-            $branch instanceof Branch => $branch,
-            $branch instanceof School => $branch,
-            $branch instanceof Network => null,
-            $branch === null && $user && $user->school => $user->school,
-            is_string($branch) => School::where('slug', $branch)->first(),
-            default => null,
-        };
-
-        if (! $networkModel && $branchModel instanceof School) {
-            $networkModel = $branchModel->network;
-        }
 
         if (! $networkModel) {
             throw new \InvalidArgumentException('Network is required to generate tenant routes.');
         }
 
-        if (! $branchModel) {
-            throw new \InvalidArgumentException('Branch is required to generate tenant routes.');
+        if (! $school) {
+            return route(
+                $name,
+                array_merge(['network' => $networkModel->slug], $parameters),
+                $absolute,
+            );
         }
 
         return route(
             $name,
             array_merge([
                 'network' => $networkModel->slug,
-                'branch' => $branchModel->slug,
-                'school' => $branchModel->slug,
+                'branch' => $school->slug,
+                'school' => $school->slug,
             ], $parameters),
             $absolute,
         );

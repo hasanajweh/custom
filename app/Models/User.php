@@ -180,6 +180,13 @@ class User extends Authenticatable
         return $this->belongsTo(Network::class);
     }
 
+    public function branches(): BelongsToMany
+    {
+        return $this->belongsToMany(School::class, 'branch_user_roles')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
     public function grades(): BelongsToMany
     {
         return $this->belongsToMany(Grade::class)
@@ -197,6 +204,15 @@ class User extends Authenticatable
     public function fileSubmissions(): HasMany
     {
         return $this->hasMany(FileSubmission::class);
+    }
+
+    public function getPrimaryBranch(): ?School
+    {
+        if ($this->relationLoaded('branches')) {
+            return $this->branches->first();
+        }
+
+        return $this->branches()->first();
     }
 
     public function supervisorSubjects(): HasMany

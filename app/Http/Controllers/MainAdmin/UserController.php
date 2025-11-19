@@ -11,6 +11,7 @@ use App\Models\School;
 use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
@@ -18,18 +19,23 @@ class UserController extends Controller
 {
     public function index(Network $network): View
     {
-        $branches = $network->branches()->withCount('users')->get();
+        $branches = $network->branches()->with(['subjects', 'grades'])->withCount('users')->get();
 
-        $usersQuery = User::with(['school'])
+        $usersQuery = User::with(['branches', 'subjects', 'grades'])
             ->withTrashed()
             ->where('network_id', $network->id);
 
         if (request('branch')) {
-            $usersQuery->where('school_id', request('branch'));
+            $branchId = (int) request('branch');
+            $usersQuery->whereHas('branches', fn ($query) => $query->where('schools.id', $branchId));
         }
 
         if (request('role')) {
-            $usersQuery->where('role', request('role'));
+            $role = request('role');
+            $usersQuery->where(function ($query) use ($role) {
+                $query->where('role', $role)
+                    ->orWhereHas('branches', fn ($branchQuery) => $branchQuery->wherePivot('role', $role));
+            });
         }
 
         if (request('status') === 'archived') {
@@ -40,39 +46,38 @@ class UserController extends Controller
 
         $users = $usersQuery->latest()->paginate(20)->withQueryString();
 
-        return view('main-admin.users.index', [
-            'network' => $network,
-            'branches' => $branches,
-            'users' => $users,
-        ]);
+        return view('main-admin.users.index', compact('network', 'branches', 'users'));
     }
 
     public function create(Network $network): View
     {
         $branches = $network->branches()->with(['subjects', 'grades'])->get();
 
-        return view('main-admin.users.create', [
-            'network' => $network,
-            'branches' => $branches,
-        ]);
+        return view('main-admin.users.create', compact('network', 'branches'));
     }
 
     public function store(StoreNetworkUserRequest $request, Network $network): RedirectResponse
     {
         $data = $request->validated();
-        $school = School::where('network_id', $network->id)->findOrFail($data['school_id']);
+
+        $assignments = collect($data['assignments'])
+            ->filter(fn ($assignment) => ($assignment['enabled'] ?? false) && !empty($assignment['role']))
+            ->values();
+
+        $primaryBranchId = optional($assignments->first())['branch_id'];
+        $primaryRole = optional($assignments->first())['role'];
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => $data['role'],
-            'school_id' => $school->id,
+            'role' => $primaryRole,
+            'school_id' => $primaryBranchId,
             'network_id' => $network->id,
             'is_active' => true,
         ]);
 
-        $this->syncAssignments($user, $data, $school);
+        $this->syncAssignments($user, $assignments, $network);
 
         return redirect()->route('main-admin.users.index', $network)->with('status', __('User created successfully.'));
     }
@@ -83,11 +88,9 @@ class UserController extends Controller
 
         $branches = $network->branches()->with(['subjects', 'grades'])->get();
 
-        return view('main-admin.users.edit', [
-            'network' => $network,
-            'user' => $user,
-            'branches' => $branches,
-        ]);
+        $user->load(['branches', 'subjects', 'grades']);
+
+        return view('main-admin.users.edit', compact('network', 'user', 'branches'));
     }
 
     public function update(UpdateNetworkUserRequest $request, Network $network, User $user): RedirectResponse
@@ -95,13 +98,19 @@ class UserController extends Controller
         abort_unless($user->network_id === $network->id, 404);
 
         $data = $request->validated();
-        $school = School::where('network_id', $network->id)->findOrFail($data['school_id']);
+
+        $assignments = collect($data['assignments'])
+            ->filter(fn ($assignment) => ($assignment['enabled'] ?? false) && !empty($assignment['role']))
+            ->values();
+
+        $primaryBranchId = optional($assignments->first())['branch_id'];
+        $primaryRole = optional($assignments->first())['role'];
 
         $user->fill([
             'name' => $data['name'],
             'email' => $data['email'],
-            'role' => $data['role'],
-            'school_id' => $school->id,
+            'role' => $primaryRole,
+            'school_id' => $primaryBranchId,
             'is_active' => $data['is_active'],
         ]);
 
@@ -111,7 +120,7 @@ class UserController extends Controller
 
         $user->save();
 
-        $this->syncAssignments($user, $data, $school);
+        $this->syncAssignments($user, $assignments, $network);
 
         return redirect()->route('main-admin.users.index', $network)->with('status', __('User updated successfully.'));
     }
@@ -133,26 +142,42 @@ class UserController extends Controller
         return redirect()->route('main-admin.users.index', $network)->with('status', __('User restored successfully.'));
     }
 
-    protected function syncAssignments(User $user, array $data, School $school): void
+    protected function syncAssignments(User $user, $assignments, Network $network): void
     {
-        if (in_array($data['role'], ['teacher', 'supervisor'])) {
-            $subjects = $data['subjects'] ?? [];
-            $grades = $data['grades'] ?? [];
-            $subjectSync = [];
-            foreach ($subjects as $subjectId) {
-                $subjectSync[$subjectId] = ['school_id' => $school->id];
+        $branchData = [];
+
+        DB::table('subject_user')->where('user_id', $user->id)->delete();
+        DB::table('grade_user')->where('user_id', $user->id)->delete();
+
+        foreach ($assignments as $assignment) {
+            $branch = School::where('network_id', $network->id)->find($assignment['branch_id']);
+            if (! $branch) {
+                continue;
             }
 
-            $gradeSync = [];
-            foreach ($grades as $gradeId) {
-                $gradeSync[$gradeId] = ['school_id' => $school->id];
-            }
+            $branchData[$branch->id] = ['role' => $assignment['role']];
 
-            $user->subjects()->sync($subjectSync);
-            $user->grades()->sync($gradeSync);
-        } else {
-            $user->subjects()->detach();
-            $user->grades()->detach();
+            if (in_array($assignment['role'], ['teacher', 'supervisor'])) {
+                $subjectSync = [];
+                foreach ($assignment['subjects'] ?? [] as $subjectId) {
+                    $subjectSync[$subjectId] = ['school_id' => $branch->id];
+                }
+
+                $gradeSync = [];
+                foreach ($assignment['grades'] ?? [] as $gradeId) {
+                    $gradeSync[$gradeId] = ['school_id' => $branch->id];
+                }
+
+                if ($subjectSync) {
+                    $user->subjects()->syncWithoutDetaching($subjectSync);
+                }
+
+                if ($gradeSync) {
+                    $user->grades()->syncWithoutDetaching($gradeSync);
+                }
+            }
         }
+
+        $user->branches()->sync($branchData);
     }
 }

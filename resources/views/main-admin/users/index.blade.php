@@ -1,4 +1,4 @@
-@extends('layouts.school')
+@extends('layouts.network')
 
 @section('title', __('Network Users'))
 
@@ -63,8 +63,20 @@
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3 font-semibold">{{ $user->name }}</td>
                         <td class="px-4 py-3">{{ $user->email }}</td>
-                        <td class="px-4 py-3 capitalize">{{ __($user->role) }}</td>
-                        <td class="px-4 py-3">{{ $user->school?->name }}</td>
+                        <td class="px-4 py-3">
+                            <div class="space-y-1">
+                                @foreach($user->branches as $branch)
+                                    <span class="px-2 py-1 rounded text-xs bg-blue-50 text-blue-800">{{ ucfirst($branch->pivot->role) }}</span>
+                                @endforeach
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <ul class="space-y-1 text-sm text-gray-800">
+                                @foreach($user->branches as $branch)
+                                    <li>{{ $branch->name }}</li>
+                                @endforeach
+                            </ul>
+                        </td>
                         <td class="px-4 py-3">
                             @if($user->trashed())
                                 <span class="px-2 py-1 text-xs rounded bg-gray-200 text-gray-700">@lang('Archived')</span>
