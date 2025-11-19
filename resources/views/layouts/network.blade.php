@@ -6,7 +6,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Scholder') }} — @yield('title')</title>
     @php
-        $network = Auth::check() ? Auth::user()->network : null;
+        $networkModel = $network ?? request()->route('network') ?? (Auth::check() ? Auth::user()->network : null);
+        $networkSlug = $networkModel instanceof \App\Models\Network
+            ? $networkModel->slug
+            : (is_string($networkModel) ? $networkModel : null);
         $userName = Auth::check() ? Auth::user()->name : '';
     @endphp
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -16,25 +19,25 @@
     <div class="flex min-h-screen">
         <aside class="w-72 bg-white border-r border-slate-200 hidden lg:flex flex-col">
             <div class="px-6 py-4 border-b border-slate-200">
-                <h1 class="text-lg font-semibold text-indigo-700">{{ $network->name ?? __('Network') }}</h1>
+                <h1 class="text-lg font-semibold text-indigo-700">{{ $networkModel?->name ?? __('Network') }}</h1>
                 <p class="text-xs text-slate-500">@lang('messages.main_admin')</p>
             </div>
             <nav class="flex-1 px-4 py-6 space-y-2">
-                <a href="{{ route('main-admin.dashboard') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.dashboard') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
+                <a href="{{ $networkSlug ? route('main-admin.dashboard', ['network' => $networkSlug]) : '#' }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.dashboard') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
                     <span class="font-semibold">@lang('messages.dashboard.dashboard')</span>
                 </a>
-                <a href="{{ route('main-admin.users.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.users.*') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
+                <a href="{{ $networkSlug ? route('main-admin.users.index', ['network' => $networkSlug]) : '#' }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.users.*') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
                     <span class="font-semibold">@lang('messages.users.manage_users')</span>
                 </a>
-                <a href="{{ route('main-admin.hierarchy') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.hierarchy') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
+                <a href="{{ $networkSlug ? route('main-admin.hierarchy', ['network' => $networkSlug]) : '#' }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.hierarchy') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
                     <span class="font-semibold">@lang('messages.network_overview')</span>
                 </a>
-                <a href="{{ route('main-admin.subjects-grades') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.subjects-grades*') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
+                <a href="{{ $networkSlug ? route('main-admin.subjects-grades', ['network' => $networkSlug]) : '#' }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.subjects-grades*') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
                     <span class="font-semibold">@lang('messages.subjects_grades')</span>
                 </a>
             </nav>
             <div class="px-4 py-4 border-t border-slate-200">
-                <form method="POST" action="{{ route('main-admin.logout') }}">
+                <form method="POST" action="{{ $networkSlug ? route('main-admin.logout', ['network' => $networkSlug]) : '#' }}">
                     @csrf
                     <button type="submit" class="w-full px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700">
                         @lang('messages.log_out')

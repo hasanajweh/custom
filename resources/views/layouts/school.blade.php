@@ -1256,9 +1256,10 @@
                         <!-- Menu Items -->
                         <div class="py-1">
                             @php
+                                $networkSlug = auth()->user()?->network?->slug;
                                 if ($isMainAdmin) {
-                                    $profileUrl = route('main-admin.dashboard');
-                                    $logoutUrl = route('main-admin.logout');
+                                    $profileUrl = $networkSlug ? route('main-admin.dashboard', ['network' => $networkSlug]) : '#';
+                                    $logoutUrl = $networkSlug ? route('main-admin.logout', ['network' => $networkSlug]) : '#';
                                 } else {
                                     $profileUrl = $school ? tenant_route('profile.edit', $school) : '#';
                                     $logoutUrl = $school ? tenant_route('logout', $school) : '#';
@@ -1318,8 +1319,9 @@
     <div class="sidebar-content">
         <nav class="space-y-1">
             @php
+                $networkSlug = $networkSlug ?? auth()->user()?->network?->slug;
                 $dashboardUrl = $isMainAdmin
-                    ? route('main-admin.dashboard', ['network' => auth()->user()?->network?->slug])
+                    ? ($networkSlug ? route('main-admin.dashboard', ['network' => $networkSlug]) : '#')
                     : (Auth::user()->role === 'admin'
                         ? ($school ? tenant_route('school.admin.dashboard', $school) : '#')
                         : ($school ? tenant_route('dashboard', $school) : '#'));
@@ -1338,19 +1340,19 @@
                     </div>
                 </div>
 
-                <a href="{{ route('main-admin.users.index') }}"
+                <a href="{{ $networkSlug ? route('main-admin.users.index', ['network' => $networkSlug]) : '#' }}"
                    class="sidebar-item {{ request()->routeIs('main-admin.users.*') ? 'active' : '' }}">
                     <i class="ri-team-line"></i>
                     <span class="sidebar-text">{{ __('messages.main_admin.navigation.users') }}</span>
                 </span></a>
 
-                <a href="{{ route('main-admin.hierarchy') }}"
+                <a href="{{ $networkSlug ? route('main-admin.hierarchy', ['network' => $networkSlug]) : '#' }}"
                    class="sidebar-item {{ request()->routeIs('main-admin.hierarchy') ? 'active' : '' }}">
                     <i class="ri-git-branch-line"></i>
                     <span class="sidebar-text">{{ __('messages.main_admin.navigation.hierarchy') }}</span>
                 </span></a>
 
-                <a href="{{ route('main-admin.subjects-grades') }}"
+                <a href="{{ $networkSlug ? route('main-admin.subjects-grades', ['network' => $networkSlug]) : '#' }}"
                    class="sidebar-item {{ request()->routeIs('main-admin.subjects-grades*') ? 'active' : '' }}">
                     <i class="ri-book-2-line"></i>
                     <span class="sidebar-text">{{ __('messages.main_admin.navigation.subjects_grades') }}</span>

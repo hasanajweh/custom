@@ -76,7 +76,7 @@ class LoginController extends Controller
         $school = $user->school;
 
         return match($user->role) {
-            'main_admin' => redirect()->route('main-admin.dashboard', $user->network?->slug),
+            'main_admin' => redirect()->route('main-admin.dashboard', ['network' => $user->network?->slug]),
             'admin' => redirect()->to(tenant_route('school.admin.dashboard', $school)),
             'teacher' => redirect()->to(tenant_route('teacher.files.index', $school)),
             'supervisor' => redirect()->to(tenant_route('supervisor.reviews.index', $school)),
@@ -100,7 +100,7 @@ class LoginController extends Controller
         }
 
         if ($network) {
-            return redirect()->route('main-admin.login', $network->slug);
+            return redirect()->route('main-admin.login', ['network' => $network->slug]);
         }
 
         return redirect('/');

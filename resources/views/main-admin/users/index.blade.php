@@ -9,7 +9,7 @@
             <h1 class="text-2xl font-bold">@lang('Network users')</h1>
             <p class="text-gray-600">@lang('Manage users across all branches in this network.')</p>
         </div>
-        <a href="{{ route('main-admin.users.create') }}" class="bg-indigo-600 text-white px-4 py-2 rounded shadow">
+        <a href="{{ route('main-admin.users.create', ['network' => $network->slug]) }}" class="bg-indigo-600 text-white px-4 py-2 rounded shadow">
             @lang('Add user')
         </a>
     </div>
@@ -76,14 +76,14 @@
                             @endif
                         </td>
                         <td class="px-4 py-3 space-x-2 text-right">
-                            <a class="text-indigo-600" href="{{ route('main-admin.users.edit', $user) }}">@lang('Edit')</a>
+                            <a class="text-indigo-600" href="{{ route('main-admin.users.edit', ['network' => $network->slug, 'user' => $user]) }}">@lang('Edit')</a>
                             @if($user->trashed())
-                                <form action="{{ route('main-admin.users.restore', $user->id) }}" method="post" class="inline">
+                                <form action="{{ route('main-admin.users.restore', ['network' => $network->slug, 'user' => $user->id]) }}" method="post" class="inline">
                                     @csrf
                                     <button class="text-green-600" type="submit">@lang('Restore')</button>
                                 </form>
                             @else
-                                <form action="{{ route('main-admin.users.destroy', $user) }}" method="post" class="inline" onsubmit="return confirm('@lang('Are you sure?')')">
+                                <form action="{{ route('main-admin.users.destroy', ['network' => $network->slug, 'user' => $user]) }}" method="post" class="inline" onsubmit="return confirm('@lang('Are you sure?')')">
                                     @csrf
                                     @method('delete')
                                     <button class="text-red-600" type="submit">@lang('Archive')</button>

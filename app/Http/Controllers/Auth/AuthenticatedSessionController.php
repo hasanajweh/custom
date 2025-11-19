@@ -20,9 +20,11 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(Network $network, School $school): View
     {
-        return view('auth.login', [
-            'school' => $school
-        ]);
+        if ($school->network_id !== $network->id) {
+            abort(404);
+        }
+
+        return view('auth.login');
     }
 
     /**
@@ -30,6 +32,10 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request, Network $network, School $school): RedirectResponse
     {
+        if ($school->network_id !== $network->id) {
+            abort(404);
+        }
+
         // Attempt authentication
         try {
             $request->authenticate();
@@ -58,7 +64,7 @@ class AuthenticatedSessionController extends Controller
             $request->session()->regenerate();
             Auth::login($user, true);
 
-            return redirect()->route('main-admin.dashboard', $user->network?->slug);
+            return redirect()->route('main-admin.dashboard', ['network' => $user->network?->slug]);
         }
 
         // Check if user belongs to this school
