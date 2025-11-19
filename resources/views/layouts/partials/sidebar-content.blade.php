@@ -1,6 +1,6 @@
 <div class="flex h-16 shrink-0 items-center">
     @if(isset($school))
-        <a href="{{ tenant_route('dashboard', $school) }}">
+        <a href="{{ $school ? tenant_route('dashboard', $school) : '#' }}">
             <x-application-logo class="h-8 w-auto" />
         </a>
     @else
