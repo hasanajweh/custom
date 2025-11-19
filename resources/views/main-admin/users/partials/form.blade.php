@@ -15,22 +15,6 @@
         <label class="text-sm text-gray-600 block">@lang('Confirm password')</label>
         <input type="password" name="password_confirmation" class="w-full border rounded p-2" @if(!isset($user)) required @endif>
     </div>
-    <div>
-        <label class="text-sm text-gray-600 block">@lang('Branch')</label>
-        <select name="school_id" class="w-full border rounded p-2" required>
-            @foreach($branches as $branch)
-                <option value="{{ $branch->id }}" @selected(old('school_id', $user->school_id ?? '')==$branch->id)>{{ $branch->name }}</option>
-            @endforeach
-        </select>
-    </div>
-    <div>
-        <label class="text-sm text-gray-600 block">@lang('Role')</label>
-        <select name="role" class="w-full border rounded p-2" required>
-            <option value="admin" @selected(old('role', $user->role ?? '')==='admin')>@lang('Admin')</option>
-            <option value="supervisor" @selected(old('role', $user->role ?? '')==='supervisor')>@lang('Supervisor')</option>
-            <option value="teacher" @selected(old('role', $user->role ?? '')==='teacher')>@lang('Teacher')</option>
-        </select>
-    </div>
     @isset($user)
         <div>
             <label class="text-sm text-gray-600 block">@lang('Active')</label>
@@ -42,36 +26,63 @@
     @endisset
 </div>
 
-<div class="border-t pt-4 space-y-3">
-    <p class="text-sm text-gray-700 font-semibold">@lang('Subjects and grades (for teachers and supervisors)')</p>
-    <div class="grid md:grid-cols-2 gap-4">
-        <div>
-            <label class="text-sm text-gray-600 block mb-2">@lang('Subjects')</label>
-            <select name="subjects[]" multiple class="w-full border rounded p-2 h-40">
-                @foreach($branches as $branch)
-                    <optgroup label="{{ $branch->name }}">
+<div class="space-y-6 mt-4">
+    @foreach($branches as $branch)
+        @php
+            $existingAssignment = isset($user)
+                ? $user->branches->firstWhere('id', $branch->id)?->pivot
+                : null;
+            $enabled = old("assignments.{$branch->id}.enabled", $existingAssignment ? true : false);
+        @endphp
+        <div class="border rounded p-4 bg-white shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="font-semibold text-gray-800">{{ $branch->name }}</h3>
+                    <p class="text-xs text-gray-500">{{ $branch->city ?? '' }}</p>
+                </div>
+                <label class="inline-flex items-center gap-2 text-sm">
+                    <input type="checkbox" name="assignments[{{ $branch->id }}][enabled]" value="1" @checked($enabled)>
+                    <span>@lang('messages.assign_to_branch')</span>
+                </label>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-4 mt-4">
+                <div>
+                    <label class="text-sm text-gray-600 block">@lang('Role')</label>
+                    <select name="assignments[{{ $branch->id }}][role]" class="w-full border rounded p-2">
+                        <option value="">@lang('messages.select_role')</option>
+                        @foreach(['admin','supervisor','teacher'] as $role)
+                            <option value="{{ $role }}" @selected(old("assignments.{$branch->id}.role", $existingAssignment->role ?? '') === $role)>{{ ucfirst($role) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600 block">@lang('Subjects')</label>
+                    <select name="assignments[{{ $branch->id }}][subjects][]" multiple class="w-full border rounded p-2 h-32">
                         @foreach($branch->subjects as $subject)
-                            <option value="{{ $subject->id }}" @selected(in_array($subject->id, old('subjects', isset($user) ? $user->subjects->pluck('id')->toArray() : [])))>{{ $subject->name }}</option>
+                            @php
+                                $selectedSubjects = old("assignments.{$branch->id}.subjects", isset($user) ? $user->subjects->where('pivot.school_id', $branch->id)->pluck('id')->toArray() : []);
+                            @endphp
+                            <option value="{{ $subject->id }}" @selected(in_array($subject->id, $selectedSubjects))>{{ $subject->name }}</option>
                         @endforeach
-                    </optgroup>
-                @endforeach
-            </select>
-        </div>
-        <div>
-            <label class="text-sm text-gray-600 block mb-2">@lang('Grades')</label>
-            <select name="grades[]" multiple class="w-full border rounded p-2 h-40">
-                @foreach($branches as $branch)
-                    <optgroup label="{{ $branch->name }}">
+                    </select>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600 block">@lang('Grades')</label>
+                    <select name="assignments[{{ $branch->id }}][grades][]" multiple class="w-full border rounded p-2 h-32">
                         @foreach($branch->grades as $grade)
-                            <option value="{{ $grade->id }}" @selected(in_array($grade->id, old('grades', isset($user) ? $user->grades->pluck('id')->toArray() : [])))>{{ $grade->name }}</option>
+                            @php
+                                $selectedGrades = old("assignments.{$branch->id}.grades", isset($user) ? $user->grades->where('pivot.school_id', $branch->id)->pluck('id')->toArray() : []);
+                            @endphp
+                            <option value="{{ $grade->id }}" @selected(in_array($grade->id, $selectedGrades))>{{ $grade->name }}</option>
                         @endforeach
-                    </optgroup>
-                @endforeach
-            </select>
+                    </select>
+                </div>
+            </div>
         </div>
-    </div>
+    @endforeach
 </div>
 
-<div class="flex justify-end">
+<div class="flex justify-end mt-6">
     <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded shadow">@lang('Save')</button>
 </div>

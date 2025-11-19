@@ -168,7 +168,7 @@ Route::prefix('{network:slug}/main-admin')
             Route::post('login', [LoginController::class, 'login']);
         });
 
-        Route::middleware(['auth', 'role:main_admin'])->group(function () {
+        Route::middleware(['auth', 'main-admin'])->group(function () {
             Route::get('dashboard', [MainAdminDashboardController::class, 'index'])->name('dashboard');
             Route::get('hierarchy', [HierarchyController::class, 'index'])->name('hierarchy');
             Route::get('subjects-grades', [SubjectGradeController::class, 'index'])->name('subjects-grades');

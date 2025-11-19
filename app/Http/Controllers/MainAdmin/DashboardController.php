@@ -5,16 +5,15 @@ namespace App\Http\Controllers\MainAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\FileSubmission;
 use App\Models\Network;
+use App\Models\Subject;
+use App\Models\Grade;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\App;
 
 class DashboardController extends Controller
 {
     public function index(Network $network): View
     {
-        App::setLocale('ar');
-
         $branches = $network->branches()->withCount([
             'users as admins_count' => function ($query) {
                 $query->where('role', 'admin');
@@ -25,6 +24,8 @@ class DashboardController extends Controller
             'users as teachers_count' => function ($query) {
                 $query->where('role', 'teacher');
             },
+            'subjects',
+            'grades',
             'fileSubmissions',
             'fileSubmissions as recent_files_count' => function ($query) {
                 $query->where('created_at', '>=', now()->subHours(72));
@@ -56,6 +57,8 @@ class DashboardController extends Controller
             'admins' => $roleCounts['admin'] ?? 0,
             'supervisors' => $roleCounts['supervisor'] ?? 0,
             'teachers' => $roleCounts['teacher'] ?? 0,
+            'subjects' => Subject::whereIn('school_id', $branchIds)->count(),
+            'grades' => Grade::whereIn('school_id', $branchIds)->count(),
         ];
 
         return view('main-admin.dashboard', [
