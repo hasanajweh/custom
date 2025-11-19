@@ -439,7 +439,6 @@ Route::prefix('{network:slug}/{branch:slug}')
                         Route::get('/{supervisor}/files', 'files')->name('files');
                     });
             });
-    });
 
 // ===========================
 // ROOT REDIRECT
