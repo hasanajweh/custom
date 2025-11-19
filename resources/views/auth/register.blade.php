@@ -32,7 +32,10 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md" href="{{ tenant_route('login', $school) }}">
+            @php
+                $loginRoute = isset($school) ? tenant_route('login', $school) : route('login');
+            @endphp
+            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md" href="{{ $loginRoute }}">
                 {{ __('Already registered?') }}
             </a>
 
