@@ -127,13 +127,13 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-center space-x-2">
-                                    <a href="{{ tenant_route('school.admin.file-browser.preview', $school->network, $school, ['file' => $file->id]) }}"
+                                    <a href="{{ tenant_route('school.admin.file-browser.preview', $school, ['file' => $file->id]) }}"
                                        target="_blank"
                                        class="p-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors"
                                        title="{{ __('messages.common.preview') }}">
                                         <i class="ri-eye-line text-lg"></i>
                                     </a>
-                                    <a href="{{ tenant_route('school.admin.file-browser.download', $school->network, $school, ['file' => $file->id]) }}"
+                                    <a href="{{ tenant_route('school.admin.file-browser.download', $school, ['file' => $file->id]) }}"
                                        class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
                                        title="{{ __('messages.common.download') }}">
                                         <i class="ri-download-line text-lg"></i>
