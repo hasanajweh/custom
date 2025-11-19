@@ -98,6 +98,10 @@ if (!function_exists('tenant_route')) {
         };
 
         if (! $network) {
+            if (! $user && ! $school && ! $routeNetworkParam) {
+                return route($name, $parameters, $absolute);
+            }
+
             throw new \InvalidArgumentException('Network is required to generate tenant routes.');
         }
 

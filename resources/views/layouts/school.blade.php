@@ -2,10 +2,10 @@
 <html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" class="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     @php
-        $school ??= Auth::user()->school ?? null;
+        $school = $school ?? (Auth::user()->school ?? null);
         $schoolName = $school->name ?? config('app.name');
-        $schoolSlug = $school->slug ?? '';
-        $networkSlug = $school->network->slug ?? Auth::user()?->network?->slug ?? '';
+        $schoolSlug = $school?->slug ?? '';
+        $networkSlug = $school?->network?->slug ?? Auth::user()?->network?->slug ?? '';
         $isMainAdmin = Auth::user()?->isMainAdmin();
     @endphp
     <meta charset="UTF-8">
@@ -1109,6 +1109,7 @@
 <div id="mobileOverlay" class="mobile-overlay" onclick="closeMobileSidebar()"></div>
 
 <!-- Enhanced Navigation -->
+@auth
 <nav class="navbar fixed w-full top-0 z-50">
     <div class="px-6 sm:px-8 lg:px-10 h-full">
         <div class="flex justify-between items-center h-full">
@@ -1290,7 +1291,9 @@
         </div>
     </div>
 </nav>
+@endauth
 
+@auth
 <!-- Enhanced Sidebar with Mobile Support -->
 <aside id="sidebar" class="sidebar {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
     <!-- Mobile Sidebar Header -->
@@ -1470,6 +1473,7 @@
         </div>
     </div>
 </aside>
+@endauth
 
 <!-- Enhanced Main Content -->
 <main class="main-content {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">

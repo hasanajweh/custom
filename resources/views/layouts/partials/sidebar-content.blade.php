@@ -1,3 +1,4 @@
+@auth
 <div class="flex h-16 shrink-0 items-center">
     @if(isset($school))
         <a href="{{ $school ? tenant_route('dashboard', $school) : '#' }}">
@@ -88,3 +89,4 @@
         </li>
     </ul>
 </nav>
+@endauth
