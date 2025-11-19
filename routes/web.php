@@ -232,9 +232,9 @@ Route::prefix('{network:slug}/{branch:slug}')
                     }
 
                     return match($user->role) {
-                        'admin' => redirect()->to(tenant_route('school.admin.dashboard', $network, $branch)),
-                        'teacher' => redirect()->to(tenant_route('teacher.dashboard', $network, $branch)),
-                        'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $network, $branch)),
+                        'admin' => redirect()->to(tenant_route('school.admin.dashboard', $branch)),
+                        'teacher' => redirect()->to(tenant_route('teacher.dashboard', $branch)),
+                        'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $branch)),
                         default => abort(403, 'Invalid user role.')
                     };
                 })->name('dashboard');
