@@ -202,12 +202,12 @@ Route::prefix('{network:slug}/{branch:slug}')
                     return view('auth.login', ['school' => $branch]);
                 })->name('home');
 
-                Route::controller(RegisteredUserController::class)->group(function() {
+                Route::controller(RegisteredUserController::class)->group(function () {
                     Route::get('register', 'create')->name('register');
                     Route::post('register', 'store');
                 });
 
-                Route::controller(AuthenticatedSessionController::class)->group(function() {
+                Route::controller(AuthenticatedSessionController::class)->group(function () {
                     Route::get('login', 'create')->name('login');
                     Route::post('login', 'store');
                 });
@@ -418,23 +418,27 @@ Route::prefix('{network:slug}/{branch:slug}')
                             });
                     });
 
-                // ===========================
-                // NOTIFICATIONS (ALL AUTHENTICATED USERS)
-                // ===========================
-                Route::controller(NotificationController::class)
-                    ->prefix('notifications')
-                    ->name('notifications.')
+                // Plan Management (Approval)
+                Route::controller(PlanManagementController::class)
+                    ->prefix('plan-management')
+                    ->name('plan-management.')
                     ->group(function () {
                         Route::get('/', 'index')->name('index');
-                        Route::post('/{notification}/read', 'markAsRead')->name('read');
-                        Route::post('/mark-all-read', 'markAllAsRead')->name('mark-all-read');
-                        Route::get('/unread-count', 'unreadCount')->name('unread-count');
+                        Route::get('/{plan}', 'show')->name('show');
+                        Route::get('/{plan}/download', 'download')->name('download');
+                        Route::post('/{plan}/approve', 'approve')->name('approve');
+                        Route::post('/{plan}/reject', 'reject')->name('reject');
                     });
 
-                // Logout
-                Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+                // Supervisors Management
+                Route::controller(SupervisorController::class)
+                    ->prefix('supervisors')
+                    ->name('supervisors.')
+                    ->group(function () {
+                        Route::get('/', 'index')->name('index');
+                        Route::get('/{supervisor}/files', 'files')->name('files');
+                    });
             });
-        });
     });
 
 // ===========================
