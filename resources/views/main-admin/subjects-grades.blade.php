@@ -30,7 +30,7 @@
                 </div>
                 <span class="text-xs px-2 py-1 bg-indigo-50 text-indigo-700 rounded-full">{{ $branches->count() }} {{ __('messages.labels.schools') }}</span>
             </div>
-            <form method="post" action="{{ route('main-admin.subjects-grades.store', $network) }}" class="space-y-4">
+            <form method="post" action="{{ route('main-admin.subjects-grades.store') }}" class="space-y-4">
                 @csrf
                 <div class="space-y-2">
                     <label class="text-sm text-gray-600 block">{{ __('messages.main_admin.subjects_grades.type') }}</label>
@@ -89,7 +89,7 @@
                             <div class="flex items-center justify-between">
                                 <div class="space-y-1">
                                     <p class="text-sm text-gray-500">{{ __('messages.labels.name') }}</p>
-                                    <form action="{{ route('main-admin.subjects-grades.update', [$network, 'subject', $subject->id]) }}" method="post" class="space-y-3">
+                                    <form action="{{ route('main-admin.subjects-grades.update', ['subject', $subject->id]) }}" method="post" class="space-y-3">
                                         @csrf
                                         @method('put')
                                         <div class="flex flex-col md:flex-row md:items-center gap-3">
@@ -116,7 +116,7 @@
                                         </div>
                                     </form>
                                 </div>
-                                <form action="{{ route('main-admin.subjects-grades.destroy', [$network, 'subject', $subject->id]) }}" method="post" onsubmit="return confirm('{{ __('messages.main_admin.common.confirm_archive') }}')">
+                                <form action="{{ route('main-admin.subjects-grades.destroy', ['subject', $subject->id]) }}" method="post" onsubmit="return confirm('{{ __('messages.main_admin.common.confirm_archive') }}')">
                                     @csrf
                                     @method('delete')
                                     <button class="text-red-600 text-sm hover:underline">{{ __('messages.actions.archive') }}</button>
@@ -145,7 +145,7 @@
                             <div class="flex items-center justify-between">
                                 <div class="space-y-1 w-full">
                                     <p class="text-sm text-gray-500">{{ __('messages.labels.name') }}</p>
-                                    <form action="{{ route('main-admin.subjects-grades.update', [$network, 'grade', $grade->id]) }}" method="post" class="space-y-3">
+                                    <form action="{{ route('main-admin.subjects-grades.update', ['grade', $grade->id]) }}" method="post" class="space-y-3">
                                         @csrf
                                         @method('put')
                                         <div class="flex flex-col md:flex-row md:items-center gap-3">
@@ -172,7 +172,7 @@
                                         </div>
                                     </form>
                                 </div>
-                                <form action="{{ route('main-admin.subjects-grades.destroy', [$network, 'grade', $grade->id]) }}" method="post" onsubmit="return confirm('{{ __('messages.main_admin.common.confirm_archive') }}')">
+                                <form action="{{ route('main-admin.subjects-grades.destroy', ['grade', $grade->id]) }}" method="post" onsubmit="return confirm('{{ __('messages.main_admin.common.confirm_archive') }}')">
                                     @csrf
                                     @method('delete')
                                     <button class="text-red-600 text-sm hover:underline">{{ __('messages.actions.archive') }}</button>

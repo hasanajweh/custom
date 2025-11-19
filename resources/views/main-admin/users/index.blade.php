@@ -9,21 +9,12 @@
             <h1 class="text-2xl font-bold">@lang('Network users')</h1>
             <p class="text-gray-600">@lang('Manage users across all branches in this network.')</p>
         </div>
-        <a href="{{ route('main-admin.users.create', $network) }}" class="bg-indigo-600 text-white px-4 py-2 rounded shadow">
+        <a href="{{ route('main-admin.users.create') }}" class="bg-indigo-600 text-white px-4 py-2 rounded shadow">
             @lang('Add user')
         </a>
     </div>
 
-    <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-white p-4 rounded shadow">
-        <div>
-            <label class="text-sm text-gray-600 block">@lang('Branch')</label>
-            <select name="branch" class="w-full border rounded p-2">
-                <option value="">@lang('All')</option>
-                @foreach($branches as $branch)
-                    <option value="{{ $branch->id }}" @selected(request('branch')==$branch->id)>{{ $branch->name }}</option>
-                @endforeach
-            </select>
-        </div>
+    <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white p-4 rounded shadow">
         <div>
             <label class="text-sm text-gray-600 block">@lang('Role')</label>
             <select name="role" class="w-full border rounded p-2">
@@ -85,14 +76,14 @@
                             @endif
                         </td>
                         <td class="px-4 py-3 space-x-2 text-right">
-                            <a class="text-indigo-600" href="{{ route('main-admin.users.edit', [$network, $user]) }}">@lang('Edit')</a>
+                            <a class="text-indigo-600" href="{{ route('main-admin.users.edit', $user) }}">@lang('Edit')</a>
                             @if($user->trashed())
-                                <form action="{{ route('main-admin.users.restore', [$network, $user->id]) }}" method="post" class="inline">
+                                <form action="{{ route('main-admin.users.restore', $user->id) }}" method="post" class="inline">
                                     @csrf
                                     <button class="text-green-600" type="submit">@lang('Restore')</button>
                                 </form>
                             @else
-                                <form action="{{ route('main-admin.users.destroy', [$network, $user]) }}" method="post" class="inline" onsubmit="return confirm('@lang('Are you sure?')')">
+                                <form action="{{ route('main-admin.users.destroy', $user) }}" method="post" class="inline" onsubmit="return confirm('@lang('Are you sure?')')">
                                     @csrf
                                     @method('delete')
                                     <button class="text-red-600" type="submit">@lang('Archive')</button>
