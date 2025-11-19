@@ -3,6 +3,7 @@
 use App\Models\Branch;
 use App\Models\Network;
 use App\Models\School;
+use Illuminate\Support\Facades\Route;
 
 /**
  * Helper functions for the Scholder application
@@ -68,10 +69,30 @@ if (!function_exists('tenant_route')) {
             }
         }
 
+        if (is_string($school)) {
+            $school = School::with('network')->where('slug', $school)->first();
+        }
+
+        $route = Route::current();
+        $routeNetworkParam = $route?->parameter('network');
+        $routeSchoolParam = $route?->parameter('school') ?? $route?->parameter('branch');
+
+        if (! $school) {
+            if ($routeSchoolParam instanceof School || $routeSchoolParam instanceof Branch) {
+                $school = $routeSchoolParam;
+            } elseif (is_string($routeSchoolParam)) {
+                $school = School::with('network')->where('slug', $routeSchoolParam)->first();
+            } elseif ($user?->school) {
+                $school = $user->school;
+            }
+        }
+
         $network = match (true) {
             $school instanceof School => $school->network,
             $school instanceof Branch => $school->network,
             $school instanceof Network => $school,
+            $routeNetworkParam instanceof Network => $routeNetworkParam,
+            is_string($routeNetworkParam) => Network::where('slug', $routeNetworkParam)->first(),
             $user && $user->network => $user->network,
             default => null,
         };
@@ -88,7 +109,7 @@ if (!function_exists('tenant_route')) {
         $branch = match (true) {
             $school instanceof Branch => $school,
             $school instanceof School => $school,
-            is_string($school) => School::where('slug', $school)->first(),
+            is_string($school) => School::with('network')->where('slug', $school)->first(),
             default => null,
         };
 
