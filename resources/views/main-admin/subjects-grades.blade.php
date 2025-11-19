@@ -1,4 +1,4 @@
-@extends('layouts.school')
+@extends('layouts.network')
 
 @section('title', __('messages.main_admin.subjects_grades.title'))
 

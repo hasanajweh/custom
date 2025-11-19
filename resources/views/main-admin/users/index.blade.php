@@ -1,4 +1,4 @@
-@extends('layouts.school')
+@extends('layouts.network')
 
 @section('title', __('Network Users'))
 
@@ -52,8 +52,8 @@
                 <tr>
                     <th class="px-4 py-3 text-left">@lang('Name')</th>
                     <th class="px-4 py-3 text-left">@lang('Email')</th>
-                    <th class="px-4 py-3 text-left">@lang('Role')</th>
-                    <th class="px-4 py-3 text-left">@lang('Branch')</th>
+                    <th class="px-4 py-3 text-left">@lang('messages.roles')</th>
+                    <th class="px-4 py-3 text-left">@lang('messages.branches')</th>
                     <th class="px-4 py-3 text-left">@lang('Status')</th>
                     <th class="px-4 py-3"></th>
                 </tr>
@@ -63,8 +63,20 @@
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3 font-semibold">{{ $user->name }}</td>
                         <td class="px-4 py-3">{{ $user->email }}</td>
-                        <td class="px-4 py-3 capitalize">{{ __($user->role) }}</td>
-                        <td class="px-4 py-3">{{ $user->school?->name }}</td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($user->schoolRoles as $role)
+                                    <span class="px-2 py-1 text-xs rounded bg-indigo-50 text-indigo-700">{{ __($role->role) }}</span>
+                                @endforeach
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-col gap-1">
+                                @foreach($user->schoolRoles as $role)
+                                    <div class="text-sm text-gray-700">{{ $role->school?->name }} — {{ __($role->role) }}</div>
+                                @endforeach
+                            </div>
+                        </td>
                         <td class="px-4 py-3">
                             @if($user->trashed())
                                 <span class="px-2 py-1 text-xs rounded bg-gray-200 text-gray-700">@lang('Archived')</span>

@@ -25,6 +25,8 @@ class DashboardController extends Controller
             'users as teachers_count' => function ($query) {
                 $query->where('role', 'teacher');
             },
+            'subjects',
+            'grades',
             'fileSubmissions',
             'fileSubmissions as recent_files_count' => function ($query) {
                 $query->where('created_at', '>=', now()->subHours(72));
@@ -52,6 +54,8 @@ class DashboardController extends Controller
             'branches' => $branches->count(),
             'files' => FileSubmission::whereIn('school_id', $branchIds)->count(),
             'plans' => FileSubmission::whereIn('school_id', $branchIds)->where('submission_type', 'plan')->count(),
+            'subjects' => $branches->sum('subjects_count'),
+            'grades' => $branches->sum('grades_count'),
             'recent_files' => $recentUploads->count(),
             'admins' => $roleCounts['admin'] ?? 0,
             'supervisors' => $roleCounts['supervisor'] ?? 0,
