@@ -189,28 +189,26 @@ Route::prefix('{network:slug}/{branch:slug}')
     ->middleware(['setlocale', 'setNetwork'])
     ->scopeBindings()
     ->group(function () {
-        Route::middleware(['match.school.network', 'setBranch'])->group(function () {
-            // ===========================
-            // GUEST ROUTES
-            // ===========================
-            Route::middleware('guest')->group(function () {
-                Route::get('/', function (Network $network, School $branch) {
-                    if ($branch->network_id !== $network->id) {
-                        abort(404);
-                    }
+        // ===========================
+        // GUEST ROUTES
+        // ===========================
+        Route::middleware('guest')->group(function () {
+            Route::get('/', function (Network $network, School $branch) {
+                if ($branch->network_id !== $network->id) {
+                    abort(404);
+                }
 
-                    return view('auth.login', ['school' => $branch]);
-                })->name('home');
+                return view('auth.login');
+            })->name('home');
 
-                Route::controller(RegisteredUserController::class)->group(function () {
-                    Route::get('register', 'create')->name('register');
-                    Route::post('register', 'store');
-                });
+            Route::controller(RegisteredUserController::class)->group(function () {
+                Route::get('register', 'create')->name('register');
+                Route::post('register', 'store');
+            });
 
-                Route::controller(AuthenticatedSessionController::class)->group(function () {
-                    Route::get('login', 'create')->name('login');
-                    Route::post('login', 'store');
-                });
+            Route::controller(AuthenticatedSessionController::class)->group(function () {
+                Route::get('login', 'create')->name('login');
+                Route::post('login', 'store');
             });
         });
 

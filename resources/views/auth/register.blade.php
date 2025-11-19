@@ -1,10 +1,10 @@
 <x-guest-layout>
     <div class="text-center mb-6">
         <h2 class="text-2xl font-bold text-brand-text">Create Your Account</h2>
-        <p class="text-sm text-brand-text-light">Join the {{ $school->name }} portal.</p>
+        <p class="text-sm text-brand-text-light">Join the learning portal.</p>
     </div>
 
-    <form method="POST" action="{{ route('register', ['school' => $school->slug]) }}">
+    <form method="POST" action="{{ url()->current() }}">
         @csrf
 
         <div>
@@ -33,7 +33,8 @@
 
         <div class="flex items-center justify-end mt-4">
             @php
-                $loginRoute = isset($school) ? tenant_route('login', $school) : route('login');
+                $loginParameters = optional(request()->route())->parameters() ?? [];
+                $loginRoute = route('login', $loginParameters);
             @endphp
             <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md" href="{{ $loginRoute }}">
                 {{ __('Already registered?') }}

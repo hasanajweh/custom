@@ -15,7 +15,7 @@
                 </button>
             </form>
         </div>
-        <!-- Left Side - School Info -->
+        <!-- Left Side - App Info (no tenant context required) -->
         <div class="lg:w-1/2 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 p-8 lg:p-16 flex items-center justify-center relative overflow-hidden">
             <!-- Background Pattern -->
             <div class="absolute inset-0 opacity-10">
@@ -29,11 +29,9 @@
                     <img src="/WayUp.png" alt="{{ __('messages.app.name') }}" class="w-24 h-24 mx-auto lg:{{ app()->getLocale() === 'ar' ? 'mr-0 ml-auto' : 'mx-0' }} rounded-2xl shadow-2xl mb-6">
                 </div>
                 <h1 class="text-4xl lg:text-5xl font-bold mb-4">
-                    {{ $school->name }}
+                    {{ config('app.name', 'Scholder') }}
                 </h1>
-                <p class="text-xl mb-6 text-white/90">
-                    {{ __('messages.school.educational_platform') }}
-                </p>
+                <p class="text-xl mb-6 text-white/90">{{ __('messages.school.educational_platform') }}</p>
                 <div class="space-y-4 text-white/80">
                     <div class="flex items-center {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }} space-x-3">
                         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,10 +69,7 @@
                 </div>
 
                 <!-- Login Form -->
-                @php
-                    $loginAction = isset($school) ? tenant_route('login', $school) : route('login');
-                @endphp
-                <form method="POST" action="{{ $loginAction }}" class="space-y-6">
+                <form method="POST" action="{{ url()->current() }}" class="space-y-6">
                     @csrf
 
                     <!-- Email Field -->

@@ -73,7 +73,8 @@ class UserController extends Controller
 
         $this->syncAssignments($user, $assignments, $network);
 
-        return redirect()->route('main-admin.users.index')->with('status', __('User created successfully.'));
+        return redirect()->route('main-admin.users.index', ['network' => $network->slug])
+            ->with('status', __('User created successfully.'));
     }
 
     public function edit(Network $network, User $user): View
@@ -113,7 +114,8 @@ class UserController extends Controller
 
         $this->syncAssignments($user, $assignments, $network);
 
-        return redirect()->route('main-admin.users.index')->with('status', __('User updated successfully.'));
+        return redirect()->route('main-admin.users.index', ['network' => $network->slug])
+            ->with('status', __('User updated successfully.'));
     }
 
     public function destroy(Network $network, User $user): RedirectResponse
@@ -122,7 +124,8 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()->route('main-admin.users.index')->with('status', __('User archived successfully.'));
+        return redirect()->route('main-admin.users.index', ['network' => $network->slug])
+            ->with('status', __('User archived successfully.'));
     }
 
     public function restore(Network $network, int $user): RedirectResponse
@@ -130,7 +133,8 @@ class UserController extends Controller
         $record = User::withTrashed()->where('network_id', $network->id)->findOrFail($user);
         $record->restore();
 
-        return redirect()->route('main-admin.users.index')->with('status', __('User restored successfully.'));
+        return redirect()->route('main-admin.users.index', ['network' => $network->slug])
+            ->with('status', __('User restored successfully.'));
     }
 
     protected function filterAssignments(array $assignments, Network $network): array

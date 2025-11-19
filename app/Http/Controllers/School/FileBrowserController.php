@@ -4,7 +4,6 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Concerns\ResolvesSchoolFromRequest;
 use App\Traits\HandlesS3Storage;
 use App\Models\FileSubmission;
 use App\Models\Grade;
@@ -19,11 +18,13 @@ use Illuminate\Support\Facades\Log;
 class FileBrowserController extends Controller
 {
     use HandlesS3Storage;
-    use ResolvesSchoolFromRequest;
-
     public function index(Request $request, Network $network, School $branch)
     {
-        $school = $this->resolveSchool($request);
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
 
         // ✅ EXCLUDE supervisor files and any plan-related files
         $query = FileSubmission::where('school_id', $school->id)
@@ -128,6 +129,10 @@ class FileBrowserController extends Controller
 
     public function show(Network $network, School $branch, $fileId)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
         $file = FileSubmission::where('school_id', $branch->id)
             ->with(['user', 'subject', 'grade'])
             ->findOrFail($fileId);
@@ -141,6 +146,10 @@ class FileBrowserController extends Controller
 
     public function preview(Network $network, School $branch, $fileId)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
         $file = FileSubmission::where('school_id', $branch->id)->findOrFail($fileId);
 
         // Check if file can be previewed
@@ -172,6 +181,10 @@ class FileBrowserController extends Controller
 
     public function download(Network $network, School $branch, $fileId)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
         $file = FileSubmission::where('school_id', $branch->id)->findOrFail($fileId);
         return $this->downloadFile($file);
     }
