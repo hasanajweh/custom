@@ -186,7 +186,7 @@ Route::prefix('{network:slug}/main-admin')
 // TENANT (SCHOOL) ROUTES
 // ===========================
 Route::prefix('{network:slug}/{branch:slug}')
-    ->middleware(['setlocale', 'setNetwork'])
+    ->middleware(['setlocale', 'setNetwork', 'setBranch'])
     ->scopeBindings()
     ->group(function () {
         // ===========================
@@ -215,7 +215,7 @@ Route::prefix('{network:slug}/{branch:slug}')
         // ===========================
         // AUTHENTICATED TENANT ROUTES (ALL ROLES)
         // ===========================
-        Route::middleware(['auth', 'match.school.network', 'verify.tenant', 'setBranch'])->group(function () {
+        Route::middleware(['setNetwork', 'setBranch', 'ensure.school.network.match', 'verify.tenant.access', 'auth'])->group(function () {
             // Dashboard (role-based)
             Route::get('/dashboard', function (Network $network, School $branch) {
                 if ($branch->network_id !== $network->id) {
@@ -330,7 +330,7 @@ Route::prefix('{network:slug}/{branch:slug}')
         // BRANCH ADMIN ROUTES
         // ===========================
         Route::prefix('admin')
-            ->middleware(['auth', 'role:admin', 'match.school.network', 'verify.tenant', 'setBranch'])
+            ->middleware(['setNetwork', 'setBranch', 'ensure.school.network.match', 'verify.tenant.access', 'auth', 'role:admin'])
             ->name('school.admin.')
             ->group(function () {
 

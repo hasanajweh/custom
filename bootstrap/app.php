@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'verify.tenant' => \App\Http\Middleware\VerifyTenantAccess::class,
+            'verify.tenant.access' => \App\Http\Middleware\VerifyTenantAccess::class,
             'setlocale' => \App\Http\Middleware\SetLocale::class,
             'setNetwork' => \App\Http\Middleware\SetNetwork::class,
             'setBranch' => \App\Http\Middleware\SetBranch::class,
@@ -28,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'superadmin' => \App\Http\Middleware\EnsureIsSuperAdmin::class,
             'active' => \App\Http\Middleware\CheckUserActive::class,
             'match.school.network' => \App\Http\Middleware\EnsureSchoolNetworkMatch::class,
+            'ensure.school.network.match' => \App\Http\Middleware\EnsureSchoolNetworkMatch::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
