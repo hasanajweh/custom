@@ -25,7 +25,7 @@ class CheckUserActive
 
             $school = SchoolResolver::resolve($request->route('school'));
 
-            $loginRoute = $school
+            $loginRoute = ($school && $school->network)
                 ? tenant_route('login', $school)
                 : route('landing');
 
