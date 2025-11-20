@@ -144,8 +144,9 @@
                                         $profileUrl = route('main-admin.dashboard', ['network' => $networkSlug]);
                                         $logoutUrl = route('main-admin.logout', ['network' => $networkSlug]);
                                     } else {
-                                        $profileUrl = $userSchool ? tenant_route('profile.edit', $userSchool) : '#';
-                                        $logoutUrl = $userSchool ? tenant_route('logout', $userSchool) : '#';
+                                        $hasTenantContext = $userSchool && $userSchool->network;
+                                        $profileUrl = $hasTenantContext ? tenant_route('profile.edit', $userSchool) : '#';
+                                        $logoutUrl = $hasTenantContext ? tenant_route('logout', $userSchool) : '#';
                                     }
                                 @endphp
                                 <x-dropdown-link :href="$profileUrl">

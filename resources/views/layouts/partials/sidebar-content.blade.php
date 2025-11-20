@@ -1,7 +1,10 @@
 @auth
 <div class="flex h-16 shrink-0 items-center">
-    @if(isset($school))
-        <a href="{{ $school ? tenant_route('dashboard', $school) : '#' }}">
+    @php
+        $hasTenantContext = isset($school) && $school && $school->network;
+    @endphp
+    @if($hasTenantContext)
+        <a href="{{ tenant_route('dashboard', $school) }}">
             <x-application-logo class="h-8 w-auto" />
         </a>
     @else
@@ -16,7 +19,7 @@
         <li>
             <ul role="list" class="-mx-2 space-y-1">
                 {{-- Tenant Links --}}
-                @if (isset($school))
+                @if ($hasTenantContext)
                     <li><x-nav-link :href="tenant_route('dashboard', $school)" :active="request()->routeIs('dashboard')">Dashboard</x-nav-link></li>
                     @if (auth()->user()->role === 'teacher')
                         <li><x-nav-link :href="route('files.index', ['school' => $school->slug])" :active="request()->routeIs('files.*')">My Files</x-nav-link></li>
@@ -67,11 +70,11 @@
                                     {{ __('Log Out') }}
                                 </x-dropdown-link>
                             </form>
-                        @elseif (isset($school))
+                        @elseif ($hasTenantContext)
                             {{-- Tenant User Links --}}
                             @php
-                                $profileUrl = $school ? tenant_route('profile.edit', $school) : '#';
-                                $logoutUrl = $school ? tenant_route('logout', $school) : '#';
+                                $profileUrl = tenant_route('profile.edit', $school);
+                                $logoutUrl = tenant_route('logout', $school);
                             @endphp
                             <x-dropdown-link :href="$profileUrl">
                                 {{ __('My Profile') }}

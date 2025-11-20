@@ -14,6 +14,7 @@
         $schoolSlug = $school?->slug ?? '';
         $networkSlug = $networkSlug ?? '';
         $isMainAdmin = $isMainAdmin ?? false;
+        $hasTenantContext = $school && $school->network;
     @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
@@ -1261,8 +1262,8 @@
                                     $profileUrl = $networkSlug ? route('main-admin.dashboard', ['network' => $networkSlug]) : '#';
                                     $logoutUrl = $networkSlug ? route('main-admin.logout', ['network' => $networkSlug]) : '#';
                                 } else {
-                                    $profileUrl = $school ? tenant_route('profile.edit', $school) : '#';
-                                    $logoutUrl = $school ? tenant_route('logout', $school) : '#';
+                                    $profileUrl = $hasTenantContext ? tenant_route('profile.edit', $school) : '#';
+                                    $logoutUrl = $hasTenantContext ? tenant_route('logout', $school) : '#';
                                 }
                             @endphp
                             <a href="{{ $profileUrl }}"
@@ -1272,12 +1273,12 @@
                             </a>
 
                             @if(Auth::user()->role === 'admin')
-                                <a href="{{ $school ? tenant_route('school.admin.plan-management.index', $school) : '#' }}"
+                                <a href="{{ $hasTenantContext ? tenant_route('school.admin.plan-management.index', $school) : '#' }}"
                                    class="dropdown-item">
                                     <i class="ri-vip-crown-line text-yellow-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
                                     <span>{{ __('messages.subscription.current_plan') }}</span>
                                 </a>
-                                <a href="{{ $school ? tenant_route('school.admin.activity-logs.index', $school) : '#' }}"
+                                <a href="{{ $hasTenantContext ? tenant_route('school.admin.activity-logs.index', $school) : '#' }}"
                                    class="dropdown-item">
                                     <i class="ri-history-line text-indigo-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
                                     <span>{{ __('messages.navigation.activity_logs') }}</span>
@@ -1323,8 +1324,8 @@
                 $dashboardUrl = $isMainAdmin
                     ? ($networkSlug ? route('main-admin.dashboard', ['network' => $networkSlug]) : '#')
                     : (Auth::user()->role === 'admin'
-                        ? ($school ? tenant_route('school.admin.dashboard', $school) : '#')
-                        : ($school ? tenant_route('dashboard', $school) : '#'));
+                        ? ($hasTenantContext ? tenant_route('school.admin.dashboard', $school) : '#')
+                        : ($hasTenantContext ? tenant_route('dashboard', $school) : '#'));
             @endphp
             <a href="{{ $dashboardUrl }}"
                class="sidebar-item {{ request()->routeIs('dashboard') || request()->routeIs('main-admin.dashboard') || request()->routeIs('school.admin.dashboard') ? 'active' : '' }}">
@@ -1358,25 +1359,25 @@
                     <span class="sidebar-text">{{ __('messages.main_admin.navigation.subjects_grades') }}</span>
                 </span></a>
             @elseif(Auth::user()->role === 'admin')
-                <a href="{{ $school ? tenant_route('school.admin.users.index', $school) : '#' }}"
+                <a href="{{ $hasTenantContext ? tenant_route('school.admin.users.index', $school) : '#' }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.users.*') ? 'active' : '' }}">
                     <i class="ri-team-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.manage_users') }}</span>
                 </span></a>
 
-                <a href="{{ $school ? tenant_route('school.admin.file-browser.index', $school) : '#' }}"
+                <a href="{{ $hasTenantContext ? tenant_route('school.admin.file-browser.index', $school) : '#' }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.file-browser.*') ? 'active' : '' }}">
                     <i class="ri-folder-3-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.file_browser') }}</span>
                 </span></a>
 
-                <a href="{{ $school ? tenant_route('school.admin.plans.index', $school) : '#' }}"
+                <a href="{{ $hasTenantContext ? tenant_route('school.admin.plans.index', $school) : '#' }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.plans.*') ? 'active' : '' }}">
                     <i class="ri-calendar-check-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.plans') }}</span>
                 </span></a>
 
-                <a href="{{ $school ? tenant_route('school.admin.supervisors.index', $school) : '#' }}"
+                <a href="{{ $hasTenantContext ? tenant_route('school.admin.supervisors.index', $school) : '#' }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.supervisors.*') ? 'active' : '' }}">
                     <i class="ri-user-star-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.supervisors') }}</span>
@@ -1389,13 +1390,13 @@
                     </div>
                 </div>
 
-                <a href="{{ $school ? tenant_route('school.admin.subjects.index', $school) : '#' }}"
+                <a href="{{ $hasTenantContext ? tenant_route('school.admin.subjects.index', $school) : '#' }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.subjects.*') ? 'active' : '' }}">
                     <i class="ri-book-2-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.subjects') }}</span>
                 </span></a>
 
-                <a href="{{ $school ? tenant_route('school.admin.grades.index', $school) : '#' }}"
+                <a href="{{ $hasTenantContext ? tenant_route('school.admin.grades.index', $school) : '#' }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.grades.*') ? 'active' : '' }}">
                     <i class="ri-graduation-cap-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.grades') }}</span>
