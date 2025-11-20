@@ -5,7 +5,7 @@ namespace App\Http\Controllers\MainAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\FileSubmission;
 use App\Models\Network;
-use App\Models\User;
+use App\Models\SchoolUserRole;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\App;
 
@@ -16,15 +16,6 @@ class DashboardController extends Controller
         App::setLocale('ar');
 
         $branches = $network->branches()->withCount([
-            'users as admins_count' => function ($query) {
-                $query->where('role', 'admin');
-            },
-            'users as supervisors_count' => function ($query) {
-                $query->where('role', 'supervisor');
-            },
-            'users as teachers_count' => function ($query) {
-                $query->where('role', 'teacher');
-            },
             'subjects',
             'grades',
             'fileSubmissions',
@@ -38,10 +29,30 @@ class DashboardController extends Controller
 
         $branchIds = $branches->pluck('id');
 
-        $roleCounts = User::whereIn('school_id', $branchIds)
-            ->selectRaw('role, COUNT(*) as total')
+        $roleCounts = SchoolUserRole::whereIn('school_id', $branchIds)
+            ->selectRaw('role, COUNT(DISTINCT user_id) as total')
             ->groupBy('role')
             ->pluck('total', 'role');
+
+        $branchRoleCounts = SchoolUserRole::whereIn('school_id', $branchIds)
+            ->selectRaw('school_id, role, COUNT(DISTINCT user_id) as total')
+            ->groupBy('school_id', 'role')
+            ->get()
+            ->groupBy('school_id');
+
+        $branchUserTotals = SchoolUserRole::whereIn('school_id', $branchIds)
+            ->selectRaw('school_id, COUNT(DISTINCT user_id) as total')
+            ->groupBy('school_id')
+            ->pluck('total', 'school_id');
+
+        $branches->transform(function ($branch) use ($branchRoleCounts, $branchUserTotals) {
+            $branch->admins_count = $branchRoleCounts[$branch->id]?->firstWhere('role', 'admin')?->total ?? 0;
+            $branch->supervisors_count = $branchRoleCounts[$branch->id]?->firstWhere('role', 'supervisor')?->total ?? 0;
+            $branch->teachers_count = $branchRoleCounts[$branch->id]?->firstWhere('role', 'teacher')?->total ?? 0;
+            $branch->users_count = $branchUserTotals[$branch->id] ?? 0;
+
+            return $branch;
+        });
 
         $recentUploads = FileSubmission::with(['school', 'user'])
             ->whereIn('school_id', $branchIds)

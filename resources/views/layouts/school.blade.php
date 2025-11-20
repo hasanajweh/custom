@@ -2,19 +2,15 @@
 <html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" class="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     @php
-        $school = $school ?? null;
+        $school = $school ?? request()->route('school') ?? request()->route('branch');
+        $branch = $branch ?? request()->route('branch');
+        $network = $network ?? request()->route('network');
 
-        if (Auth::check()) {
-            $school = $school ?? (Auth::user()->school ?? null);
-            $networkSlug = $school?->network?->slug ?? Auth::user()?->network?->slug ?? '';
-            $isMainAdmin = Auth::user()?->isMainAdmin();
-        }
-
-        $schoolName = $school->name ?? config('app.name');
+        $schoolName = $school?->name ?? config('app.name');
         $schoolSlug = $school?->slug ?? '';
-        $networkSlug = $networkSlug ?? '';
-        $isMainAdmin = $isMainAdmin ?? false;
-        $hasTenantContext = $school && $school->network;
+        $networkSlug = $network?->slug ?? '';
+        $isMainAdmin = false;
+        $hasTenantContext = $school && $network;
     @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">

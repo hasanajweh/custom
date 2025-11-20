@@ -3,10 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Branch extends Model
 {
     protected $table = 'schools';
+
+    public function network(): BelongsTo
+    {
+        return $this->belongsTo(Network::class, 'network_id');
+    }
 
     public function subjects()
     {
