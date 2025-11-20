@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -36,6 +37,18 @@ class School extends Model
     public function network()
     {
         return $this->belongsTo(Network::class);
+    }
+
+    public function userRoles(): HasMany
+    {
+        return $this->hasMany(SchoolUserRole::class);
+    }
+
+    public function assignedUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'school_user_roles')
+            ->withPivot(['role', 'is_active'])
+            ->withTimestamps();
     }
 
     /**
