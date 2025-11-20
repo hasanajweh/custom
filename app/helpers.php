@@ -133,6 +133,24 @@ if (!function_exists('tenant_route')) {
     }
 }
 
+if (!function_exists('safe_tenant_route')) {
+    /**
+     * Safely generate tenant aware routes without throwing exceptions.
+     */
+    function safe_tenant_route(string $name, $school = null, string $fallback = '#', array $parameters = [], bool $absolute = true): string
+    {
+        try {
+            if ($school && $school->network) {
+                return tenant_route($name, $school, $parameters, $absolute);
+            }
+        } catch (\Throwable $e) {
+            return $fallback;
+        }
+
+        return $fallback;
+    }
+}
+
 if (!function_exists('tenant_dashboard_route')) {
     /**
      * Generate the correct dashboard route for the current tenant based on user role.

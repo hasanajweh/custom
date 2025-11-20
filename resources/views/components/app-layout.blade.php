@@ -45,6 +45,11 @@
     @stack('styles')
 </head>
 <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+@php
+    $school = $school ?? Auth::user()?->school;
+    $network = $network ?? $school?->network ?? Auth::user()?->network;
+    $hasTenantContext = $school && $network;
+@endphp
 <!-- Loading bar -->
 <div x-data="{
         loading: false,
@@ -138,15 +143,15 @@
                             <x-slot name="content">
                                 @php
                                     $user = Auth::user();
-                                    $userSchool = $user?->school;
+                                    $userSchool = $user?->school ?? $school;
                                     if ($user && $user->role === 'main_admin') {
                                         $networkSlug = $user->network?->slug;
                                         $profileUrl = route('main-admin.dashboard', ['network' => $networkSlug]);
                                         $logoutUrl = route('main-admin.logout', ['network' => $networkSlug]);
                                     } else {
                                         $hasTenantContext = $userSchool && $userSchool->network;
-                                        $profileUrl = $hasTenantContext ? tenant_route('profile.edit', $userSchool) : '#';
-                                        $logoutUrl = $hasTenantContext ? tenant_route('logout', $userSchool) : '#';
+                                        $profileUrl = safe_tenant_route('profile.edit', $userSchool);
+                                        $logoutUrl = safe_tenant_route('logout', $userSchool);
                                     }
                                 @endphp
                                 <x-dropdown-link :href="$profileUrl">
