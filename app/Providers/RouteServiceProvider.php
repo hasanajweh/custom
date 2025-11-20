@@ -8,8 +8,8 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
-use App\Models\Branch;
 use App\Models\Network;
+use App\Models\School;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -43,7 +43,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::bind('branch', function ($value) {
             $network = request()->route('network');
 
-            $query = Branch::query()->where('slug', $value);
+            $query = School::query()->where('slug', $value);
 
             if ($network instanceof Network) {
                 $query->where('network_id', $network->id);
@@ -62,7 +62,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::bind('school', function ($value) {
             $network = request()->route('network');
 
-            $query = Branch::query()->where('slug', $value);
+            $query = School::query()->where('slug', $value);
 
             if ($network instanceof Network) {
                 $query->where('network_id', $network->id);

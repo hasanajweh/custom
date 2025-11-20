@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Branch;
 use App\Models\Network;
+use App\Models\School;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
@@ -19,9 +19,9 @@ class SetBranch
         }
 
         $branchParam = $request->route('branch') ?? $request->route('school');
-        $branch = $branchParam instanceof Branch
+        $branch = $branchParam instanceof School
             ? $branchParam
-            : Branch::where('slug', $branchParam)->first();
+            : School::where('slug', $branchParam)->first();
 
         if (! $branch || ($network instanceof Network && $branch->network_id !== $network->id)) {
             abort(404, 'Branch not found');

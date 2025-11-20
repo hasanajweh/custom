@@ -18,21 +18,24 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(Network $network, School $school): View
+    public function create(Network $network, School $branch): View
     {
-        if ($school->network_id !== $network->id) {
+        if ($branch->network_id !== $network->id) {
             abort(404);
         }
 
-        return view('auth.login');
+        return view('auth.login', [
+            'network' => $network,
+            'school' => $branch,
+        ]);
     }
 
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request, Network $network, School $school): RedirectResponse
+    public function store(LoginRequest $request, Network $network, School $branch): RedirectResponse
     {
-        if ($school->network_id !== $network->id) {
+        if ($branch->network_id !== $network->id) {
             abort(404);
         }
 
@@ -51,7 +54,7 @@ class AuthenticatedSessionController extends Controller
         $user = Auth::user();
 
         if ($user->role === 'main_admin') {
-            if ($user->network_id !== $school->network_id) {
+            if ($user->network_id !== $branch->network_id) {
                 Auth::logout();
 
                 return back()->withErrors([
@@ -68,8 +71,8 @@ class AuthenticatedSessionController extends Controller
         }
 
         // Check if user belongs to this school
-        if ($user->school_id !== $school->id) {
-            SecurityLogger::logTenantIsolationBreach($school->id, $user->school_id);
+        if ($user->school_id !== $branch->id) {
+            SecurityLogger::logTenantIsolationBreach($branch->id, $user->school_id);
             Auth::logout();
 
             return back()->withErrors([
@@ -86,7 +89,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         // Check if school is active
-        if (!$school->isActiveWithNetwork()) {
+        if (!$branch->isActiveWithNetwork()) {
             Auth::logout();
             return back()->withErrors([
                 'email' => 'This school is currently inactive. Please contact support.',
@@ -94,9 +97,9 @@ class AuthenticatedSessionController extends Controller
         }
 
         // Check for active subscription (skip for super admin)
-        if (!$user->is_super_admin && !$school->hasActiveSubscription()) {
+        if (!$user->is_super_admin && !$branch->hasActiveSubscription()) {
             // Allow admin's first login to set up subscription
-            if ($school->subscriptions()->count() === 0 && $user->role === 'admin') {
+            if ($branch->subscriptions()->count() === 0 && $user->role === 'admin') {
                 SecurityLogger::logSuccessfulLogin($user);
 
                 // Update last login timestamp
@@ -107,7 +110,7 @@ class AuthenticatedSessionController extends Controller
                 // Keep user logged in for 30 days
                 Auth::login($user, true);
 
-                return redirect()->intended(tenant_dashboard_route($school, $user));
+                return redirect()->intended(tenant_dashboard_route($branch, $user));
             }
 
             Auth::logout();
@@ -132,13 +135,13 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('superadmin.dashboard');
         }
 
-        return redirect()->intended(tenant_dashboard_route($school, $user));
+        return redirect()->intended(tenant_dashboard_route($branch, $user));
     }
 
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request, Network $network, School $school): RedirectResponse
+    public function destroy(Request $request, Network $network, School $branch): RedirectResponse
     {
         // Simply logout without logging (method doesn't exist)
         Auth::guard('web')->logout();
@@ -147,6 +150,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect()->to(tenant_route('login', $school));
+        return redirect()->to(tenant_route('login', $branch));
     }
 }
