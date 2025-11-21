@@ -11,7 +11,7 @@
                 <h1 class="text-2xl md:text-3xl font-bold text-gray-900">{{ __('messages.users.archived.heading') }}</h1>
                 <p class="mt-1 text-sm text-gray-600">{{ __('messages.users.archived.subheading') }}</p>
             </div>
-            <a href="{{ tenant_route('school.admin.users.index', $school) }}"
+            <a href="{{ safe_tenant_route('school.admin.users.index', $school) }}"
                class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-lg">
                 <i class="ri-arrow-left-line mr-2"></i>
                 {{ __('messages.users.archived.back') }}
@@ -33,7 +33,7 @@
 
         <!-- Search -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <form method="GET" action="{{ tenant_route('school.admin.users.archived', $school) }}">
+            <form method="GET" action="{{ safe_tenant_route('school.admin.users.archived', $school) }}">
                 <div class="flex gap-4">
                     <div class="flex-1">
                         <div class="relative">
@@ -122,7 +122,7 @@
                                 <div class="flex items-center justify-center space-x-2">
                                     <!-- Restore Button -->
                                     <form method="POST"
-                                          action="{{ tenant_route('school.admin.users.restore', $school, ['user' => $user->id]) }}"
+                                          action="{{ safe_tenant_route('school.admin.users.restore', $school, ['user' => $user->id]) }}"
                                           onsubmit="return confirm('{{ __('messages.users.archived.restore_confirm') }}')"
                                           class="inline">
                                         @csrf
@@ -136,7 +136,7 @@
 
                                     <!-- Permanent Delete Button -->
                                       <form method="POST"
-                                            action="{{ tenant_route('school.admin.users.force-delete', $school, ['user' => $user->id]) }}"
+                                            action="{{ safe_tenant_route('school.admin.users.force-delete', $school, ['user' => $user->id]) }}"
                                             onsubmit="return confirm('{{ __('messages.users.archived.delete_confirm') }}')"
                                             class="inline">
                                         @csrf

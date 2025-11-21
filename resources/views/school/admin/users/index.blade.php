@@ -15,12 +15,12 @@
                         <p class="text-lg text-gray-600">{{ __('messages.navigation.manage_users') }}</p>
                     </div>
                     <div class="flex gap-3">
-                        <a href="{{ tenant_route('school.admin.users.archived', $school) }}"
+                        <a href="{{ safe_tenant_route('school.admin.users.archived', $school) }}"
                            class="inline-flex items-center gap-2 px-6 py-3 bg-gray-600 text-white font-semibold rounded-xl hover:bg-gray-700">
                             <i class="ri-archive-line text-xl"></i>
                             <span>{{ __('messages.users.archived.heading') }}</span>
                         </a>
-                        <a href="{{ tenant_route('school.admin.users.create', $school) }}"
+                        <a href="{{ safe_tenant_route('school.admin.users.create', $school) }}"
                            class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700">
                             <i class="ri-user-add-line text-xl"></i>
                             <span>{{ __('messages.users.add_new_user') }}</span>
@@ -66,7 +66,7 @@
 
             <!-- Compact Filters -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <form method="GET" action="{{ tenant_route('school.admin.users.index', $school) }}">
+                <form method="GET" action="{{ safe_tenant_route('school.admin.users.index', $school) }}">
                     <div class="mb-4">
                         <div class="relative">
                             <div class="absolute inset-y-0 {{ app()->getLocale() === 'ar' ? 'right-0 pr-3' : 'left-0 pl-3' }} flex items-center pointer-events-none">
@@ -97,7 +97,7 @@
                             <i class="ri-search-line"></i>
                             <span>{{ __('messages.actions.search') }}</span>
                         </button>
-                        <a href="{{ tenant_route('school.admin.users.index', $school) }}"
+                        <a href="{{ safe_tenant_route('school.admin.users.index', $school) }}"
                            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg">
                             <i class="ri-refresh-line"></i>
                             <span>{{ __('messages.actions.reset') }}</span>
@@ -199,7 +199,7 @@
 
                                 <td class="px-8 py-6">
                                     <div class="flex items-center justify-center {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }} space-x-2">
-                                        <a href="{{ tenant_route('school.admin.users.edit', $school, ['user' => $user->id]) }}"
+                                        <a href="{{ safe_tenant_route('school.admin.users.edit', $school, ['user' => $user->id]) }}"
                                            class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
                                            title="{{ __('messages.tooltips.edit') }}">
                                             <i class="ri-edit-line text-lg"></i>
@@ -207,7 +207,7 @@
 
                                         @if($user->id !== Auth::id())
                                             <form method="POST"
-                                                  action="{{ tenant_route('school.admin.users.toggle-status', $school, ['user' => $user->id]) }}"
+                                                  action="{{ safe_tenant_route('school.admin.users.toggle-status', $school, ['user' => $user->id]) }}"
                                                   class="inline">
                                                 @csrf
                                                 @method('PATCH')
@@ -219,7 +219,7 @@
                                             </form>
 
                                             <form method="POST"
-                                                  action="{{ tenant_route('school.admin.users.destroy', $school, ['user' => $user->id]) }}"
+                                                  action="{{ safe_tenant_route('school.admin.users.destroy', $school, ['user' => $user->id]) }}"
                                                   onsubmit="return confirm('Archive this user?')"
                                                   class="inline">
                                                 @csrf
