@@ -53,16 +53,15 @@ if (!function_exists('tenant_route')) {
     /**
      * Generate tenant aware routes.
      *
-     * Usage:
-     *  tenant_route('main-admin.dashboard')
-     *  tenant_route('school.admin.dashboard', $school)
+     * Controllers/services should use this helper with the default strict mode to
+     * guarantee context is present. Views should use safe_tenant_route() instead.
      */
-    function tenant_route(string $name, $school = null, array $parameters = [], bool $absolute = true): string
+    function tenant_route(string $name, $school = null, array $parameters = [], bool $absolute = true, bool $strict = true): string
     {
         $user = auth()->user();
 
         // When only parameters are passed, shift them correctly
-        if ($school !== null && ! $school instanceof Network && ! $school instanceof School && ! is_string($school)) {
+        if ($school !== null && ! $school instanceof Network && ! $school instanceof School && ! $school instanceof Branch && ! is_string($school)) {
             if (is_array($school) && empty($parameters)) {
                 $parameters = $school;
                 $school = null;
@@ -98,11 +97,20 @@ if (!function_exists('tenant_route')) {
         };
 
         if (! $network) {
-            if (! $user && ! $school && ! $routeNetworkParam) {
+            if (! $strict) {
                 return route($name, $parameters, $absolute);
             }
 
-            throw new \InvalidArgumentException('Network is required to generate tenant routes.');
+            $context = [
+                'route_network_param' => is_object($routeNetworkParam) ? $routeNetworkParam?->slug : $routeNetworkParam,
+                'route_school_param' => is_object($routeSchoolParam) ? $routeSchoolParam?->slug : $routeSchoolParam,
+                'user_id' => $user?->id,
+                'school_provided' => (bool) $school,
+            ];
+
+            throw new \InvalidArgumentException(
+                'Network is required to generate tenant routes. Context: ' . json_encode($context),
+            );
         }
 
         // Main admin routes do not include school/branch parameters
@@ -118,7 +126,19 @@ if (!function_exists('tenant_route')) {
         };
 
         if (! $branch) {
+            if (! $strict) {
+                return route($name, $parameters, $absolute);
+            }
+
             throw new \InvalidArgumentException('Branch is required to generate tenant routes for branch-level pages.');
+        }
+
+        if (! $branch->network) {
+            if (! $strict) {
+                return route($name, $parameters, $absolute);
+            }
+
+            throw new \InvalidArgumentException('Network is required to generate tenant routes for the provided school.');
         }
 
         return route(
@@ -136,18 +156,29 @@ if (!function_exists('tenant_route')) {
 if (!function_exists('safe_tenant_route')) {
     /**
      * Safely generate tenant aware routes without throwing exceptions.
+     *
+     * Intended for Blade templates or contexts where tenant data might be missing.
      */
-    function safe_tenant_route(string $name, $school = null, string $fallback = '#', array $parameters = [], bool $absolute = true): string
+    function safe_tenant_route(string $name, $school = null, string|array $fallback = '#', array $parameters = [], bool $absolute = true): string
     {
-        try {
-            if ($school && $school->network) {
-                return tenant_route($name, $school, $parameters, $absolute);
-            }
-        } catch (\Throwable $e) {
-            return $fallback;
+        if (is_array($fallback) && empty($parameters)) {
+            $parameters = $fallback;
+            $fallback = '#';
         }
 
-        return $fallback;
+        try {
+            return tenant_route($name, $school, $parameters, $absolute, strict: false);
+        } catch (\Throwable $e) {
+            \Log::warning('safe_tenant_route fallback used', [
+                'route' => $name,
+                'school_has_network' => (bool) ($school?->network),
+                'school_id' => $school?->id,
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage(),
+            ]);
+
+            return $fallback;
+        }
     }
 }
 
