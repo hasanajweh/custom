@@ -16,6 +16,7 @@ class DashboardController extends Controller
         App::setLocale('ar');
 
         $branches = $network->branches()->withCount([
+            'users',
             'subjects',
             'grades',
             'fileSubmissions',
@@ -38,7 +39,8 @@ class DashboardController extends Controller
             ->selectRaw('school_id, role, COUNT(DISTINCT user_id) as total')
             ->groupBy('school_id', 'role')
             ->get()
-            ->groupBy('school_id');
+            ->groupBy('school_id')
+            ->map(fn ($group) => $group->keyBy('role'));
 
         $branchUserTotals = SchoolUserRole::whereIn('school_id', $branchIds)
             ->selectRaw('school_id, COUNT(DISTINCT user_id) as total')
@@ -46,9 +48,11 @@ class DashboardController extends Controller
             ->pluck('total', 'school_id');
 
         $branches->transform(function ($branch) use ($branchRoleCounts, $branchUserTotals) {
-            $branch->admins_count = $branchRoleCounts[$branch->id]?->firstWhere('role', 'admin')?->total ?? 0;
-            $branch->supervisors_count = $branchRoleCounts[$branch->id]?->firstWhere('role', 'supervisor')?->total ?? 0;
-            $branch->teachers_count = $branchRoleCounts[$branch->id]?->firstWhere('role', 'teacher')?->total ?? 0;
+            $branchRoleCount = $branchRoleCounts->get($branch->id, collect());
+
+            $branch->admins_count = optional($branchRoleCount->get('admin'))->total ?? 0;
+            $branch->supervisors_count = optional($branchRoleCount->get('supervisor'))->total ?? 0;
+            $branch->teachers_count = optional($branchRoleCount->get('teacher'))->total ?? 0;
             $branch->users_count = $branchUserTotals[$branch->id] ?? 0;
 
             return $branch;

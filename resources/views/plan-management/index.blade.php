@@ -221,7 +221,7 @@
                         <h3 class="text-2xl font-bold text-gray-900 mb-3">{{ __('messages.subscription.no_subscription') }}</h3>
                         <p class="text-gray-600 mb-6">{{ __('messages.subscription.contact_administrator') }}</p>
                         <div class="flex gap-3 justify-center">
-                            <a href="{{ tenant_route('school.admin.dashboard', $school) }}"
+                            <a href="{{ safe_tenant_route('school.admin.dashboard', $school) }}"
                                class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg">
                                 <i class="ri-dashboard-line"></i>
                                 {{ __('messages.navigation.dashboard') }}

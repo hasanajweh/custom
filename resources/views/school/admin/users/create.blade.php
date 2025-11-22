@@ -14,7 +14,7 @@
             <p class="text-sm text-gray-600 mt-1">{{ __('messages.users.create_new_account') }}</p>
         </div>
 
-        <form method="POST" action="{{ tenant_route('school.admin.users.store', $school) }}" class="p-6 space-y-6">
+        <form method="POST" action="{{ safe_tenant_route('school.admin.users.store', $school) }}" class="p-6 space-y-6">
             @csrf
 
             <!-- Name -->
@@ -150,7 +150,7 @@
 
             <!-- Actions -->
             <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200">
-                <a href="{{ tenant_route('school.admin.users.index', $school) }}"
+                <a href="{{ safe_tenant_route('school.admin.users.index', $school) }}"
                    class="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition-colors">
                     {{ __('messages.actions.cancel') }}
                 </a>

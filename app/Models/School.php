@@ -51,6 +51,26 @@ class School extends Model
             ->withTimestamps();
     }
 
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class, 'school_id');
+    }
+
+    public function admins(): HasMany
+    {
+        return $this->users()->where('role', 'admin');
+    }
+
+    public function teachers(): HasMany
+    {
+        return $this->users()->where('role', 'teacher');
+    }
+
+    public function supervisors(): HasMany
+    {
+        return $this->users()->where('role', 'supervisor');
+    }
+
     /**
      * Get all subscriptions for this school
      */

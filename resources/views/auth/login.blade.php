@@ -1,5 +1,9 @@
 {{-- resources/views/auth/login.blade.php --}}
 <x-guest-layout>
+    @php
+        $school = $school ?? request()->route('school') ?? request()->route('branch');
+        $loginAction = $school ? safe_tenant_route('login', $school) : route('login');
+    @endphp
     <div class="min-h-screen flex flex-col lg:flex-row" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
         <!-- Language Switcher -->
         <div class="absolute top-4 {{ app()->getLocale() === 'ar' ? 'left-4' : 'right-4' }} z-50">
@@ -69,7 +73,7 @@
                 </div>
 
                 <!-- Login Form -->
-                <form method="POST" action="{{ url()->current() }}" class="space-y-6">
+                <form method="POST" action="{{ $loginAction }}" class="space-y-6">
                     @csrf
 
                     <!-- Email Field -->

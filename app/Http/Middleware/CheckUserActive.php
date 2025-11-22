@@ -26,7 +26,7 @@ class CheckUserActive
             $school = SchoolResolver::resolve($request->route('school'));
 
             $loginRoute = ($school && $school->network)
-                ? tenant_route('login', $school)
+                ? safe_tenant_route('login', $school)
                 : route('landing');
 
             return redirect()->to($loginRoute)
