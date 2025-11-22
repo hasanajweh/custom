@@ -66,15 +66,15 @@ class DashboardController extends Controller
             ->get();
 
         $summary = [
-            'branches' => $branches->count(),
-            'files' => FileSubmission::whereIn('school_id', $branchIds)->count(),
-            'plans' => FileSubmission::whereIn('school_id', $branchIds)->where('submission_type', 'plan')->count(),
-            'subjects' => $branches->sum('subjects_count'),
-            'grades' => $branches->sum('grades_count'),
-            'recent_files' => $recentUploads->count(),
-            'admins' => $roleCounts['admin'] ?? 0,
-            'supervisors' => $roleCounts['supervisor'] ?? 0,
-            'teachers' => $roleCounts['teacher'] ?? 0,
+            'branches' => (int) $branches->count(),
+            'files' => (int) FileSubmission::whereIn('school_id', $branchIds)->count(),
+            'plans' => (int) FileSubmission::whereIn('school_id', $branchIds)->where('submission_type', 'plan')->count(),
+            'subjects' => (int) $branches->sum('subjects_count'),
+            'grades' => (int) $branches->sum('grades_count'),
+            'recent_files' => (int) $recentUploads->count(),
+            'admins' => (int) ($roleCounts['admin'] ?? 0),
+            'supervisors' => (int) ($roleCounts['supervisor'] ?? 0),
+            'teachers' => (int) ($roleCounts['teacher'] ?? 0),
         ];
 
         return view('main-admin.dashboard', [
