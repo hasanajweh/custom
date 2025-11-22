@@ -50,10 +50,10 @@ class DashboardController extends Controller
         $branches->transform(function ($branch) use ($branchRoleCounts, $branchUserTotals) {
             $branchRoleCount = $branchRoleCounts->get($branch->id, collect());
 
-            $branch->admins_count = (int) optional($branchRoleCount->get('admin'))->total ?? 0;
-            $branch->supervisors_count = (int) optional($branchRoleCount->get('supervisor'))->total ?? 0;
-            $branch->teachers_count = (int) optional($branchRoleCount->get('teacher'))->total ?? 0;
-            $branch->users_count = (int) ($branchUserTotals->get($branch->id) ?? 0);
+            $branch->admins_count = optional($branchRoleCount->get('admin'))->total ?? 0;
+            $branch->supervisors_count = optional($branchRoleCount->get('supervisor'))->total ?? 0;
+            $branch->teachers_count = optional($branchRoleCount->get('teacher'))->total ?? 0;
+            $branch->users_count = $branchUserTotals[$branch->id] ?? 0;
 
             return $branch;
         });
