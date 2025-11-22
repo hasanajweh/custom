@@ -590,7 +590,8 @@ return [
     ],
 
     // Subjects Management
-    'subjects' => [
+    'subjects' => 'المواد',
+    'subjects_management' => [
         'title' => 'إدارة المواد',
         'subject_management' => 'إدارة المواد',
         'add_subject' => 'إضافة مادة جديدة',
