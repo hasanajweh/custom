@@ -96,6 +96,15 @@ if (!function_exists('tenant_route')) {
             default => null,
         };
 
+        $context = [
+            'route_network_param' => is_object($routeNetworkParam) ? $routeNetworkParam?->slug : $routeNetworkParam,
+            'route_school_param' => is_object($routeSchoolParam) ? $routeSchoolParam?->slug : $routeSchoolParam,
+            'user_id' => $user?->id,
+            'user_role' => $user?->role,
+            'school_id' => $school?->id,
+            'school_has_network' => (bool) ($school?->network),
+        ];
+
         if (! $network) {
             if (! $strict) {
                 return route($name, $parameters, $absolute);
@@ -113,7 +122,6 @@ if (!function_exists('tenant_route')) {
             );
         }
 
-        // Main admin routes do not include school/branch parameters
         if ($school === null || $school instanceof Network) {
             return route($name, array_merge(['network' => $network->slug], $parameters), $absolute);
         }
@@ -121,7 +129,9 @@ if (!function_exists('tenant_route')) {
         $branch = match (true) {
             $school instanceof Branch => $school,
             $school instanceof School => $school,
-            is_string($school) => School::with('network')->where('slug', $school)->first(),
+            $routeSchoolParam instanceof Branch => $routeSchoolParam,
+            $routeSchoolParam instanceof School => $routeSchoolParam,
+            is_string($routeSchoolParam) => School::with('network')->where('slug', $routeSchoolParam)->first(),
             default => null,
         };
 
