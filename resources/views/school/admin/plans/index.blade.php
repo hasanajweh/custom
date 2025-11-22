@@ -73,7 +73,7 @@
                     <p class="text-gray-600">{{ __('messages.plans.use_filters') }}</p>
                 </div>
 
-                <form method="GET" action="{{ tenant_route('school.admin.plans.index', $school) }}" class="space-y-6">
+                <form method="GET" action="{{ safe_tenant_route('school.admin.plans.index', $school) }}" class="space-y-6">
                     <!-- Search Bar -->
                     <div class="w-full">
                         <label for="search" class="block text-sm font-medium text-gray-700 mb-3">{{ __('messages.plans.search_plans') }}</label>
@@ -220,7 +220,7 @@
                                     <div class="flex items-center justify-center space-x-2">
                                         {{-- Preview Button --}}
                                         @if($canPreview)
-                                            <a href="{{ tenant_route('school.admin.plans.show', $school, ['plan' => $plan->id]) }}"
+                                            <a href="{{ safe_tenant_route('school.admin.plans.show', $school, ['plan' => $plan->id]) }}"
                                                target="_blank"
                                                class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
                                                title="{{ __('messages.files.preview_file') }}">
@@ -235,7 +235,7 @@
                                         @endif
 
                                         {{-- Download Button - Always Active --}}
-                                        <a href="{{ tenant_route('school.admin.plans.download', $school, ['plan' => $plan->id]) }}"
+                                        <a href="{{ safe_tenant_route('school.admin.plans.download', $school, ['plan' => $plan->id]) }}"
                                            class="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-150"
                                            title="{{ __('messages.files.download_file') }}">
                                             <i class="ri-download-line text-lg"></i>
@@ -243,7 +243,7 @@
 
                                         {{-- Print Button --}}
                                         @if($canPreview)
-                                            <button onclick="printFile('{{ tenant_route('school.admin.plans.show', $school, ['plan' => $plan->id]) }}', '{{ $plan->title }}', '{{ $plan->user->name }}', '{{ $plan->created_at->format('M d, Y') }}')"
+                                            <button onclick="printFile('{{ safe_tenant_route('school.admin.plans.show', $school, ['plan' => $plan->id]) }}', '{{ $plan->title }}', '{{ $plan->user->name }}', '{{ $plan->created_at->format('M d, Y') }}')"
                                                     class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
                                                     title="{{ __('messages.files.print_file') }}">
                                                 <i class="ri-printer-line text-lg"></i>

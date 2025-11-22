@@ -2,15 +2,15 @@
 <html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" class="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     @php
-        $school = $school ?? request()->route('school') ?? request()->route('branch');
+        $school = $school ?? request()->route('school') ?? request()->route('branch') ?? auth()->user()?->school;
         $branch = $branch ?? request()->route('branch');
-        $network = $network ?? request()->route('network');
+        $network = $network ?? request()->route('network') ?? $school?->network ?? auth()->user()?->network;
 
         $schoolName = $school?->name ?? config('app.name');
         $schoolSlug = $school?->slug ?? '';
-        $networkSlug = $network?->slug ?? '';
-        $isMainAdmin = false;
-        $hasTenantContext = $school && $network;
+        $networkSlug = $network?->slug ?? $school?->network?->slug ?? auth()->user()?->network?->slug ?? '';
+        $isMainAdmin = $isMainAdmin ?? (bool) auth()->user()?->is_main_admin;
+        $hasTenantContext = $school && $school->network;
     @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
@@ -1300,6 +1300,7 @@
 @endauth
 
 @auth
+@if($hasTenantContext || $isMainAdmin)
 <!-- Enhanced Sidebar with Mobile Support -->
 <aside id="sidebar" class="sidebar {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
     <!-- Mobile Sidebar Header -->
@@ -1319,9 +1320,11 @@
                 $networkSlug = $networkSlug ?? auth()->user()?->network?->slug;
                 $dashboardUrl = $isMainAdmin
                     ? ($networkSlug ? route('main-admin.dashboard', ['network' => $networkSlug]) : '#')
-                    : (Auth::user()->role === 'admin'
-                        ? safe_tenant_route('school.admin.dashboard', $school)
-                        : safe_tenant_route('dashboard', $school));
+                    : ($hasTenantContext
+                        ? (Auth::user()->role === 'admin'
+                            ? safe_tenant_route('school.admin.dashboard', $school)
+                            : safe_tenant_route('dashboard', $school))
+                        : '#');
             @endphp
             <a href="{{ $dashboardUrl }}"
                class="sidebar-item {{ request()->routeIs('dashboard') || request()->routeIs('main-admin.dashboard') || request()->routeIs('school.admin.dashboard') ? 'active' : '' }}">
@@ -1354,7 +1357,7 @@
                     <i class="ri-book-2-line"></i>
                     <span class="sidebar-text">{{ __('messages.main_admin.navigation.subjects_grades') }}</span>
                 </span></a>
-            @elseif(Auth::user()->role === 'admin')
+            @elseif($hasTenantContext && Auth::user()->role === 'admin')
                 <a href="{{ safe_tenant_route('school.admin.users.index', $school) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.users.*') ? 'active' : '' }}">
                     <i class="ri-team-line"></i>
@@ -1398,7 +1401,7 @@
                     <span class="sidebar-text">{{ __('messages.navigation.grades') }}</span>
                 </span></a>
 
-            @elseif(Auth::user()->role === 'teacher')
+            @elseif($hasTenantContext && Auth::user()->role === 'teacher')
                 <a href="{{ route('teacher.files.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('teacher.files.index') || request()->routeIs('teacher.files.show') ? 'active' : '' }}">
                     <i class="ri-file-list-3-line"></i>
@@ -1411,7 +1414,7 @@
                     <span class="sidebar-text">{{ __('messages.navigation.upload_file') }}</span>
                 </span></a>
 
-            @elseif(Auth::user()->role === 'supervisor')
+            @elseif($hasTenantContext && Auth::user()->role === 'supervisor')
                 <a href="{{ route('supervisor.reviews.index', $schoolSlug) }}"
                    class="sidebar-item {{ request()->routeIs('supervisor.reviews.*') ? 'active' : '' }}">
                     <i class="ri-file-search-line"></i>
@@ -1480,6 +1483,7 @@
         </div>
     </div>
 </aside>
+@endif
 @endauth
 
 <!-- Enhanced Main Content -->

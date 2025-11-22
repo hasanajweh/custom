@@ -12,30 +12,30 @@
     <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div class="bg-white shadow rounded-lg p-4 border border-gray-200">
             <p class="text-sm text-gray-500 mb-1">@lang('messages.total_branches')</p>
-            <p class="text-2xl font-semibold text-gray-900">{{ $summary['branches'] }}</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ (int) ($summary['branches'] ?? 0) }}</p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 border border-gray-200">
             <p class="text-sm text-gray-500 mb-1">@lang('messages.total_files_across_branches')</p>
-            <p class="text-2xl font-semibold text-gray-900">{{ $summary['files'] }}</p>
-            <p class="text-xs text-gray-500">@lang('messages.last_72_hours_label'): {{ $summary['recent_files'] }}</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ (int) ($summary['files'] ?? 0) }}</p>
+            <p class="text-xs text-gray-500">@lang('messages.last_72_hours_label'): {{ (int) ($summary['recent_files'] ?? 0) }}</p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 border border-gray-200">
             <p class="text-sm text-gray-500 mb-1">@lang('messages.plans_across_branches')</p>
-            <p class="text-2xl font-semibold text-gray-900">{{ $summary['plans'] }}</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ (int) ($summary['plans'] ?? 0) }}</p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 border border-gray-200">
             <p class="text-sm text-gray-500 mb-1">@lang('messages.subjects')</p>
-            <p class="text-2xl font-semibold text-gray-900">{{ $summary['subjects'] }}</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ (int) ($summary['subjects'] ?? 0) }}</p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 border border-gray-200">
             <p class="text-sm text-gray-500 mb-1">@lang('messages.grades')</p>
-            <p class="text-2xl font-semibold text-gray-900">{{ $summary['grades'] }}</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ (int) ($summary['grades'] ?? 0) }}</p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 border border-gray-200">
             <p class="text-sm text-gray-500 mb-1">@lang('messages.team_distribution')</p>
-            <p class="text-sm text-gray-700">@lang('messages.admins'): <span class="font-semibold">{{ $summary['admins'] }}</span></p>
-            <p class="text-sm text-gray-700">@lang('messages.supervisors'): <span class="font-semibold">{{ $summary['supervisors'] }}</span></p>
-            <p class="text-sm text-gray-700">@lang('messages.teachers'): <span class="font-semibold">{{ $summary['teachers'] }}</span></p>
+            <p class="text-sm text-gray-700">@lang('messages.admins'): <span class="font-semibold">{{ (int) ($summary['admins'] ?? 0) }}</span></p>
+            <p class="text-sm text-gray-700">@lang('messages.supervisors'): <span class="font-semibold">{{ (int) ($summary['supervisors'] ?? 0) }}</span></p>
+            <p class="text-sm text-gray-700">@lang('messages.teachers'): <span class="font-semibold">{{ (int) ($summary['teachers'] ?? 0) }}</span></p>
         </div>
     </div>
 
@@ -55,27 +55,27 @@
                 <div class="space-y-2 text-sm text-gray-700">
                     <div class="flex justify-between">
                         <span>@lang('messages.files_count')</span>
-                        <span class="font-semibold">{{ $branch->file_submissions_count ?? 0 }}</span>
+                        <span class="font-semibold">{{ (int) ($branch->file_submissions_count ?? 0) }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>@lang('messages.recent_uploads_72h')</span>
-                        <span class="font-semibold">{{ $branch->recent_files_count ?? 0 }}</span>
+                        <span class="font-semibold">{{ (int) ($branch->recent_files_count ?? 0) }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>@lang('messages.plans_label')</span>
-                        <span class="font-semibold">{{ $branch->plans_count ?? 0 }}</span>
+                        <span class="font-semibold">{{ (int) ($branch->plans_count ?? 0) }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>@lang('messages.admins')</span>
-                        <span class="font-semibold">{{ $branch->admins_count }}</span>
+                        <span class="font-semibold">{{ (int) ($branch->admins_count ?? 0) }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>@lang('messages.supervisors')</span>
-                        <span class="font-semibold">{{ $branch->supervisors_count }}</span>
+                        <span class="font-semibold">{{ (int) ($branch->supervisors_count ?? 0) }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>@lang('messages.teachers')</span>
-                        <span class="font-semibold">{{ $branch->teachers_count }}</span>
+                        <span class="font-semibold">{{ (int) ($branch->teachers_count ?? 0) }}</span>
                     </div>
                 </div>
             </div>

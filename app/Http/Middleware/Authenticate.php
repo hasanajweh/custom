@@ -28,7 +28,7 @@ class Authenticate extends Middleware
         $school = SchoolResolver::resolve($request->route('school'));
 
         if ($school && $school->network) {
-            return tenant_route('login', $school);
+            return safe_tenant_route('login', $school);
         }
 
         // ⭐ SECURITY FIX: Don't redirect to random school
