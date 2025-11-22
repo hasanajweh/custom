@@ -541,8 +541,10 @@ return [
         'powerpoint' => 'PowerPoint',
         'supervisor_resource' => 'Supervisor Resource',
         'description' => 'Description',
+        'no_files_match' => 'No files match your current filters.',
         'never' => 'Never',
         'mb_file_size' => 'MB File Size',
+        'cannot_print_browser' => 'Cannot print this file type in the browser',
         'cannot_preview_browser' => 'Cannot Preview in Browser',
         'office_file_limitation' => 'This file type requires a desktop application',
         'office_files_notice' => 'Office documents (Word, Excel, PowerPoint) cannot be previewed or printed directly in the browser.',
@@ -551,6 +553,7 @@ return [
         'step_download_file' => 'Click the "Download File" button below',
         'step_open_appropriate_app' => 'Open the file with Microsoft Office, Google Docs, or a compatible application',
         'step_view_edit_print' => 'View, edit, or print the file as needed',
+        'total_files' => 'Total Files',
 
     ],
 
@@ -862,6 +865,18 @@ return [
             'heading' => 'Payment Required',
             'message' => 'Payment is required to access this resource.',
         ],
+        '403' => [
+            'title' => 'Forbidden',
+            'heading' => 'Access Denied',
+            'message' => 'Sorry, you do not have permission to access this page. Please contact your administrator if you believe this is a mistake.',
+            'action' => 'Go Back',
+        ],
+        '404' => [
+            'title' => 'Page Not Found',
+            'heading' => 'Oops! Page not found',
+            'message' => 'The page you are looking for seems to be missing. Let us help you get back on track!',
+            'action' => 'Go Home',
+        ],
         '405' => [
             'title' => 'Method Not Allowed',
             'heading' => 'Method Not Allowed',
@@ -892,6 +907,12 @@ return [
             'heading' => 'URI Too Long',
             'message' => 'The URI provided was too long for the server to process.',
         ],
+        '419' => [
+            'title' => 'Session Expired',
+            'heading' => 'Session Expired',
+            'message' => 'Your session has expired for security reasons. Please log in again to continue.',
+            'action' => 'Log in again',
+        ],
         '422' => [
             'title' => 'Unprocessable Entity',
             'heading' => 'Validation Error',
@@ -903,10 +924,24 @@ return [
             'message' => 'You have made too many requests. Please slow down and try again later.',
             'action' => 'Wait & Retry',
         ],
+        '500' => [
+            'title' => 'Server Error',
+            'heading' => 'Oops! Something went wrong',
+            'message' => 'Our team has been notified and is working to fix this issue.',
+            'action' => 'Try again',
+        ],
         '502' => [
             'title' => 'Bad Gateway',
             'heading' => 'Bad Gateway',
             'message' => 'The server received an invalid response from an upstream server.',
+        ],
+        '503' => [
+            'title' => 'Maintenance Mode',
+            'heading' => 'We will be right back!',
+            'message' => 'We are currently performing scheduled maintenance. We should be back online shortly. Thank you for your patience!',
+            'estimated' => 'Estimated time',
+            'minutes' => 'minutes',
+            'follow_updates' => 'Follow us for updates',
         ],
         '504' => [
             'title' => 'Gateway Timeout',
