@@ -53,13 +53,14 @@ if (!function_exists('tenant_route')) {
     /**
      * Generate tenant aware routes.
      *
-     * Use strict mode (default) from controllers/services where tenant context must exist.
-     * Views/layouts must call safe_tenant_route() instead to avoid runtime exceptions.
+     * Controllers/services should use this helper with the default strict mode to
+     * guarantee context is present. Views should use safe_tenant_route() instead.
      */
     function tenant_route(string $name, $school = null, array $parameters = [], bool $absolute = true, bool $strict = true): string
     {
         $user = auth()->user();
 
+        // When only parameters are passed, shift them correctly
         if ($school !== null && ! $school instanceof Network && ! $school instanceof School && ! $school instanceof Branch && ! is_string($school)) {
             if (is_array($school) && empty($parameters)) {
                 $parameters = $school;
@@ -106,14 +107,15 @@ if (!function_exists('tenant_route')) {
 
         if (! $network) {
             if (! $strict) {
-                try {
-                    return route($name, $parameters, $absolute);
-                } catch (\Throwable) {
-                    return '#';
-                }
+                return route($name, $parameters, $absolute);
             }
 
-            $context['reason'] = 'network_not_resolved';
+            $context = [
+                'route_network_param' => is_object($routeNetworkParam) ? $routeNetworkParam?->slug : $routeNetworkParam,
+                'route_school_param' => is_object($routeSchoolParam) ? $routeSchoolParam?->slug : $routeSchoolParam,
+                'user_id' => $user?->id,
+                'school_provided' => (bool) $school,
+            ];
 
             throw new \InvalidArgumentException(
                 'Network is required to generate tenant routes. Context: ' . json_encode($context),
@@ -135,18 +137,18 @@ if (!function_exists('tenant_route')) {
 
         if (! $branch) {
             if (! $strict) {
-                try {
-                    return route($name, $parameters, $absolute);
-                } catch (\Throwable) {
-                    return '#';
-                }
+                return route($name, $parameters, $absolute);
             }
 
-            $context['reason'] = 'branch_not_resolved';
+            throw new \InvalidArgumentException('Branch is required to generate tenant routes for branch-level pages.');
+        }
 
-            throw new \InvalidArgumentException(
-                'Network is required to generate tenant routes for the provided school. Context: ' . json_encode($context),
-            );
+        if (! $branch->network) {
+            if (! $strict) {
+                return route($name, $parameters, $absolute);
+            }
+
+            throw new \InvalidArgumentException('Network is required to generate tenant routes for the provided school.');
         }
 
         return route(
@@ -182,12 +184,10 @@ if (!function_exists('safe_tenant_route')) {
                 'school_has_network' => (bool) ($school?->network),
                 'school_id' => $school?->id,
                 'user_id' => auth()->id(),
-                'user_role' => auth()->user()?->role,
-                'fallback' => $fallback,
                 'error' => $e->getMessage(),
             ]);
 
-            return is_string($fallback) ? $fallback : '#';
+            return $fallback;
         }
     }
 }
