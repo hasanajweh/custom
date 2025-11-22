@@ -150,6 +150,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect()->to(tenant_route('login', $branch));
+        return redirect()->to(safe_tenant_route('login', $branch));
     }
 }

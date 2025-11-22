@@ -19,7 +19,7 @@
                 <p class="text-sm text-gray-600 mt-1">{{ __('messages.grades.create_grade_levels') }}</p>
             </div>
             <div class="p-6">
-                <form method="POST" action="{{ tenant_route('school.admin.grades.store', $school) }}" class="space-y-6">
+                <form method="POST" action="{{ safe_tenant_route('school.admin.grades.store', $school) }}" class="space-y-6">
                     @csrf
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
@@ -128,7 +128,7 @@
                                                 {{ __('messages.actions.cancel') }}
                                             </button>
                                             <form method="POST"
-                                                action="{{ tenant_route('school.admin.grades.archive', $school, ['grade' => $grade->id]) }}">
+                                                action="{{ safe_tenant_route('school.admin.grades.archive', $school, ['grade' => $grade->id]) }}">
                                                 @csrf
                                                 @method('PATCH')
                                                 <button type="submit"
@@ -185,7 +185,7 @@
                                         </p>
                                     </div>
                                 </div>
-                                <form method="POST" action="{{ tenant_route('school.admin.grades.restore', $school, ['grade' => $grade->id]) }}">
+                                <form method="POST" action="{{ safe_tenant_route('school.admin.grades.restore', $school, ['grade' => $grade->id]) }}">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="px-3 py-1.5 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition duration-200">

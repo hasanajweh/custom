@@ -16,6 +16,7 @@ class DashboardController extends Controller
         App::setLocale('ar');
 
         $branches = $network->branches()->withCount([
+            'users',
             'subjects',
             'grades',
             'fileSubmissions',
