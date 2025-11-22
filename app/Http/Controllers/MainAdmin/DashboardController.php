@@ -42,25 +42,38 @@ class DashboardController extends Controller
             ->selectRaw('school_id, role, COUNT(DISTINCT user_id) as total')
             ->groupBy('school_id', 'role')
             ->get()
-            ->groupBy('school_id')                // group branches
-            ->map(fn ($group) => $group->keyBy('role'));  // inside branch, key by role
+            ->groupBy('school_id')
+            ->map(function ($group) {
+                return $group->mapWithKeys(function ($row) {
+                    return [
+                        $row->role => ['total' => (int) $row->total],
+                    ];
+                });
+            });
 
         // Total users per branch
         $branchUserTotals = SchoolUserRole::whereIn('school_id', $branchIds)
             ->selectRaw('school_id, COUNT(DISTINCT user_id) as total')
             ->groupBy('school_id')
-            ->pluck('total', 'school_id');
+            ->pluck('total', 'school_id')
+            ->map(fn ($value) => (int) $value);
 
         // Inject the computed values into each branch
         $branches->transform(function ($branch) use ($branchRoleCounts, $branchUserTotals) {
 
             $roleGroup = $branchRoleCounts->get($branch->id, collect());
 
-            $branch->admins_count = (int) optional($roleGroup->get('admin'))->total ?? 0;
-            $branch->supervisors_count = (int) optional($roleGroup->get('supervisor'))->total ?? 0;
-            $branch->teachers_count = (int) optional($roleGroup->get('teacher'))->total ?? 0;
+            $branch->subjects_count = (int) $branch->subjects_count;
+            $branch->grades_count = (int) $branch->grades_count;
+            $branch->file_submissions_count = (int) $branch->file_submissions_count;
+            $branch->recent_files_count = (int) $branch->recent_files_count;
+            $branch->plans_count = (int) $branch->plans_count;
 
-            $branch->users_count = (int) ($branchUserTotals[$branch->id] ?? 0);
+            $branch->admins_count = (int) data_get($roleGroup->get('admin'), 'total', 0);
+            $branch->supervisors_count = (int) data_get($roleGroup->get('supervisor'), 'total', 0);
+            $branch->teachers_count = (int) data_get($roleGroup->get('teacher'), 'total', 0);
+
+            $branch->users_count = (int) $branchUserTotals->get($branch->id, 0);
 
             return $branch;
         });
