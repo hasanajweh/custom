@@ -555,7 +555,8 @@ return [
     ],
 
     // Subjects Management
-    'subjects' => [
+    'subjects' => 'Subjects',
+    'subjects_management' => [
         'title' => 'Subject Management',
         'subject_management' => 'Subject Management',
         'add_subject' => 'Add New Subject',
