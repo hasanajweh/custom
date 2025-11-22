@@ -15,6 +15,7 @@ class DashboardController extends Controller
     {
         App::setLocale('ar');
 
+        // Load branches with file/subject/grade counts
         $branches = $network->branches()->withCount([
             'users',
             'subjects',
@@ -28,36 +29,43 @@ class DashboardController extends Controller
             },
         ])->get();
 
-        $branchIds = $branches->pluck('id');
+        $branchIds = $branches->pluck('id')->toArray();
 
+        // Global role counts (admin, supervisor, teacher)
         $roleCounts = SchoolUserRole::whereIn('school_id', $branchIds)
             ->selectRaw('role, COUNT(DISTINCT user_id) as total')
             ->groupBy('role')
             ->pluck('total', 'role');
 
+        // Role counts per branch
         $branchRoleCounts = SchoolUserRole::whereIn('school_id', $branchIds)
             ->selectRaw('school_id, role, COUNT(DISTINCT user_id) as total')
             ->groupBy('school_id', 'role')
             ->get()
-            ->groupBy('school_id')
-            ->map(fn ($group) => $group->keyBy('role'));
+            ->groupBy('school_id')                // group branches
+            ->map(fn ($group) => $group->keyBy('role'));  // inside branch, key by role
 
+        // Total users per branch
         $branchUserTotals = SchoolUserRole::whereIn('school_id', $branchIds)
             ->selectRaw('school_id, COUNT(DISTINCT user_id) as total')
             ->groupBy('school_id')
             ->pluck('total', 'school_id');
 
+        // Inject the computed values into each branch
         $branches->transform(function ($branch) use ($branchRoleCounts, $branchUserTotals) {
-            $branchRoleCount = $branchRoleCounts->get($branch->id, collect());
 
-            $branch->admins_count = optional($branchRoleCount->get('admin'))->total ?? 0;
-            $branch->supervisors_count = optional($branchRoleCount->get('supervisor'))->total ?? 0;
-            $branch->teachers_count = optional($branchRoleCount->get('teacher'))->total ?? 0;
-            $branch->users_count = $branchUserTotals[$branch->id] ?? 0;
+            $roleGroup = $branchRoleCounts->get($branch->id, collect());
+
+            $branch->admins_count = (int) optional($roleGroup->get('admin'))->total ?? 0;
+            $branch->supervisors_count = (int) optional($roleGroup->get('supervisor'))->total ?? 0;
+            $branch->teachers_count = (int) optional($roleGroup->get('teacher'))->total ?? 0;
+
+            $branch->users_count = (int) ($branchUserTotals[$branch->id] ?? 0);
 
             return $branch;
         });
 
+        // Recent uploads
         $recentUploads = FileSubmission::with(['school', 'user'])
             ->whereIn('school_id', $branchIds)
             ->where('created_at', '>=', now()->subHours(72))
@@ -65,10 +73,12 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
+        // Final summary (SAFE — all integers)
         $summary = [
             'branches' => (int) $branches->count(),
             'files' => (int) FileSubmission::whereIn('school_id', $branchIds)->count(),
-            'plans' => (int) FileSubmission::whereIn('school_id', $branchIds)->where('submission_type', 'plan')->count(),
+            'plans' => (int) FileSubmission::whereIn('school_id', $branchIds)
+                ->where('submission_type', 'plan')->count(),
             'subjects' => (int) $branches->sum('subjects_count'),
             'grades' => (int) $branches->sum('grades_count'),
             'recent_files' => (int) $recentUploads->count(),
