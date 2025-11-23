@@ -28,7 +28,7 @@
 
         <!-- Filters -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <form method="GET" action="{{ tenant_route('school.admin.supervisors.files', $school, ['supervisor' => $supervisor->id]) }}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <form method="GET" action="{{ tenant_route('school.admin.supervisors.files', [$school, $supervisor]) }}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.common.search') }}</label>
                     <input type="text"
@@ -127,13 +127,13 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-center space-x-2">
-                                    <a href="{{ tenant_route('school.admin.file-browser.preview', $school, ['file' => $file->id]) }}"
+                                    <a href="{{ tenant_route('school.admin.file-browser.preview', [$school, $file]) }}"
                                        target="_blank"
                                        class="p-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors"
                                        title="{{ __('messages.common.preview') }}">
                                         <i class="ri-eye-line text-lg"></i>
                                     </a>
-                                    <a href="{{ tenant_route('school.admin.file-browser.download', $school, ['file' => $file->id]) }}"
+                                    <a href="{{ tenant_route('school.admin.file-browser.download', [$school, $file]) }}"
                                        class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
                                        title="{{ __('messages.common.download') }}">
                                         <i class="ri-download-line text-lg"></i>
