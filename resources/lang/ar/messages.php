@@ -1233,6 +1233,7 @@ return [
     'password' => 'كلمة المرور',
     'remember_me' => 'تذكرني',
     'forgot_password' => 'نسيت كلمة المرور؟',
+    'title' => 'العنوان',
     'total_branches' => 'إجمالي الفروع',
     'total_files_across_branches' => 'الملفات عبر الفروع',
     'plans_across_branches' => 'الخطط عبر الفروع',
@@ -1244,6 +1245,7 @@ return [
     'user' => 'المستخدم',
     'submitted_at' => 'تاريخ الرفع',
     'plans_label' => 'الخطط',
+    'grades_label' => 'الصفوف',
     'last_72_hours_label' => 'آخر 72 ساعة',
 
     'main_admin' => [
