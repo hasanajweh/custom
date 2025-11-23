@@ -2,7 +2,11 @@
 <html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" class="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     @php
-        $school = $school ?? request()->route('school') ?? request()->route('branch') ?? auth()->user()?->school;
+        $school = $school
+            ?? request()->attributes->get('branch')
+            ?? request()->attributes->get('school')
+            ?? Auth::user()->school;
+
         $branch = $branch ?? request()->route('branch');
         $network = $network ?? request()->route('network') ?? $school?->network ?? auth()->user()?->network;
 
@@ -1367,6 +1371,18 @@
                     <span class="sidebar-text">{{ __('messages.navigation.manage_users') }}</span>
                 </span></a>
 
+                <a href="{{ tenant_route('school.admin.subjects.index', $school) }}"
+                   class="sidebar-item {{ request()->routeIs('school.admin.subjects.*') ? 'active' : '' }}">
+                    <i class="ri-book-2-line"></i>
+                    <span class="sidebar-text">{{ __('messages.navigation.subjects') }}</span>
+                </span></a>
+
+                <a href="{{ tenant_route('school.admin.grades.index', $school) }}"
+                   class="sidebar-item {{ request()->routeIs('school.admin.grades.*') ? 'active' : '' }}">
+                    <i class="ri-graduation-cap-line"></i>
+                    <span class="sidebar-text">{{ __('messages.navigation.grades') }}</span>
+                </span></a>
+
                 <a href="{{ tenant_route('school.admin.file-browser.index', $school) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.file-browser.*') ? 'active' : '' }}">
                     <i class="ri-folder-3-line"></i>
@@ -1383,25 +1399,6 @@
                    class="sidebar-item {{ request()->routeIs('school.admin.supervisors.*') ? 'active' : '' }}">
                     <i class="ri-user-star-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.supervisors') }}</span>
-                </span></a>
-
-                <div class="sidebar-divider">
-                    <div class="sidebar-divider-line"></div>
-                    <div class="sidebar-divider-title">
-                        {{ __('messages.navigation.content_management') }}
-                    </div>
-                </div>
-
-                <a href="{{ tenant_route('school.admin.subjects.index', $school) }}"
-                   class="sidebar-item {{ request()->routeIs('school.admin.subjects.*') ? 'active' : '' }}">
-                    <i class="ri-book-2-line"></i>
-                    <span class="sidebar-text">{{ __('messages.navigation.subjects') }}</span>
-                </span></a>
-
-                <a href="{{ tenant_route('school.admin.grades.index', $school) }}"
-                   class="sidebar-item {{ request()->routeIs('school.admin.grades.*') ? 'active' : '' }}">
-                    <i class="ri-graduation-cap-line"></i>
-                    <span class="sidebar-text">{{ __('messages.navigation.grades') }}</span>
                 </span></a>
 
             @elseif($hasTenantContext && Auth::user()->role === 'teacher')
@@ -1856,6 +1853,8 @@
     // ========================================
     // FILE PREVIEW LOGIC (Unchanged)
     // ========================================
+    const previewDataUrlTemplate = @json(tenant_route('school.admin.file-browser.preview-data', [$school, '__FILE_ID__']));
+
     function handlePreviewClick(event, schoolSlug, fileId) {
         event.preventDefault();
         const button = event.currentTarget;
@@ -1863,7 +1862,9 @@
         button.innerHTML = '<i class="ri-loader-4-line animate-spin text-lg"></i>';
         button.disabled = true;
 
-        fetch(`/${networkSlug}/${schoolSlug}/admin/file-browser/${fileId}/preview-data`)
+        const previewDataUrl = previewDataUrlTemplate.replace('__FILE_ID__', fileId);
+
+        fetch(previewDataUrl)
             .then(response => response.json())
             .then(data => {
                 button.innerHTML = originalHTML;

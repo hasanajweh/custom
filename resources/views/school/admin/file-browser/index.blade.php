@@ -239,7 +239,7 @@
                                     <div class="flex items-center justify-center {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }} space-x-2">
                                         {{-- Preview Button --}}
                                           @if($canPreview)
-                                              <a href="{{ tenant_route('school.admin.file-browser.preview', $school, ['file' => $file->id]) }}"
+                                              <a href="{{ tenant_route('school.admin.file-browser.preview', [$school, $file]) }}"
                                                  target="_blank"
                                                  class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
                                                  title="{{ __('messages.files.preview_file') }}">
@@ -254,7 +254,7 @@
                                         @endif
 
                                         {{-- Download Button - Always Active --}}
-                                          <a href="{{ tenant_route('school.admin.file-browser.download', $school, ['file' => $file->id]) }}"
+                                          <a href="{{ tenant_route('school.admin.file-browser.download', [$school, $file]) }}"
                                              class="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-150"
                                              title="{{ __('messages.files.download_file') }}">
                                               <i class="ri-download-line text-lg"></i>
@@ -262,7 +262,7 @@
 
                                         {{-- Print Button --}}
                                           @if($canPreview)
-                                              <button onclick="printFile('{{ tenant_route('school.admin.file-browser.preview', $school, ['file' => $file->id]) }}', '{{ $file->title }}', '{{ $file->user->name ?? 'Unknown' }}', '{{ $file->created_at->format('M d, Y') }}')"
+                                              <button onclick="printFile('{{ tenant_route('school.admin.file-browser.preview', [$school, $file]) }}', '{{ $file->title }}', '{{ $file->user->name ?? 'Unknown' }}', '{{ $file->created_at->format('M d, Y') }}')"
                                                       class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
                                                       title="{{ __('messages.files.print_file') }}">
                                                   <i class="ri-printer-line text-lg"></i>

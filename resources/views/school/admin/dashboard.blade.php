@@ -108,7 +108,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 no-print">
+        <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4 no-print">
             <a href="{{ tenant_route('school.admin.file-browser.index', $school) }}"
                class="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-all group">
                 <i class="ri-folder-line text-3xl text-blue-600 mb-3"></i>
@@ -121,16 +121,28 @@
                 <h3 class="font-semibold text-gray-900">{{ __('messages.users.add_user') }}</h3>
             </a>
 
+            <a href="{{ tenant_route('school.admin.subjects.index', $school) }}"
+               class="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-all group">
+                <i class="ri-book-line text-3xl text-orange-600 mb-3"></i>
+                <h3 class="font-semibold text-gray-900">{{ __('messages.navigation.subjects') }}</h3>
+            </a>
+
+            <a href="{{ tenant_route('school.admin.grades.index', $school) }}"
+               class="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-all group">
+                <i class="ri-graduation-cap-line text-3xl text-indigo-600 mb-3"></i>
+                <h3 class="font-semibold text-gray-900">{{ __('messages.navigation.grades') }}</h3>
+            </a>
+
             <a href="{{ tenant_route('school.admin.plans.index', $school) }}"
                class="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-all group">
                 <i class="ri-calendar-check-line text-3xl text-purple-600 mb-3"></i>
                 <h3 class="font-semibold text-gray-900">{{ __('messages.plans.view_plan') }}</h3>
             </a>
 
-            <a href="{{ tenant_route('school.admin.subjects.index', $school) }}"
+            <a href="{{ tenant_route('school.admin.supervisors.index', $school) }}"
                class="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-all group">
-                <i class="ri-book-line text-3xl text-orange-600 mb-3"></i>
-                <h3 class="font-semibold text-gray-900">{{ __('messages.navigation.subjects') }}</h3>
+                <i class="ri-user-star-line text-3xl text-teal-600 mb-3"></i>
+                <h3 class="font-semibold text-gray-900">{{ __('messages.navigation.supervisors') }}</h3>
             </a>
         </div>
 
@@ -241,7 +253,7 @@
                             <td class="px-8 py-6 no-print">
                                 <div class="flex items-center justify-center space-x-2">
                                     @if($canPreview)
-                                        <a href="{{ tenant_route('school.admin.file-browser.preview', $school, ['file' => $file->id]) }}"
+                                        <a href="{{ tenant_route('school.admin.file-browser.preview', [$school, $file]) }}"
                                            target="_blank"
                                            class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
                                            title="{{ __('messages.actions.preview') }}">
@@ -253,14 +265,14 @@
                                         </button>
                                     @endif
 
-                                    <a href="{{ tenant_route('school.admin.file-browser.download', $school, ['file' => $file->id]) }}"
+                                    <a href="{{ tenant_route('school.admin.file-browser.download', [$school, $file]) }}"
                                        class="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-150"
                                        title="{{ __('messages.actions.download') }}">
                                         <i class="ri-download-line text-lg"></i>
                                     </a>
 
                                     @if($canPreview)
-                                        <button onclick="printFile('{{ tenant_route('school.admin.file-browser.preview', $school, ['file' => $file->id]) }}', '{{ $file->title }}', '{{ $file->user->name ?? __('messages.users.unknown') }}', '{{ $file->created_at->format('M d, Y') }}')"
+                                        <button onclick="printFile('{{ tenant_route('school.admin.file-browser.preview', [$school, $file]) }}', '{{ $file->title }}', '{{ $file->user->name ?? __('messages.users.unknown') }}', '{{ $file->created_at->format('M d, Y') }}')"
                                                 class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
                                                 title="{{ __('messages.actions.print') }}">
                                             <i class="ri-printer-line text-lg"></i>
@@ -390,7 +402,7 @@
                             <td class="px-8 py-6 no-print">
                                 <div class="flex items-center justify-center space-x-2">
                                     @if($canPreview)
-                                        <a href="{{ tenant_route('school.admin.file-browser.preview', $school, ['file' => $file->id]) }}"
+                                        <a href="{{ tenant_route('school.admin.file-browser.preview', [$school, $file]) }}"
                                            target="_blank"
                                            class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
                                            title="{{ __('messages.actions.preview') }}">
@@ -402,14 +414,14 @@
                                         </button>
                                     @endif
 
-                                    <a href="{{ tenant_route('school.admin.file-browser.download', $school, ['file' => $file->id]) }}"
+                                    <a href="{{ tenant_route('school.admin.file-browser.download', [$school, $file]) }}"
                                        class="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-150"
                                        title="{{ __('messages.actions.download') }}">
                                         <i class="ri-download-line text-lg"></i>
                                     </a>
 
                                     @if($canPreview)
-                                        <button onclick="printFile('{{ tenant_route('school.admin.file-browser.preview', $school, ['file' => $file->id]) }}', '{{ $file->title }}', '{{ $file->user->name ?? __('messages.users.unknown') }}', '{{ $file->created_at->format('M d, Y') }}')"
+                                        <button onclick="printFile('{{ tenant_route('school.admin.file-browser.preview', [$school, $file]) }}', '{{ $file->title }}', '{{ $file->user->name ?? __('messages.users.unknown') }}', '{{ $file->created_at->format('M d, Y') }}')"
                                                 class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
                                                 title="{{ __('messages.actions.print') }}">
                                             <i class="ri-printer-line text-lg"></i>
@@ -545,7 +557,7 @@
                             <td class="px-8 py-6 no-print">
                                 <div class="flex items-center justify-center space-x-2">
                                     @if($canPreview)
-                                        <a href="{{ tenant_route('school.admin.file-browser.preview', $school, ['file' => $file->id]) }}"
+                                        <a href="{{ tenant_route('school.admin.file-browser.preview', [$school, $file]) }}"
                                            target="_blank"
                                            class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
                                            title="{{ __('messages.actions.preview') }}">
@@ -557,14 +569,14 @@
                                         </button>
                                     @endif
 
-                                    <a href="{{ tenant_route('school.admin.file-browser.download', $school, ['file' => $file->id]) }}"
+                                    <a href="{{ tenant_route('school.admin.file-browser.download', [$school, $file]) }}"
                                        class="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-150"
                                        title="{{ __('messages.actions.download') }}">
                                         <i class="ri-download-line text-lg"></i>
                                     </a>
 
                                     @if($canPreview)
-                                        <button onclick="printFile('{{ tenant_route('school.admin.file-browser.preview', $school, ['file' => $file->id]) }}', '{{ $file->title }}', '{{ $file->user->name ?? __('messages.users.unknown') }}', '{{ $file->created_at->format('M d, Y') }}')"
+                                        <button onclick="printFile('{{ tenant_route('school.admin.file-browser.preview', [$school, $file]) }}', '{{ $file->title }}', '{{ $file->user->name ?? __('messages.users.unknown') }}', '{{ $file->created_at->format('M d, Y') }}')"
                                                 class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
                                                 title="{{ __('messages.actions.print') }}">
                                             <i class="ri-printer-line text-lg"></i>
