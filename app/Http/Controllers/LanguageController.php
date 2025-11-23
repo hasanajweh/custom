@@ -14,7 +14,7 @@ use Carbon\Carbon;
 
 class LanguageController extends Controller
 {
-    public function __invoke(Request $request, $locale)
+    public function __invoke(Request $request, string $locale)
     {
         return $this->switchLanguage($request, $locale);
     }
@@ -43,7 +43,7 @@ class LanguageController extends Controller
      * @param string $locale
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
-    public function switchLanguage(Request $request, $locale)
+    public function switchLanguage(Request $request, string $locale)
     {
         // Validate locale
         if (!in_array($locale, $this->availableLocales)) {
@@ -99,18 +99,9 @@ class LanguageController extends Controller
         // Flash success message in the new language
         $message = __('messages.language_switched', ['language' => $this->localeNames[$locale]], $locale);
 
-        $networkSlug = $request->input('network');
-        $branchSlug = $request->input('branch');
-        $redirect = redirect()->back();
-
-        if (!$request->headers->has('referer') && $networkSlug && $branchSlug) {
-            $network = Network::where('slug', $networkSlug)->first();
-            $school = School::where('slug', $branchSlug)->first();
-
-            if ($network && $school && $school->network_id === $network->id) {
-                $redirect = redirect()->to(tenant_route('dashboard', $school));
-            }
-        }
+        $redirect = $request->headers->has('referer')
+            ? redirect()->back()
+            : $this->determineFallbackRedirect($request);
 
         return $redirect
             ->with('success', $message)
@@ -199,6 +190,34 @@ class LanguageController extends Controller
         ];
 
         return $flags[$locale] ?? '🌐';
+    }
+
+    /**
+     * Determine the safest redirect target when no referrer is present.
+     */
+    protected function determineFallbackRedirect(Request $request)
+    {
+        $networkSlug = $request->input('network');
+        $branchSlug = $request->input('branch');
+
+        $school = null;
+
+        if ($networkSlug && $branchSlug) {
+            $network = Network::where('slug', $networkSlug)->first();
+            $school = School::where('slug', $branchSlug)->first();
+
+            if ($network && $school && $school->network_id !== $network->id) {
+                $school = null;
+            }
+        }
+
+        if (!$school && auth()->check()) {
+            $school = auth()->user()->school;
+        }
+
+        return $school
+            ? redirect()->to(tenant_route('dashboard', $school))
+            : redirect('/');
     }
 
     /**

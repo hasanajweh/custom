@@ -9,7 +9,7 @@
             <div class="bg-gradient-to-r from-green-50 to-teal-50 px-6 py-4 border-b border-gray-200">
                 <div class="flex items-center justify-between">
                     <h1 class="text-xl font-semibold text-gray-900">{{ __('messages.supervisors.review_file') }}</h1>
-                    <a href="{{ route('supervisor.reviews.index', $school->slug) }}"
+                    <a href="{{ tenant_route('supervisor.reviews.index', $school) }}"
                        class="text-sm text-gray-600 hover:text-gray-900">
                         <i class="ri-arrow-left-line mr-1"></i> {{ __('messages.supervisors.back_to_files') }}
                     </a>
@@ -67,13 +67,13 @@
 
                 <!-- Actions -->
                 <div class="flex items-center justify-center gap-4 pt-6 border-t border-gray-200">
-                    <a href="{{ route('supervisor.reviews.preview', [$school->slug, $fileSubmission->id]) }}"
+                    <a href="{{ tenant_route('supervisor.reviews.preview', $school, ['fileSubmission' => $fileSubmission->id]) }}"
                        target="_blank"
                        class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                         <i class="ri-external-link-line mr-2"></i>
                         {{ __('messages.files.preview_file') }}
                     </a>
-                    <a href="{{ route('supervisor.reviews.download', [$school->slug, $fileSubmission->id]) }}"
+                    <a href="{{ tenant_route('supervisor.reviews.download', $school, ['fileSubmission' => $fileSubmission->id]) }}"
                        class="inline-flex items-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
                         <i class="ri-download-2-line mr-2"></i>
                         {{ __('messages.files.download_file') }}
