@@ -1,5 +1,11 @@
 @extends('layouts.school')
 
+@php
+    $school = $school
+        ?? request()->attributes->get('branch')
+        ?? Auth::user()->school;
+@endphp
+
 @section('title', __('messages.plans.title') . ' - ' . __('messages.app.name'))
 
 @section('content')
