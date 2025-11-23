@@ -7,6 +7,12 @@
 <div class="min-h-screen bg-slate-50 py-6 px-3 sm:py-8 sm:px-4">
     <div class="max-w-2xl mx-auto">
 
+        @if (session('status'))
+            <div class="alert alert-success">
+                {{ session('status') }}
+            </div>
+        @endif
+
         {{-- ✅ Success Message --}}
         @if(session('upload_success'))
             @php
