@@ -1,4 +1,9 @@
 {{-- resources/views/school/admin/file-browser/index.blade.php --}}
+@php
+    $school = $school
+        ?? request()->attributes->get('branch')
+        ?? Auth::user()->school;
+@endphp
 @extends('layouts.school')
 
 @section('title', __('messages.files.title') . ' - ' . __('messages.app.name'))

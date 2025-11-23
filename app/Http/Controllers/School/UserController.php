@@ -8,16 +8,32 @@ use App\Models\School;
 use App\Models\Subject;
 use App\Models\Grade;
 use App\Models\SupervisorSubject;
+use App\Models\Network;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    public function index(Request $request, School $school)
+    private function validateContext(Network $network, School $branch): School
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        if (Auth::user()->school_id !== $branch->id) {
+            abort(403);
+        }
+
+        return $branch;
+    }
+
+    public function index(Request $request, Network $network, School $branch)
+    {
+        $school = $this->validateContext($network, $branch);
         // ⭐ CHANGED: Show ALL users (active and inactive), but not archived
         $query = User::where('school_id', $school->id);
 
@@ -70,12 +86,15 @@ class UserController extends Controller
             'teacherCount',
             'supervisorCount',
             'adminCount',
-            'inactiveCount'
+            'inactiveCount',
+            'branch',
+            'network'
         ));
     }
 
-    public function archived(Request $request, School $school)
+    public function archived(Request $request, Network $network, School $branch)
     {
+        $school = $this->validateContext($network, $branch);
         $query = User::onlyTrashed()
             ->where('school_id', $school->id);
 
@@ -102,19 +121,21 @@ class UserController extends Controller
             }
         }
 
-        return view('school.admin.users.archived', compact('school', 'archivedUsers'));
+        return view('school.admin.users.archived', compact('school', 'archivedUsers', 'branch', 'network'));
     }
 
-    public function create(School $school)
+    public function create(Network $network, School $branch)
     {
+        $school = $this->validateContext($network, $branch);
         $subjects = Subject::where('school_id', $school->id)->get();
         $grades = Grade::where('school_id', $school->id)->get();
 
-        return view('school.admin.users.create', compact('school', 'subjects', 'grades'));
+        return view('school.admin.users.create', compact('school', 'subjects', 'grades', 'branch', 'network'));
     }
 
-    public function store(Request $request, School $school)
+    public function store(Request $request, Network $network, School $branch)
     {
+        $school = $this->validateContext($network, $branch);
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
@@ -181,8 +202,9 @@ class UserController extends Controller
         }
     }
 
-    public function edit(School $school, User $user)
+    public function edit(Network $network, School $branch, User $user)
     {
+        $school = $this->validateContext($network, $branch);
         if ($user->school_id !== $school->id) {
             abort(404);
         }
@@ -207,12 +229,15 @@ class UserController extends Controller
             'grades',
             'selectedSupervisorSubjectIds',
             'selectedTeacherSubjectIds',
-            'selectedTeacherGradeIds'
+            'selectedTeacherGradeIds',
+            'branch',
+            'network'
         ));
     }
 
-    public function update(Request $request, School $school, User $user)
+    public function update(Request $request, Network $network, School $branch, User $user)
     {
+        $school = $this->validateContext($network, $branch);
         if ($user->school_id !== $school->id) {
             abort(404);
         }
@@ -297,8 +322,9 @@ class UserController extends Controller
     /**
      * ⭐ TOGGLE STATUS - Activate/Deactivate (User stays visible, just can't login)
      */
-    public function toggleStatus(School $school, User $user)
+    public function toggleStatus(Network $network, School $branch, User $user)
     {
+        $school = $this->validateContext($network, $branch);
         if ($user->school_id !== $school->id) {
             abort(404);
         }
@@ -322,8 +348,9 @@ class UserController extends Controller
     /**
      * ⭐ ARCHIVE (SOFT DELETE) - Moves user to archived page
      */
-    public function destroy(School $school, User $user)
+    public function destroy(Network $network, School $branch, User $user)
     {
+        $school = $this->validateContext($network, $branch);
         if ($user->school_id !== $school->id) {
             abort(404);
         }
@@ -342,8 +369,9 @@ class UserController extends Controller
     /**
      * ⭐ RESTORE from archive
      */
-    public function restore(School $school, $userId)
+    public function restore(Network $network, School $branch, $userId)
     {
+        $school = $this->validateContext($network, $branch);
         $user = User::onlyTrashed()
             ->where('school_id', $school->id)
             ->findOrFail($userId);
@@ -357,8 +385,9 @@ class UserController extends Controller
     /**
      * ⭐ PERMANENT DELETE - Only from archived page
      */
-    public function forceDelete(School $school, $userId)
+    public function forceDelete(Network $network, School $branch, $userId)
     {
+        $school = $this->validateContext($network, $branch);
         $user = User::onlyTrashed()
             ->where('school_id', $school->id)
             ->findOrFail($userId);

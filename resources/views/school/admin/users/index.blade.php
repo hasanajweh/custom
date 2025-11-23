@@ -1,4 +1,9 @@
 {{-- resources/views/school/admin/users/index.blade.php --}}
+@php
+    $school = $school
+        ?? request()->attributes->get('branch')
+        ?? Auth::user()->school;
+@endphp
 @extends('layouts.school')
 
 @section('title', __('messages.users.user_management') . ' - ' . __('messages.app.name'))
