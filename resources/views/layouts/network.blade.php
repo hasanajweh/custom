@@ -20,7 +20,7 @@
         <aside class="w-72 bg-white border-r border-slate-200 hidden lg:flex flex-col">
             <div class="px-6 py-4 border-b border-slate-200">
                 <h1 class="text-lg font-semibold text-indigo-700">{{ $networkModel?->name ?? __('Network') }}</h1>
-                <p class="text-xs text-slate-500">@lang('messages.main_admin')</p>
+                <p class="text-xs text-slate-500">@lang('messages.main_admin_label')</p>
             </div>
             <nav class="flex-1 px-4 py-6 space-y-2">
                 <a href="{{ $networkSlug ? route('main-admin.dashboard', ['network' => $networkSlug]) : '#' }}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 {{ request()->routeIs('main-admin.dashboard') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700' }}">
@@ -49,7 +49,7 @@
             <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
                 <div>
                     <h2 class="text-xl font-semibold text-slate-800">@yield('title')</h2>
-                    <p class="text-sm text-slate-500">@lang('messages.main_admin')</p>
+                    <p class="text-sm text-slate-500">@lang('messages.main_admin_label')</p>
                 </div>
                 <div class="text-sm text-slate-600">
                     {{ $userName }}
