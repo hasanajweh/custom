@@ -6,6 +6,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Scholder') }} — @yield('title')</title>
     @php
+        $school = $school
+            ?? request()->attributes->get('branch')
+            ?? request()->attributes->get('school')
+            ?? Auth::user()->school;
+    @endphp
+    @php
         $networkModel = $network ?? request()->route('network') ?? (Auth::check() ? Auth::user()->network : null);
         $networkSlug = $networkModel instanceof \App\Models\Network
             ? $networkModel->slug

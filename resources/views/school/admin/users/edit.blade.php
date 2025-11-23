@@ -14,7 +14,7 @@
             <p class="text-sm text-gray-600 mt-1">{{ __('messages.users.update_user_info') }}</p>
         </div>
 
-        <form method="POST" action="{{ tenant_route('school.admin.users.update', $school, ['user' => $user->id]) }}" class="p-6 space-y-6">
+        <form method="POST" action="{{ tenant_route('school.admin.users.update', [$school, $user]) }}" class="p-6 space-y-6">
             @csrf
             @method('PATCH')
 

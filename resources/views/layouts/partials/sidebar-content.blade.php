@@ -1,7 +1,10 @@
 @auth
 <div class="flex h-16 shrink-0 items-center">
     @php
-        $school = $school ?? Auth::user()?->school;
+        $school = $school
+            ?? request()->attributes->get('branch')
+            ?? request()->attributes->get('school')
+            ?? Auth::user()?->school;
         $network = $network ?? $school?->network ?? Auth::user()?->network;
         $hasTenantContext = $school && $network;
         $schoolSlug = $school?->slug;
@@ -41,6 +44,9 @@
                         <li><x-nav-link :href="tenant_route('school.admin.users.index', $school)" :active="request()->routeIs('school.admin.users.*')">Manage Users</x-nav-link></li>
                         <li><x-nav-link :href="tenant_route('school.admin.subjects.index', $school)" :active="request()->routeIs('school.admin.subjects.*')">Manage Subjects</x-nav-link></li>
                         <li><x-nav-link :href="tenant_route('school.admin.grades.index', $school)" :active="request()->routeIs('school.admin.grades.*')">Manage Grades</x-nav-link></li>
+                        <li><x-nav-link :href="tenant_route('school.admin.file-browser.index', $school)" :active="request()->routeIs('school.admin.file-browser.*')">File Browser</x-nav-link></li>
+                        <li><x-nav-link :href="tenant_route('school.admin.plans.index', $school)" :active="request()->routeIs('school.admin.plans.*')">Plans</x-nav-link></li>
+                        <li><x-nav-link :href="tenant_route('school.admin.supervisors.index', $school)" :active="request()->routeIs('school.admin.supervisors.*')">Supervisors</x-nav-link></li>
                     @endif
                 @endif
 

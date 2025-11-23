@@ -128,7 +128,7 @@
                                                 {{ __('messages.actions.cancel') }}
                                             </button>
                                             <form method="POST"
-                                                action="{{ tenant_route('school.admin.subjects.archive', $school, ['subject' => $subject->id]) }}">
+                                                action="{{ tenant_route('school.admin.subjects.archive', [$school, $subject]) }}">
                                                 @csrf
                                                 @method('PATCH')
                                                 <button type="submit"
@@ -185,7 +185,7 @@
                                         </p>
                                     </div>
                                 </div>
-                                <form method="POST" action="{{ tenant_route('school.admin.subjects.restore', $school, ['subject' => $subject->id]) }}">
+                                <form method="POST" action="{{ tenant_route('school.admin.subjects.restore', [$school, $subject]) }}">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="px-3 py-1.5 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition duration-200">
