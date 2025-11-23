@@ -2,22 +2,31 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Concerns\ResolvesSchoolFromRequest;
 use App\Traits\HandlesS3Storage;
 use App\Models\FileSubmission;
+use App\Models\Network;
+use App\Models\School;
 use App\Models\Subject;
 use App\Models\Grade;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PlansController extends Controller
 {
     use HandlesS3Storage;
-    use ResolvesSchoolFromRequest;
 
-    public function index(Request $request)
+    public function index(Request $request, Network $network, School $branch)
     {
-        $school = $this->resolveSchool($request);
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        if (Auth::user()->school_id !== $branch->id) {
+            abort(403);
+        }
+
+        $school = $branch;
 
         $query = FileSubmission::where('school_id', $school->id)
             ->whereIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan'])
@@ -56,7 +65,7 @@ class PlansController extends Controller
         // Filter by extension
         if ($request->filled('extension')) {
             $extensions = explode(',', $request->extension);
-            $query->where(function($q) use ($extensions) {
+            $query->where(function ($q) use ($extensions) {
                 foreach ($extensions as $ext) {
                     $q->orWhere('original_filename', 'like', '%.' . trim($ext));
                 }
@@ -107,9 +116,17 @@ class PlansController extends Controller
         ));
     }
 
-    public function show(Request $request, $school, FileSubmission $plan)
+    public function show(Request $request, Network $network, School $branch, FileSubmission $plan)
     {
-        $school = $this->resolveSchool($request);
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        if (Auth::user()->school_id !== $branch->id) {
+            abort(403);
+        }
+
+        $school = $branch;
 
         if ($plan->school_id !== $school->id) {
             abort(404);
@@ -118,9 +135,17 @@ class PlansController extends Controller
         return view('school.admin.plans.show', compact('plan', 'school'));
     }
 
-    public function download(Request $request, $school, FileSubmission $plan)
+    public function download(Request $request, Network $network, School $branch, FileSubmission $plan)
     {
-        $school = $this->resolveSchool($request);
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        if (Auth::user()->school_id !== $branch->id) {
+            abort(403);
+        }
+
+        $school = $branch;
 
         if ($plan->school_id !== $school->id) {
             abort(404);
