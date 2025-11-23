@@ -9,7 +9,7 @@
         <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-xl">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <a href="{{ route('school.admin.supervisors.index', $school->slug) }}"
+                    <a href="{{ tenant_route('school.admin.supervisors.index', $school) }}"
                        class="inline-flex items-center text-indigo-200 hover:text-white mb-4 transition-colors">
                         <i class="ri-arrow-left-line mr-2"></i>
                         {{ __('messages.supervisor.files.back') }}
@@ -28,7 +28,7 @@
 
         <!-- Filters -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <form method="GET" action="{{ route('school.admin.supervisors.files', [$school->slug, $supervisor->id]) }}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <form method="GET" action="{{ tenant_route('school.admin.supervisors.files', $school, ['supervisor' => $supervisor->id]) }}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.common.search') }}</label>
                     <input type="text"
