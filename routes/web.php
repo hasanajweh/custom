@@ -9,7 +9,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\School\DashboardController;
 use App\Http\Controllers\School\FileBrowserController;
 use App\Http\Controllers\School\GradeController;
-use App\Http\Controllers\School\PlanManagementController;
 use App\Http\Controllers\School\SubjectController;
 use App\Http\Controllers\School\ActivityLogController as SchoolActivityLogController;
 use App\Http\Controllers\School\SupervisorController;
@@ -54,7 +53,7 @@ use Illuminate\Support\Facades\Session;
 // ===========================
 
 // Language switching route - works globally
-Route::post('/language/{locale}', [LanguageController::class, 'switchLanguage'])
+Route::match(['GET', 'POST'], '/language/{locale}', [LanguageController::class, 'switchLanguage'])
     ->name('language.switch')
     ->where('locale', 'en|ar');
 
@@ -392,18 +391,6 @@ Route::prefix('{network:slug}/{branch:slug}')
                         Route::get('/', 'index')->name('index');
                         Route::get('/{plan}', 'show')->name('show');
                         Route::get('/{plan}/download', 'download')->name('download');
-                    });
-
-                // Plan Management (Approval)
-                Route::controller(PlanManagementController::class)
-                    ->prefix('plan-management')
-                    ->name('plan-management.')
-                    ->group(function () {
-                        Route::get('/', 'index')->name('index');
-                        Route::get('/{plan}', 'show')->name('show');
-                        Route::get('/{plan}/download', 'download')->name('download');
-                        Route::post('/{plan}/approve', 'approve')->name('approve');
-                        Route::post('/{plan}/reject', 'reject')->name('reject');
                     });
 
                 // Supervisors Management
