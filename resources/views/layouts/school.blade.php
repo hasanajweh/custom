@@ -1277,11 +1277,6 @@
                             </a>
 
                             @if(Auth::user()->role === 'admin')
-                                <a href="{{ safe_tenant_route('school.admin.plan-management.index', $school) }}"
-                                   class="dropdown-item">
-                                    <i class="ri-vip-crown-line text-yellow-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
-                                    <span>{{ __('messages.subscription.current_plan') }}</span>
-                                </a>
                                 <a href="{{ safe_tenant_route('school.admin.activity-logs.index', $school) }}"
                                    class="dropdown-item">
                                     <i class="ri-history-line text-indigo-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
