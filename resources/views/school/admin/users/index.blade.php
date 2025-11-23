@@ -199,7 +199,7 @@
 
                                 <td class="px-8 py-6">
                                     <div class="flex items-center justify-center {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }} space-x-2">
-                                        <a href="{{ tenant_route('school.admin.users.edit', $school, ['user' => $user->id]) }}"
+                                        <a href="{{ tenant_route('school.admin.users.edit', [$school, $user]) }}"
                                            class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
                                            title="{{ __('messages.tooltips.edit') }}">
                                             <i class="ri-edit-line text-lg"></i>
@@ -207,7 +207,7 @@
 
                                         @if($user->id !== Auth::id())
                                             <form method="POST"
-                                                  action="{{ tenant_route('school.admin.users.toggle-status', $school, ['user' => $user->id]) }}"
+                                                  action="{{ tenant_route('school.admin.users.toggle-status', [$school, $user]) }}"
                                                   class="inline">
                                                 @csrf
                                                 @method('PATCH')
@@ -219,7 +219,7 @@
                                             </form>
 
                                             <form method="POST"
-                                                  action="{{ tenant_route('school.admin.users.destroy', $school, ['user' => $user->id]) }}"
+                                                  action="{{ tenant_route('school.admin.users.destroy', [$school, $user]) }}"
                                                   onsubmit="return confirm('Archive this user?')"
                                                   class="inline">
                                                 @csrf

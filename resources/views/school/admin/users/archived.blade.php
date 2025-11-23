@@ -122,7 +122,7 @@
                                 <div class="flex items-center justify-center space-x-2">
                                     <!-- Restore Button -->
                                     <form method="POST"
-                                          action="{{ tenant_route('school.admin.users.restore', $school, ['user' => $user->id]) }}"
+                                          action="{{ tenant_route('school.admin.users.restore', [$school, $user]) }}"
                                           onsubmit="return confirm('{{ __('messages.users.archived.restore_confirm') }}')"
                                           class="inline">
                                         @csrf
@@ -136,7 +136,7 @@
 
                                     <!-- Permanent Delete Button -->
                                       <form method="POST"
-                                            action="{{ tenant_route('school.admin.users.force-delete', $school, ['user' => $user->id]) }}"
+                                            action="{{ tenant_route('school.admin.users.force-delete', [$school, $user]) }}"
                                             onsubmit="return confirm('{{ __('messages.users.archived.delete_confirm') }}')"
                                             class="inline">
                                         @csrf
