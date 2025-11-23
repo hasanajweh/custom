@@ -3,27 +3,40 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Concerns\ResolvesSchoolFromRequest;
+use App\Models\Network;
+use App\Models\School;
 use App\Models\Subject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SubjectController extends Controller
 {
-    use ResolvesSchoolFromRequest;
-
-    public function index(Request $request)
+    private function validateContext(Network $network, School $branch): School
     {
-        $school = $this->resolveSchool($request);
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        if (Auth::user()->school_id !== $branch->id) {
+            abort(403);
+        }
+
+        return $branch;
+    }
+
+    public function index(Request $request, Network $network, School $branch)
+    {
+        $school = $this->validateContext($network, $branch);
 
         $subjects = $school->subjects()->orderBy('name')->get();
         $archivedSubjects = $school->subjects()->onlyTrashed()->orderBy('name')->get();
 
-        return view('school.subjects.index', compact('subjects', 'archivedSubjects', 'school'));
+        return view('school.admin.subjects.index', compact('subjects', 'archivedSubjects', 'school', 'branch', 'network'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, Network $network, School $branch)
     {
-        $school = $this->resolveSchool($request);
+        $school = $this->validateContext($network, $branch);
 
         $request->validate(['name' => 'required|string|max:255']);
 
@@ -32,9 +45,9 @@ class SubjectController extends Controller
         return redirect()->back()->with('success', __('messages.subjects.subject_created'));
     }
 
-    public function archive(Request $request, Subject $subject)
+    public function archive(Request $request, Network $network, School $branch, Subject $subject)
     {
-        $school = $this->resolveSchool($request);
+        $school = $this->validateContext($network, $branch);
 
         if ($subject->school_id !== $school->id) {
             abort(403);
@@ -45,9 +58,9 @@ class SubjectController extends Controller
         return redirect()->back()->with('success', __('messages.subjects.subject_archived'));
     }
 
-    public function restore(Request $request, $subjectId)
+    public function restore(Request $request, Network $network, School $branch, $subjectId)
     {
-        $school = $this->resolveSchool($request);
+        $school = $this->validateContext($network, $branch);
 
         $subject = Subject::withTrashed()
             ->where('school_id', $school->id)

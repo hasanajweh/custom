@@ -4,20 +4,33 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Concerns\ResolvesSchoolFromRequest;
 use App\Models\User;
 use App\Models\FileSubmission;
 use App\Models\Subject;
 use App\Models\SupervisorSubject;
 use Illuminate\Http\Request;
+use App\Models\Network;
+use App\Models\School;
+use Illuminate\Support\Facades\Auth;
 
 class SupervisorController extends Controller
 {
-    use ResolvesSchoolFromRequest;
-
-    public function index(Request $request)
+    private function validateContext(Network $network, School $branch): School
     {
-        $school = $this->resolveSchool($request);
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        if (Auth::user()->school_id !== $branch->id) {
+            abort(403);
+        }
+
+        return $branch;
+    }
+
+    public function index(Request $request, Network $network, School $branch)
+    {
+        $school = $this->validateContext($network, $branch);
 
         // ✅ Get all supervisors with their subjects from pivot table
         $supervisors = User::where('school_id', $school->id)
@@ -64,12 +77,12 @@ class SupervisorController extends Controller
                 return $supervisor;
             });
 
-        return view('supervisor.index', compact('school', 'supervisors'));
+        return view('school.admin.supervisors.index', compact('school', 'supervisors', 'branch', 'network'));
     }
 
-    public function files(Request $request, $school, User $supervisor)
+    public function files(Request $request, Network $network, School $branch, User $supervisor)
     {
-        $school = $this->resolveSchool($request);
+        $school = $this->validateContext($network, $branch);
 
         // Verify supervisor belongs to school
         if ($supervisor->school_id !== $school->id || $supervisor->role !== 'supervisor') {

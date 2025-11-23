@@ -14,17 +14,26 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class FileBrowserController extends Controller
 {
     use HandlesS3Storage;
-    public function index(Request $request, Network $network, School $branch)
+    private function validateContext(Network $network, School $branch): School
     {
         if ($branch->network_id !== $network->id) {
             abort(404);
         }
 
-        $school = $branch;
+        if (Auth::user()->school_id !== $branch->id) {
+            abort(403);
+        }
+
+        return $branch;
+    }
+    public function index(Request $request, Network $network, School $branch)
+    {
+        $school = $this->validateContext($network, $branch);
 
         // ✅ EXCLUDE supervisor files and any plan-related files
         $query = FileSubmission::where('school_id', $school->id)
@@ -129,9 +138,7 @@ class FileBrowserController extends Controller
 
     public function show(Network $network, School $branch, $fileId)
     {
-        if ($branch->network_id !== $network->id) {
-            abort(404);
-        }
+        $this->validateContext($network, $branch);
 
         $file = FileSubmission::where('school_id', $branch->id)
             ->with(['user', 'subject', 'grade'])
@@ -146,9 +153,7 @@ class FileBrowserController extends Controller
 
     public function preview(Network $network, School $branch, $fileId)
     {
-        if ($branch->network_id !== $network->id) {
-            abort(404);
-        }
+        $this->validateContext($network, $branch);
 
         $file = FileSubmission::where('school_id', $branch->id)->findOrFail($fileId);
 
@@ -181,9 +186,7 @@ class FileBrowserController extends Controller
 
     public function download(Network $network, School $branch, $fileId)
     {
-        if ($branch->network_id !== $network->id) {
-            abort(404);
-        }
+        $this->validateContext($network, $branch);
 
         $file = FileSubmission::where('school_id', $branch->id)->findOrFail($fileId);
         return $this->downloadFile($file);
