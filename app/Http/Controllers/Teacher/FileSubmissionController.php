@@ -9,6 +9,7 @@ use App\Traits\HandlesS3Storage;
 use App\Models\Network;
 use App\Models\School;
 use App\Http\Requests\StoreFileSubmissionRequest;
+use Illuminate\Http\Request;
 use App\Models\Subject;
 use App\Services\ActivityLoggerService;
 use App\Models\Grade;
@@ -157,13 +158,18 @@ class FileSubmissionController extends Controller
         ));
     }
 
-    public function store(StoreFileSubmissionRequest $request, Network $network, School $branch)
+    public function store(Network $network, School $branch, Request $request)
     {
         if ($branch->network_id !== $network->id) {
             abort(404);
         }
 
         $school = $branch;
+        $formRequest = new StoreFileSubmissionRequest();
+        $validated = $request->validate(
+            $formRequest->rules(),
+            method_exists($formRequest, 'messages') ? $formRequest->messages() : []
+        );
         Log::info('=== FILE UPLOAD START ===', [
             'user_id' => Auth::id(),
             'school_id' => $school->id,
@@ -172,8 +178,6 @@ class FileSubmissionController extends Controller
 
         $planTypes = ['daily_plan', 'weekly_plan', 'monthly_plan'];
         $submissionType = $request->input('submission_type');
-        $validated = $request->validated();
-
         $file = $request->file('file');
 
         try {
@@ -255,9 +259,9 @@ class FileSubmissionController extends Controller
             // Update school storage
             $school->increment('storage_used', $file->getSize());
 
-            return redirect()->route('teacher.files.create', $school->slug)
-                ->with('upload_success', true)
-                ->with('success', 'File uploaded successfully.');
+            return redirect()->to(
+                tenant_route('teacher.files.create', $branch)
+            )->with('status', __('messages.files.upload_success'));
 
         } catch (\InvalidArgumentException $e) {
             Log::error('File validation failed', [
