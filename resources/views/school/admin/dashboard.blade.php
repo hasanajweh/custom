@@ -1,6 +1,16 @@
 {{-- resources/views/school/admin/dashboard.blade.php --}}
 @extends('layouts.school')
 
+@php
+    $school = $school
+        ?? request()->attributes->get('branch')
+        ?? request()->attributes->get('school')
+        ?? Auth::user()->school;
+
+    $branch = $branch ?? $school;
+    $network = $network ?? request()->attributes->get('network') ?? $school?->network ?? Auth::user()?->network;
+@endphp
+
 @section('title', __('messages.dashboard.admin_dashboard') . ' - ' . __('messages.app.name'))
 
 @push('styles')

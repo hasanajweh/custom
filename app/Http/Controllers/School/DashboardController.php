@@ -4,10 +4,11 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
-use App\Traits\HandlesS3Storage;
+use App\Models\Network;
 use App\Models\School;
 use App\Models\User;
 use App\Models\FileSubmission;
+use App\Traits\HandlesS3Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
@@ -17,8 +18,20 @@ class DashboardController extends Controller
 {
     use HandlesS3Storage;
 
-    public function index(School $school)
+    public function index(Network $network, School $branch)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $user = Auth::user();
+
+        if ($user && $user->school_id !== $branch->id) {
+            abort(403);
+        }
+
+        $school = $branch;
+
         // Get per_page from request, default to 10
         $perPage = request()->get('per_page', 10);
 
@@ -99,6 +112,8 @@ class DashboardController extends Controller
 
         return view('school.admin.dashboard', compact(
             'school',
+            'branch',
+            'network',
             'todayUploads',
             'weekUploads',
             'totalFiles',

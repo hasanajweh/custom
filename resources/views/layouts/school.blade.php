@@ -94,7 +94,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="/Scholder-512.png">
 
     <!-- Web App Manifest - UNIVERSAL -->
-    <link rel="manifest" href="{{ url('/manifest.json' . ($schoolSlug ? '?school=' . $schoolSlug : '')) }}">
+    <link rel="manifest" href="{{ url('/manifest.json') }}">
 
     <!-- Enhanced Font Loading with Language Support -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
