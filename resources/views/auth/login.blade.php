@@ -2,7 +2,7 @@
 <x-guest-layout>
     @php
         $school = $school ?? request()->route('school') ?? request()->route('branch');
-        $loginAction = $school ? safe_tenant_route('login', $school) : route('login');
+        $loginAction = $school ? tenant_route('login', $school) : route('login');
     @endphp
     <div class="min-h-screen flex flex-col lg:flex-row" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
         <!-- Language Switcher -->

@@ -7,7 +7,7 @@
         $schoolSlug = $school?->slug;
     @endphp
     @if($hasTenantContext)
-        <a href="{{ safe_tenant_route('dashboard', $school) }}">
+        <a href="{{ tenant_route('dashboard', $school) }}">
             <x-application-logo class="h-8 w-auto" />
         </a>
     @else
@@ -23,21 +23,18 @@
             <ul role="list" class="-mx-2 space-y-1">
                 {{-- Tenant Links --}}                    
                 @if ($hasTenantContext)
-                    <li><x-nav-link :href="safe_tenant_route('dashboard', $school)" :active="request()->routeIs('dashboard')">Dashboard</x-nav-link></li>
+                    <li><x-nav-link :href="tenant_route('dashboard', $school)" :active="request()->routeIs('dashboard')">Dashboard</x-nav-link></li>
                     @if (auth()->user()->role === 'teacher')
-                        @php $filesIndex = $schoolSlug ? route('files.index', ['school' => $schoolSlug]) : '#'; @endphp
-                        <li><x-nav-link :href="$filesIndex" :active="request()->routeIs('files.*')">My Files</x-nav-link></li>
-                        @php $notificationsIndex = $schoolSlug ? route('notifications.index', ['school' => $schoolSlug]) : '#'; @endphp
-                        <li><x-nav-link :href="$notificationsIndex" :active="request()->routeIs('notifications.*')" class="flex items-center">Notifications @if(auth()->user()->unreadNotifications->count() > 0)<span class="ml-auto w-6 min-w-max whitespace-nowrap rounded-full bg-red-500 px-2.5 py-0.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-red-500">{{ auth()->user()->unreadNotifications->count() }}</span>@endif</x-nav-link></li>
+                        <li><x-nav-link :href="tenant_route('teacher.files.index', $school)" :active="request()->routeIs('teacher.files.*')">My Files</x-nav-link></li>
+                        <li><x-nav-link :href="tenant_route('notifications.index', $school)" :active="request()->routeIs('notifications.*')" class="flex items-center">Notifications @if(auth()->user()->unreadNotifications->count() > 0)<span class="ml-auto w-6 min-w-max whitespace-nowrap rounded-full bg-red-500 px-2.5 py-0.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-red-500">{{ auth()->user()->unreadNotifications->count() }}</span>@endif</x-nav-link></li>
                     @endif
                     @if (auth()->user()->role === 'supervisor')
-                        @php $reviewsIndex = $schoolSlug ? route('reviews.index', ['school' => $schoolSlug]) : '#'; @endphp
-                        <li><x-nav-link :href="$reviewsIndex" :active="request()->routeIs('reviews.*')">Review Files</x-nav-link></li>
+                        <li><x-nav-link :href="tenant_route('supervisor.reviews.index', $school)" :active="request()->routeIs('supervisor.reviews.*')">Review Files</x-nav-link></li>
                     @endif
                     @if (auth()->user()->role === 'admin')
-                        <li><x-nav-link :href="safe_tenant_route('school.admin.users.index', $school)" :active="request()->routeIs('school.admin.users.*')">Manage Users</x-nav-link></li>
-                        <li><x-nav-link :href="safe_tenant_route('school.admin.subjects.index', $school)" :active="request()->routeIs('school.admin.subjects.*')">Manage Subjects</x-nav-link></li>
-                        <li><x-nav-link :href="safe_tenant_route('school.admin.grades.index', $school)" :active="request()->routeIs('school.admin.grades.*')">Manage Grades</x-nav-link></li>
+                        <li><x-nav-link :href="tenant_route('school.admin.users.index', $school)" :active="request()->routeIs('school.admin.users.*')">Manage Users</x-nav-link></li>
+                        <li><x-nav-link :href="tenant_route('school.admin.subjects.index', $school)" :active="request()->routeIs('school.admin.subjects.*')">Manage Subjects</x-nav-link></li>
+                        <li><x-nav-link :href="tenant_route('school.admin.grades.index', $school)" :active="request()->routeIs('school.admin.grades.*')">Manage Grades</x-nav-link></li>
                     @endif
                 @endif
 
@@ -79,8 +76,8 @@
                         @elseif ($hasTenantContext)
                             {{-- Tenant User Links --}}                    
                             @php
-                                $profileUrl = safe_tenant_route('profile.edit', $school);
-                                $logoutUrl = safe_tenant_route('logout', $school);
+                                $profileUrl = tenant_route('profile.edit', $school);
+                                $logoutUrl = tenant_route('logout', $school);
                             @endphp
                             <x-dropdown-link :href="$profileUrl">
                                 {{ __('My Profile') }}
