@@ -14,7 +14,7 @@
                         <h1 class="text-3xl font-bold text-gray-900 tracking-tight">{{ __('messages.files.my_files') }}</h1>
                         <p class="text-lg text-gray-600">{{ __('messages.files.manage_uploaded_resources') }}</p>
                     </div>
-                    <a href="{{ safe_tenant_route('teacher.files.create', $school) }}"
+                    <a href="{{ tenant_route('teacher.files.create', $school) }}"
                        class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                         <i class="ri-upload-2-line text-xl"></i>
                         <span>{{ __('messages.files.upload_new_file') }}</span>
@@ -44,7 +44,7 @@
             <div id="generalSection" class="tab-content">
                 <!-- Filters -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                    <form method="GET" action="{{ safe_tenant_route('teacher.files.index', $school) }}" id="generalFilterForm">
+                    <form method="GET" action="{{ tenant_route('teacher.files.index', $school) }}" id="generalFilterForm">
                         <input type="hidden" name="tab" value="general">
 
                         <div class="mb-4">
@@ -86,7 +86,7 @@
                                 <i class="ri-search-line"></i>
                                 <span>{{ __('messages.actions.search') }}</span>
                             </button>
-                            <a href="{{ safe_tenant_route('teacher.files.index', $school) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors">
+                            <a href="{{ tenant_route('teacher.files.index', $school) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors">
                                 <i class="ri-refresh-line"></i>
                                 <span>{{ __('messages.actions.reset') }}</span>
                             </a>
@@ -188,7 +188,7 @@
                                         <div class="flex items-center justify-center space-x-2 rtl:space-x-reverse">
                                             {{-- Preview Button --}}
                                             @if($canPreview)
-                                                <a href="{{ safe_tenant_route('teacher.files.preview', $school, ['fileSubmission' => $file->id]) }}"
+                                                <a href="{{ tenant_route('teacher.files.preview', $school, ['fileSubmission' => $file->id]) }}"
                                                    target="_blank"
                                                    class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
                                                    title="{{ __('messages.files.preview_file') }}">
@@ -203,7 +203,7 @@
                                             @endif
 
                                             {{-- Download Button - Always Active --}}
-                                            <a href="{{ safe_tenant_route('teacher.files.download', $school, ['fileSubmission' => $file->id]) }}"
+                                            <a href="{{ tenant_route('teacher.files.download', $school, ['fileSubmission' => $file->id]) }}"
                                                class="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-150"
                                                title="{{ __('messages.files.download_file') }}">
                                                 <i class="ri-download-line text-lg"></i>
@@ -211,7 +211,7 @@
 
                                             {{-- Print Button --}}
                                             @if($canPreview)
-                                                <button onclick="printFile('{{ safe_tenant_route('teacher.files.preview', $school, ['fileSubmission' => $file->id]) }}', '{{ $file->title }}', '{{ Auth::user()->name }}', '{{ $file->created_at->format('M d, Y') }}')"
+                                                <button onclick="printFile('{{ tenant_route('teacher.files.preview', $school, ['fileSubmission' => $file->id]) }}', '{{ $file->title }}', '{{ Auth::user()->name }}', '{{ $file->created_at->format('M d, Y') }}')"
                                                         class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
                                                         title="{{ __('messages.files.print_file') }}">
                                                     <i class="ri-printer-line text-lg"></i>
@@ -257,7 +257,7 @@
             <div id="plansSection" class="tab-content hidden">
                 <!-- Filters -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                    <form method="GET" action="{{ safe_tenant_route('teacher.files.index', $school) }}" id="plansFilterForm">
+                    <form method="GET" action="{{ tenant_route('teacher.files.index', $school) }}" id="plansFilterForm">
                         <input type="hidden" name="tab" value="plans">
 
                         <div class="mb-4">
@@ -292,7 +292,7 @@
                                 <i class="ri-search-line"></i>
                                 <span>{{ __('messages.actions.search') }}</span>
                             </button>
-                            <a href="{{ safe_tenant_route('teacher.files.index', $school) }}?tab=plans" class="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors">
+                            <a href="{{ tenant_route('teacher.files.index', $school) }}?tab=plans" class="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors">
                                 <i class="ri-refresh-line"></i>
                                 <span>{{ __('messages.actions.reset') }}</span>
                             </a>
@@ -384,7 +384,7 @@
                                         <div class="flex items-center justify-center space-x-2 rtl:space-x-reverse">
                                             {{-- Preview Button --}}
                                             @if($canPreview)
-                                                <a href="{{ safe_tenant_route('teacher.files.preview', $school, ['fileSubmission' => $plan->id]) }}"
+                                                <a href="{{ tenant_route('teacher.files.preview', $school, ['fileSubmission' => $plan->id]) }}"
                                                    target="_blank"
                                                    class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
                                                    title="{{ __('messages.files.preview_file') }}">
@@ -399,7 +399,7 @@
                                             @endif
 
                                             {{-- Download Button - Always Active --}}
-                                            <a href="{{ safe_tenant_route('teacher.files.download', $school, ['fileSubmission' => $plan->id]) }}"
+                                            <a href="{{ tenant_route('teacher.files.download', $school, ['fileSubmission' => $plan->id]) }}"
                                                class="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-150"
                                                title="{{ __('messages.files.download_file') }}">
                                                 <i class="ri-download-line text-lg"></i>
@@ -407,7 +407,7 @@
 
                                             {{-- Print Button --}}
                                             @if($canPreview)
-                                                <button onclick="printFile('{{ safe_tenant_route('teacher.files.preview', $school, ['fileSubmission' => $plan->id]) }}', '{{ $plan->title }}', '{{ Auth::user()->name }}', '{{ $plan->created_at->format('M d, Y') }}')"
+                                                <button onclick="printFile('{{ tenant_route('teacher.files.preview', $school, ['fileSubmission' => $plan->id]) }}', '{{ $plan->title }}', '{{ Auth::user()->name }}', '{{ $plan->created_at->format('M d, Y') }}')"
                                                         class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
                                                         title="{{ __('messages.files.print_file') }}">
                                                     <i class="ri-printer-line text-lg"></i>

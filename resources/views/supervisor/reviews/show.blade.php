@@ -6,7 +6,7 @@
 @section('content')
     <div class="max-w-4xl mx-auto space-y-6">
         <!-- Back Button -->
-        <a href="{{ safe_tenant_route('supervisor.reviews.index', $school) }}"
+        <a href="{{ tenant_route('supervisor.reviews.index', $school) }}"
            class="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors font-medium">
             <i class="ri-arrow-left-line mr-2"></i>
             {{ __('messages.supervisors.back_to_files') }}
@@ -77,12 +77,12 @@
                 <!-- File Actions -->
                 <div class="border-t border-gray-200 pt-6">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <a href="{{ safe_tenant_route('supervisor.reviews.download', $school, ['fileSubmission' => $fileSubmission->id]) }}"
+                        <a href="{{ tenant_route('supervisor.reviews.download', $school, ['fileSubmission' => $fileSubmission->id]) }}"
                            class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-colors shadow-sm">
                             <i class="ri-download-2-line mr-2"></i>
                             {{ __('messages.files.download_file') }}
                         </a>
-                        <a href="{{ safe_tenant_route('supervisor.reviews.preview', $school, ['fileSubmission' => $fileSubmission->id]) }}"
+                        <a href="{{ tenant_route('supervisor.reviews.preview', $school, ['fileSubmission' => $fileSubmission->id]) }}"
                            target="_blank"
                            class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors shadow-sm">
                             <i class="ri-external-link-line mr-2"></i>

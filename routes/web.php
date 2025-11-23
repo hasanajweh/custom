@@ -53,9 +53,8 @@ use Illuminate\Support\Facades\Session;
 // ===========================
 
 // Language switching route - works globally
-Route::match(['GET', 'POST'], '/language/{locale}', [LanguageController::class, 'switchLanguage'])
-    ->name('language.switch')
-    ->where('locale', 'en|ar');
+Route::match(['GET', 'POST'], '/language/{locale}', LanguageController::class)
+    ->name('language.switch');
 
 // Get available languages (for AJAX)
 Route::get('/api/languages', [LanguageController::class, 'getLanguages'])
@@ -64,20 +63,6 @@ Route::get('/api/languages', [LanguageController::class, 'getLanguages'])
 // Get current language (for AJAX)
 Route::get('/api/language/current', [LanguageController::class, 'getCurrentLanguage'])
     ->name('language.current');
-
-// Alternative GET route for language switching (for links)
-Route::get('/switch-language/{locale}', function ($locale) {
-    if (in_array($locale, ['en', 'ar'])) {
-        Session::put('locale', $locale);
-        App::setLocale($locale);
-
-        if (auth()->check()) {
-            auth()->user()->update(['locale' => $locale]);
-        }
-    }
-
-    return back();
-})->name('language.switch.get')->where('locale', 'en|ar');
 
 // ===========================
 // SUPER ADMIN ROUTES
@@ -323,86 +308,85 @@ Route::prefix('{network:slug}/{branch:slug}')
 
             // Logout
             Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+            // ===========================
+            // BRANCH ADMIN ROUTES
+            // ===========================
+            Route::prefix('admin')
+                ->middleware(['role:admin'])
+                ->name('school.admin.')
+                ->group(function () {
+                    Route::get('dashboard', [DashboardController::class, 'index'])
+                        ->name('dashboard');
+
+                    Route::get('activity-logs', [SchoolActivityLogController::class, 'index'])
+                        ->name('activity-logs.index');
+
+                    // User Management
+                    Route::resource('users', SchoolUserController::class)->except(['show']);
+                    Route::post('users/store-ajax', [SchoolUserController::class, 'storeAjax'])->name('users.store-ajax');
+                    Route::patch('users/{user}/toggle-status', [SchoolUserController::class, 'toggleStatus'])->name('users.toggle-status');
+                    Route::get('users/archived', [SchoolUserController::class, 'archived'])->name('users.archived');
+                    Route::patch('users/archived/{user}/restore', [SchoolUserController::class, 'restore'])->name('users.restore');
+                    Route::delete('users/archived/{user}/force-delete', [SchoolUserController::class, 'forceDelete'])->name('users.force-delete');
+
+                    // Subject Management
+                    Route::controller(SubjectController::class)
+                        ->prefix('subjects')
+                        ->name('subjects.')
+                        ->group(function () {
+                            Route::get('/', 'index')->name('index');
+                            Route::post('/', 'store')->name('store');
+                            Route::patch('/{subject}/archive', 'archive')->name('archive');
+                            Route::patch('/{subject}/restore', 'restore')->name('restore');
+                        });
+
+                    // Grade Management
+                    Route::controller(GradeController::class)
+                        ->prefix('grades')
+                        ->name('grades.')
+                        ->group(function () {
+                            Route::get('/', 'index')->name('index');
+                            Route::post('/', 'store')->name('store');
+                            Route::patch('/{grade}/archive', 'archive')->name('archive');
+                            Route::patch('/{grade}/restore', 'restore')->name('restore');
+                        });
+
+                    // File Browser
+                    Route::controller(FileBrowserController::class)
+                        ->prefix('file-browser')
+                        ->name('file-browser.')
+                        ->group(function () {
+                            Route::get('/', 'index')->name('index');
+                            Route::get('/{file}', 'show')->name('show');
+                            Route::get('/{file}/download', 'download')->name('download');
+                            Route::get('/{file}/preview', 'preview')->name('preview');
+                            Route::get('/{file}/preview-data', 'previewData')->name('preview-data');
+                            Route::delete('/{file}', 'destroy')->name('destroy');
+                            Route::post('/bulk-download', 'bulkDownload')->name('bulk-download');
+                            Route::delete('/bulk-delete', 'bulkDelete')->name('bulk-delete');
+                        });
+
+                    // Plans Management
+                    Route::controller(PlansController::class)
+                        ->prefix('plans')
+                        ->name('plans.')
+                        ->group(function () {
+                            Route::get('/', 'index')->name('index');
+                            Route::get('/{plan}', 'show')->name('show');
+                            Route::get('/{plan}/download', 'download')->name('download');
+                        });
+
+                    // Supervisors Management
+                    Route::controller(SupervisorController::class)
+                        ->prefix('supervisors')
+                        ->name('supervisors.')
+                        ->group(function () {
+                            Route::get('/', 'index')->name('index');
+                            Route::get('/{supervisor}/files', 'files')->name('files');
+                        });
+                });
         });
-
-        // ===========================
-        // BRANCH ADMIN ROUTES
-        // ===========================
-        Route::prefix('admin')
-            ->middleware(['setNetwork', 'setBranch', 'ensure.school.network.match', 'verify.tenant.access', 'auth', 'role:admin'])
-            ->name('school.admin.')
-            ->group(function () {
-                Route::get('dashboard', [DashboardController::class, 'index'])
-                    ->name('dashboard');
-
-                Route::get('activity-logs', [SchoolActivityLogController::class, 'index'])
-                    ->name('activity-logs.index');
-
-                // User Management
-                Route::resource('users', SchoolUserController::class)->except(['show']);
-                Route::post('users/store-ajax', [SchoolUserController::class, 'storeAjax'])->name('users.store-ajax');
-                Route::patch('users/{user}/toggle-status', [SchoolUserController::class, 'toggleStatus'])->name('users.toggle-status');
-                Route::get('users/archived', [SchoolUserController::class, 'archived'])->name('users.archived');
-                Route::patch('users/archived/{user}/restore', [SchoolUserController::class, 'restore'])->name('users.restore');
-                Route::delete('users/archived/{user}/force-delete', [SchoolUserController::class, 'forceDelete'])->name('users.force-delete');
-
-                // Subject Management
-                Route::controller(SubjectController::class)
-                    ->prefix('subjects')
-                    ->name('subjects.')
-                    ->group(function () {
-                        Route::get('/', 'index')->name('index');
-                        Route::post('/', 'store')->name('store');
-                        Route::patch('/{subject}/archive', 'archive')->name('archive');
-                        Route::patch('/{subject}/restore', 'restore')->name('restore');
-                    });
-
-                // Grade Management
-                Route::controller(GradeController::class)
-                    ->prefix('grades')
-                    ->name('grades.')
-                    ->group(function () {
-                        Route::get('/', 'index')->name('index');
-                        Route::post('/', 'store')->name('store');
-                        Route::patch('/{grade}/archive', 'archive')->name('archive');
-                        Route::patch('/{grade}/restore', 'restore')->name('restore');
-                    });
-
-                // File Browser
-                Route::controller(FileBrowserController::class)
-                    ->prefix('file-browser')
-                    ->name('file-browser.')
-                    ->group(function () {
-                        Route::get('/', 'index')->name('index');
-                        Route::get('/{file}', 'show')->name('show');
-                        Route::get('/{file}/download', 'download')->name('download');
-                        Route::get('/{file}/preview', 'preview')->name('preview');
-                        Route::get('/{file}/preview-data', 'previewData')->name('preview-data');
-                        Route::delete('/{file}', 'destroy')->name('destroy');
-                        Route::post('/bulk-download', 'bulkDownload')->name('bulk-download');
-                        Route::delete('/bulk-delete', 'bulkDelete')->name('bulk-delete');
-                    });
-
-                // Plans Management
-                Route::controller(PlansController::class)
-                    ->prefix('plans')
-                    ->name('plans.')
-                    ->group(function () {
-                        Route::get('/', 'index')->name('index');
-                        Route::get('/{plan}', 'show')->name('show');
-                        Route::get('/{plan}/download', 'download')->name('download');
-                    });
-
-                // Supervisors Management
-                Route::controller(SupervisorController::class)
-                    ->prefix('supervisors')
-                    ->name('supervisors.')
-                    ->group(function () {
-                        Route::get('/', 'index')->name('index');
-                        Route::get('/{supervisor}/files', 'files')->name('files');
-                    });
-            });
-            });
+    });
 
 // ===========================
 // ROOT REDIRECT
