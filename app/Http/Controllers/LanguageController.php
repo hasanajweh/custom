@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Network;
+use App\Models\School;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
@@ -92,8 +94,20 @@ class LanguageController extends Controller
         // Flash success message in the new language
         $message = __('messages.language_switched', ['language' => $this->localeNames[$locale]], $locale);
 
-        // For regular HTTP requests, redirect back
-        return back()
+        $networkSlug = $request->input('network');
+        $branchSlug = $request->input('branch');
+        $redirect = redirect()->back();
+
+        if (!$request->headers->has('referer') && $networkSlug && $branchSlug) {
+            $network = Network::where('slug', $networkSlug)->first();
+            $school = School::where('slug', $branchSlug)->first();
+
+            if ($network && $school && $school->network_id === $network->id) {
+                $redirect = redirect()->to(tenant_route('dashboard', $school));
+            }
+        }
+
+        return $redirect
             ->with('success', $message)
             ->with('locale_changed', true)
             ->with('new_locale', $locale);

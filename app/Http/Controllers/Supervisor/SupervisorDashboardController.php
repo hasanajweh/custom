@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Supervisor;
 
 use App\Http\Controllers\Controller;
+use App\Models\Network;
 use App\Models\School;
 use App\Models\FileSubmission;
 use App\Models\SupervisorSubject;
@@ -14,8 +15,13 @@ use Illuminate\Support\Facades\DB;
 
 class SupervisorDashboardController extends Controller
 {
-    public function index(School $school)
+    public function index(Network $network, School $branch)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
         $supervisor = Auth::user();
 
         // Get supervisor's subjects
@@ -108,8 +114,13 @@ class SupervisorDashboardController extends Controller
         ));
     }
 
-    public function files(School $school)
+    public function files(Network $network, School $branch)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
         $supervisor = Auth::user();
 
         // Get supervisor's subjects

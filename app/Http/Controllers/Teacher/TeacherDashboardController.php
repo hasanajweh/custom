@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\Network;
 use App\Models\School;
 use App\Models\FileSubmission;
 use Illuminate\Support\Facades\Auth;
@@ -11,8 +12,13 @@ use Illuminate\Support\Facades\DB;
 
 class TeacherDashboardController extends Controller
 {
-    public function index(School $school)
+    public function index(Network $network, School $branch)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
         $user = Auth::user();
 
         // Statistics

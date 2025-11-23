@@ -55,4 +55,22 @@ class ProfileController extends Controller
         return redirect()->to(tenant_route('profile.edit', $school))
             ->with('success', 'Password updated successfully.');
     }
+
+    public function updateLanguage(Request $request)
+    {
+        $school = $this->resolveSchool($request);
+
+        $request->validate([
+            'locale' => ['required', 'in:en,ar'],
+        ]);
+
+        $user = Auth::user();
+        $user->update(['locale' => $request->locale]);
+
+        app()->setLocale($request->locale);
+        session()->put('locale', $request->locale);
+
+        return redirect()->to(tenant_route('profile.edit', $school))
+            ->with('success', __('messages.language_switched', ['language' => $request->locale]));
+    }
 }
