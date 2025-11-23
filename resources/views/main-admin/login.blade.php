@@ -11,7 +11,7 @@
             </div>
             <div class="p-8">
                 <h2 class="text-xl font-semibold text-gray-900 mb-4">@lang('messages.log_in')
-                    <span class="text-sm text-gray-500">(@lang('messages.main_admin'))</span>
+                    <span class="text-sm text-gray-500">(@lang('messages.main_admin_label'))</span>
                 </h2>
                 <form method="POST" action="{{ route('main-admin.login', ['network' => $network->slug ?? $network]) }}" class="space-y-4">
                     @csrf

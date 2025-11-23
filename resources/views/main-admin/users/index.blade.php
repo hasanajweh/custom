@@ -43,7 +43,7 @@
                 <tr>
                     <th class="px-4 py-3 text-left">@lang('Name')</th>
                     <th class="px-4 py-3 text-left">@lang('Email')</th>
-                    <th class="px-4 py-3 text-left">@lang('messages.roles')</th>
+                    <th class="px-4 py-3 text-left">@lang('messages.roles_label')</th>
                     <th class="px-4 py-3 text-left">@lang('messages.branches')</th>
                     <th class="px-4 py-3 text-left">@lang('Status')</th>
                     <th class="px-4 py-3"></th>
