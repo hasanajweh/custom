@@ -1266,8 +1266,8 @@
                                     $profileUrl = $networkSlug ? route('main-admin.dashboard', ['network' => $networkSlug]) : '#';
                                     $logoutUrl = $networkSlug ? route('main-admin.logout', ['network' => $networkSlug]) : '#';
                                 } else {
-                                    $profileUrl = safe_tenant_route('profile.edit', $school, '#');
-                                    $logoutUrl = safe_tenant_route('logout', $school, '#');
+                                    $profileUrl = $hasTenantContext ? tenant_route('profile.edit', $school) : '#';
+                                    $logoutUrl = $hasTenantContext ? tenant_route('logout', $school) : '#';
                                 }
                             @endphp
                             <a href="{{ $profileUrl }}"
@@ -1277,7 +1277,7 @@
                             </a>
 
                             @if(Auth::user()->role === 'admin')
-                                <a href="{{ safe_tenant_route('school.admin.activity-logs.index', $school) }}"
+                                <a href="{{ tenant_route('school.admin.activity-logs.index', $school) }}"
                                    class="dropdown-item">
                                     <i class="ri-history-line text-indigo-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
                                     <span>{{ __('messages.navigation.activity_logs') }}</span>
@@ -1325,8 +1325,8 @@
                     ? ($networkSlug ? route('main-admin.dashboard', ['network' => $networkSlug]) : '#')
                     : ($hasTenantContext
                         ? (Auth::user()->role === 'admin'
-                            ? safe_tenant_route('school.admin.dashboard', $school)
-                            : safe_tenant_route('dashboard', $school))
+                            ? tenant_route('school.admin.dashboard', $school)
+                            : tenant_route('dashboard', $school))
                         : '#');
             @endphp
             <a href="{{ $dashboardUrl }}"
@@ -1361,25 +1361,25 @@
                     <span class="sidebar-text">{{ __('messages.main_admin.navigation.subjects_grades') }}</span>
                 </span></a>
             @elseif($hasTenantContext && Auth::user()->role === 'admin')
-                <a href="{{ safe_tenant_route('school.admin.users.index', $school) }}"
+                <a href="{{ tenant_route('school.admin.users.index', $school) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.users.*') ? 'active' : '' }}">
                     <i class="ri-team-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.manage_users') }}</span>
                 </span></a>
 
-                <a href="{{ safe_tenant_route('school.admin.file-browser.index', $school) }}"
+                <a href="{{ tenant_route('school.admin.file-browser.index', $school) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.file-browser.*') ? 'active' : '' }}">
                     <i class="ri-folder-3-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.file_browser') }}</span>
                 </span></a>
 
-                <a href="{{ safe_tenant_route('school.admin.plans.index', $school) }}"
+                <a href="{{ tenant_route('school.admin.plans.index', $school) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.plans.*') ? 'active' : '' }}">
                     <i class="ri-calendar-check-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.plans') }}</span>
                 </span></a>
 
-                <a href="{{ safe_tenant_route('school.admin.supervisors.index', $school) }}"
+                <a href="{{ tenant_route('school.admin.supervisors.index', $school) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.supervisors.*') ? 'active' : '' }}">
                     <i class="ri-user-star-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.supervisors') }}</span>
@@ -1392,39 +1392,39 @@
                     </div>
                 </div>
 
-                <a href="{{ safe_tenant_route('school.admin.subjects.index', $school) }}"
+                <a href="{{ tenant_route('school.admin.subjects.index', $school) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.subjects.*') ? 'active' : '' }}">
                     <i class="ri-book-2-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.subjects') }}</span>
                 </span></a>
 
-                <a href="{{ safe_tenant_route('school.admin.grades.index', $school) }}"
+                <a href="{{ tenant_route('school.admin.grades.index', $school) }}"
                    class="sidebar-item {{ request()->routeIs('school.admin.grades.*') ? 'active' : '' }}">
                     <i class="ri-graduation-cap-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.grades') }}</span>
                 </span></a>
 
             @elseif($hasTenantContext && Auth::user()->role === 'teacher')
-                <a href="{{ safe_tenant_route('teacher.files.index', $school) }}"
+                <a href="{{ tenant_route('teacher.files.index', $school) }}"
                    class="sidebar-item {{ request()->routeIs('teacher.files.index') || request()->routeIs('teacher.files.show') ? 'active' : '' }}">
                     <i class="ri-file-list-3-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.my_files') }}</span>
                 </span></a>
 
-                <a href="{{ safe_tenant_route('teacher.files.create', $school) }}"
+                <a href="{{ tenant_route('teacher.files.create', $school) }}"
                    class="sidebar-item {{ request()->routeIs('teacher.files.create') ? 'active' : '' }}">
                     <i class="ri-upload-cloud-2-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.upload_file') }}</span>
                 </span></a>
 
             @elseif($hasTenantContext && Auth::user()->role === 'supervisor')
-                <a href="{{ safe_tenant_route('supervisor.reviews.index', $school) }}"
+                <a href="{{ tenant_route('supervisor.reviews.index', $school) }}"
                    class="sidebar-item {{ request()->routeIs('supervisor.reviews.*') ? 'active' : '' }}">
                     <i class="ri-file-search-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.review_files') }}</span>
                 </span></a>
 
-                <a href="{{ safe_tenant_route('supervisor.files.create', $school) }}"
+                <a href="{{ tenant_route('supervisor.files.create', $school) }}"
                    class="sidebar-item {{ request()->routeIs('supervisor.files.create') ? 'active' : '' }}">
                     <i class="ri-upload-cloud-2-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.upload_file') }}</span>
