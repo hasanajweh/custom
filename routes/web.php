@@ -329,6 +329,7 @@ Route::prefix('{network:slug}/{branch:slug}/admin')
         Route::resource('users', SchoolUserController::class)->except(['show']);
         Route::post('users/store-ajax', [SchoolUserController::class, 'storeAjax'])->name('users.store-ajax');
         Route::patch('users/{user}/toggle-status', [SchoolUserController::class, 'toggleStatus'])->name('users.toggle-status');
+        Route::delete('users/{user}/archive', [SchoolUserController::class, 'destroy'])->name('users.archive');
         Route::get('users/archived', [SchoolUserController::class, 'archived'])->name('users.archived');
         Route::patch('users/archived/{user}/restore', [SchoolUserController::class, 'restore'])->name('users.restore');
         Route::delete('users/archived/{user}/force-delete', [SchoolUserController::class, 'forceDelete'])->name('users.force-delete');

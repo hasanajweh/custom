@@ -212,7 +212,7 @@
 
                                         @if($user->id !== Auth::id())
                                             <form method="POST"
-                                                  action="{{ tenant_route('school.admin.users.toggle-status', [$school, $user]) }}"
+                                                  action="{{ tenant_route('school.admin.users.toggle-status', $school, ['user' => $user]) }}"
                                                   class="inline">
                                                 @csrf
                                                 @method('PATCH')
@@ -224,7 +224,7 @@
                                             </form>
 
                                             <form method="POST"
-                                                  action="{{ tenant_route('school.admin.users.destroy', [$school, $user]) }}"
+                                                  action="{{ tenant_route('school.admin.users.archive', [$school, $user]) }}"
                                                   onsubmit="return confirm('Archive this user?')"
                                                   class="inline">
                                                 @csrf
