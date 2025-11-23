@@ -15,7 +15,8 @@ class VerifyTenantAccess
 
     public function handle(Request $request, Closure $next): Response
     {
-        $school = SchoolResolver::resolve($request->route('school'));
+        $schoolParam = $request->route('school') ?? $request->route('branch');
+        $school = SchoolResolver::resolve($schoolParam);
         $network = $request->route('network');
         $user = $request->user();
 

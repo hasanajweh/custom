@@ -14,6 +14,11 @@ use Carbon\Carbon;
 
 class LanguageController extends Controller
 {
+    public function __invoke(Request $request, $locale)
+    {
+        return $this->switchLanguage($request, $locale);
+    }
+
     /**
      * Available languages for the application
      *

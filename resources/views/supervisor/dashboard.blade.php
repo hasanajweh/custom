@@ -86,7 +86,7 @@
                 <div class="p-6 border-b border-gray-100">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-semibold text-gray-900">{{ __('messages.dashboard.files_to_review') }}</h2>
-                        <a href="{{ safe_tenant_route('supervisor.reviews.index', $school) }}"
+                        <a href="{{ tenant_route('supervisor.reviews.index', $school) }}"
                            class="text-sm text-green-600 hover:text-green-800 font-medium">{{ __('messages.actions.view_all') }}</a>
                     </div>
                 </div>
@@ -110,7 +110,7 @@
                                         </p>
                                     </div>
                                 </div>
-                                <a href="{{ safe_tenant_route('supervisor.reviews.show', $school, ['fileSubmission' => $file->id]) }}"
+                                <a href="{{ tenant_route('supervisor.reviews.show', $school, ['fileSubmission' => $file->id]) }}"
                                    class="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-medium hover:bg-green-200 transition-colors whitespace-nowrap ml-3">
                                     {{ __('messages.actions.review') }}
                                 </a>

@@ -203,7 +203,7 @@
                     <p class="mt-2 text-green-100">{{ __('messages.files.quick_simple_upload') }}</p>
                 </div>
 
-                <form method="POST" action="{{ safe_tenant_route('supervisor.files.store', $school) }}"
+                <form method="POST" action="{{ tenant_route('supervisor.files.store', $school) }}"
                       enctype="multipart/form-data" class="p-8 space-y-8" id="uploadForm">
                     @csrf
 
@@ -337,7 +337,7 @@
 
                     {{-- Submit Buttons --}}
                     <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-                        <a href="{{ safe_tenant_route('supervisor.reviews.index', $school) }}"
+                        <a href="{{ tenant_route('supervisor.reviews.index', $school) }}"
                            class="inline-flex items-center px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl font-semibold transition-all transform hover:scale-105">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>

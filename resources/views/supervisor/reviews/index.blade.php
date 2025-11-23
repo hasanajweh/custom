@@ -22,7 +22,7 @@
 
         <!-- Filters -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6">
-            <form method="GET" action="{{ safe_tenant_route('supervisor.reviews.index', $school) }}" class="space-y-4">
+            <form method="GET" action="{{ tenant_route('supervisor.reviews.index', $school) }}" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <!-- Date Filter -->
                     <div>
@@ -147,7 +147,7 @@
                                 <div class="flex items-center justify-center space-x-2">
                                     {{-- Preview Button --}}
                                     @if($canPreview)
-                                        <a href="{{ safe_tenant_route('supervisor.reviews.preview', $school, ['fileSubmission' => $file->id]) }}"
+                                        <a href="{{ tenant_route('supervisor.reviews.preview', $school, ['fileSubmission' => $file->id]) }}"
                                            target="_blank"
                                            class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
                                            title="{{ __('messages.files.preview_file') }}">
@@ -162,7 +162,7 @@
                                     @endif
 
                                     {{-- Download Button - Always Active --}}
-                                    <a href="{{ safe_tenant_route('supervisor.reviews.download', $school, ['fileSubmission' => $file->id]) }}"
+                                    <a href="{{ tenant_route('supervisor.reviews.download', $school, ['fileSubmission' => $file->id]) }}"
                                        class="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-150"
                                        title="{{ __('messages.files.download_file') }}">
                                         <i class="ri-download-line text-lg"></i>
@@ -170,7 +170,7 @@
 
                                     {{-- Print Button --}}
                                     @if($canPreview)
-                                        <button onclick="printFile('{{ safe_tenant_route('supervisor.reviews.preview', $school, ['fileSubmission' => $file->id]) }}', '{{ $file->title }}', '{{ $teacherName }}', '{{ $file->created_at->format('M d, Y') }}')"
+                                        <button onclick="printFile('{{ tenant_route('supervisor.reviews.preview', $school, ['fileSubmission' => $file->id]) }}', '{{ $file->title }}', '{{ $teacherName }}', '{{ $file->created_at->format('M d, Y') }}')"
                                                 class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
                                                 title="{{ __('messages.files.print_file') }}">
                                             <i class="ri-printer-line text-lg"></i>

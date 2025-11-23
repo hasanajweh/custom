@@ -150,8 +150,8 @@
                                         $logoutUrl = route('main-admin.logout', ['network' => $networkSlug]);
                                     } else {
                                         $hasTenantContext = $userSchool && $userSchool->network;
-                                        $profileUrl = safe_tenant_route('profile.edit', $userSchool);
-                                        $logoutUrl = safe_tenant_route('logout', $userSchool);
+                                        $profileUrl = $hasTenantContext ? tenant_route('profile.edit', $userSchool) : '#';
+                                        $logoutUrl = $hasTenantContext ? tenant_route('logout', $userSchool) : '#';
                                     }
                                 @endphp
                                 <x-dropdown-link :href="$profileUrl">
