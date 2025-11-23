@@ -172,7 +172,7 @@ class UserController extends Controller
 
             DB::commit();
 
-            return redirect()->route('school.admin.users.index', $school->slug)
+            return redirect()->to(tenant_route('school.admin.users.index', $school))
                 ->with('success', 'User created successfully.');
 
         } catch (\Exception $e) {
@@ -285,7 +285,7 @@ class UserController extends Controller
             
             DB::commit();
 
-            return redirect()->route('school.admin.users.index', $school->slug)
+            return redirect()->to(tenant_route('school.admin.users.index', $school))
                 ->with('success', 'User updated successfully.');
 
         } catch (\Exception $e) {
@@ -335,7 +335,7 @@ class UserController extends Controller
         // ⭐ Soft delete - moves to archived
         $user->delete();
 
-        return redirect()->route('school.admin.users.index', $school->slug)
+        return redirect()->to(tenant_route('school.admin.users.index', $school))
             ->with('success', 'User moved to archived. You can restore them anytime from the Archived Users page.');
     }
 
@@ -350,7 +350,7 @@ class UserController extends Controller
 
         $user->restore();
 
-        return redirect()->route('school.admin.users.archived', $school->slug)
+        return redirect()->to(tenant_route('school.admin.users.archived', $school))
             ->with('success', 'User restored successfully and moved back to active users list.');
     }
 
@@ -376,7 +376,7 @@ class UserController extends Controller
 
             DB::commit();
 
-            return redirect()->route('school.admin.users.archived', $school->slug)
+            return redirect()->to(tenant_route('school.admin.users.archived', $school))
                 ->with('success', 'User permanently deleted. This action cannot be undone.');
 
         } catch (\Exception $e) {
