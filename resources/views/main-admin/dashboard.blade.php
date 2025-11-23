@@ -28,7 +28,7 @@
             <p class="text-2xl font-semibold text-gray-900">{{ (int) ($summary['subjects'] ?? 0) }}</p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 border border-gray-200">
-            <p class="text-sm text-gray-500 mb-1">@lang('messages.grades')</p>
+            <p class="text-sm text-gray-500 mb-1">@lang('messages.grades_label')</p>
             <p class="text-2xl font-semibold text-gray-900">{{ (int) ($summary['grades'] ?? 0) }}</p>
         </div>
         <div class="bg-white shadow rounded-lg p-4 border border-gray-200">

@@ -1233,6 +1233,7 @@ return [
     'password' => 'Password',
     'remember_me' => 'Remember me',
     'forgot_password' => 'Forgot your password?',
+    'title' => 'Title',
     'total_branches' => 'Total branches',
     'total_files_across_branches' => 'Files across branches',
     'plans_across_branches' => 'Plans across branches',
@@ -1244,6 +1245,7 @@ return [
     'user' => 'User',
     'submitted_at' => 'Submitted at',
     'plans_label' => 'Plans',
+    'grades_label' => 'Grades',
     'last_72_hours_label' => 'Last 72 hours',
 
     'main_admin' => [
