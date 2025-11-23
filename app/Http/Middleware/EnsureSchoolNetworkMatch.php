@@ -16,7 +16,8 @@ class EnsureSchoolNetworkMatch
     public function handle(Request $request, Closure $next): Response
     {
         $network = $request->route('network');
-        $school = SchoolResolver::resolve($request->route('school'));
+        $schoolParam = $request->route('school') ?? $request->route('branch');
+        $school = SchoolResolver::resolve($schoolParam);
 
         $networkModel = $network instanceof Network
             ? $network
