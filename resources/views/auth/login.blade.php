@@ -7,8 +7,10 @@
     <div class="min-h-screen flex flex-col lg:flex-row" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
         <!-- Language Switcher -->
         <div class="absolute top-4 {{ app()->getLocale() === 'ar' ? 'left-4' : 'right-4' }} z-50">
-            <form method="POST" action="{{ route('language.switch', ['locale' => app()->getLocale() === 'ar' ? 'en' : 'ar']) }}" class="inline">
+            <form method="POST" action="{{ tenant_route('profile.language.update', $school) }}" class="inline">
                 @csrf
+                @method('PATCH')
+                <input type="hidden" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
                 <button type="submit" class="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm hover:bg-white rounded-lg shadow-md transition-all transform hover:scale-105">
                     <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>

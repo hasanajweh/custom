@@ -1169,8 +1169,10 @@
 
                     <div id="languageDropdown" class="language-dropdown">
                         <!-- English Option -->
-                        <form method="POST" action="{{ route('language.switch', ['locale' => 'en']) }}" class="w-full">
+                        <form method="POST" action="{{ tenant_route('profile.language.update', $school) }}" class="w-full">
                             @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="locale" value="en">
                             @if($hasTenantContext)
                                 <input type="hidden" name="network" value="{{ $networkSlug }}">
                                 <input type="hidden" name="branch" value="{{ $schoolSlug }}">
@@ -1186,8 +1188,10 @@
                         </form>
 
                         <!-- Arabic Option -->
-                        <form method="POST" action="{{ route('language.switch', ['locale' => 'ar']) }}" class="w-full">
+                        <form method="POST" action="{{ tenant_route('profile.language.update', $school) }}" class="w-full">
                             @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="locale" value="ar">
                             @if($hasTenantContext)
                                 <input type="hidden" name="network" value="{{ $networkSlug }}">
                                 <input type="hidden" name="branch" value="{{ $schoolSlug }}">
@@ -1450,8 +1454,10 @@
 
                 <div id="languageDropdownMobile" class="language-dropdown">
                     <!-- English Option -->
-                    <form method="POST" action="{{ route('language.switch', ['locale' => 'en']) }}" class="w-full">
+                    <form method="POST" action="{{ tenant_route('profile.language.update', $school) }}" class="w-full">
                         @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="locale" value="en">
                         @if($hasTenantContext)
                             <input type="hidden" name="network" value="{{ $networkSlug }}">
                             <input type="hidden" name="branch" value="{{ $schoolSlug }}">
@@ -1467,8 +1473,10 @@
                     </form>
 
                     <!-- Arabic Option -->
-                    <form method="POST" action="{{ route('language.switch', ['locale' => 'ar']) }}" class="w-full">
+                    <form method="POST" action="{{ tenant_route('profile.language.update', $school) }}" class="w-full">
                         @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="locale" value="ar">
                         @if($hasTenantContext)
                             <input type="hidden" name="network" value="{{ $networkSlug }}">
                             <input type="hidden" name="branch" value="{{ $schoolSlug }}">

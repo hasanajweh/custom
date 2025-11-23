@@ -3,19 +3,27 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Concerns\ResolvesSchoolFromRequest;
+use App\Models\Network;
+use App\Models\School;
 use App\Models\User;
 use App\Services\ActivityLoggerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\Models\Activity;
 
 class ActivityLogController extends Controller
 {
-    use ResolvesSchoolFromRequest;
-
-    public function index(Request $request)
+    public function index(Request $request, Network $network, School $branch)
     {
-        $school = $this->resolveSchool($request);
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        if (Auth::user()->school_id !== $branch->id) {
+            abort(403);
+        }
+
+        $school = $branch;
 
         $query = Activity::with(['causer'])
             ->where('school_id', $school->id)
