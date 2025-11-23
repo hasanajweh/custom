@@ -7,6 +7,7 @@ use App\Traits\HandlesS3Storage;
 use App\Http\Controllers\Controller;
 use App\Models\FileSubmission;
 use App\Services\ActivityLoggerService;
+use App\Models\Network;
 use App\Models\Subject;
 use App\Models\School;
 use App\Models\SupervisorSubject;
@@ -20,14 +21,24 @@ class FileSubmissionController extends Controller
     use HandlesS3Storage;
 
 
-    public function index(School $school)
+    public function index(Network $network, School $branch)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
         // Redirect to review files for supervisors
-        return redirect()->route('supervisor.reviews.index', $school->slug);
+        return redirect()->to(tenant_route('supervisor.reviews.index', $school));
     }
 
-    public function create(School $school)
+    public function create(Network $network, School $branch)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
         $user = Auth::user();
 
         // Get supervisor's assigned subjects to display on the page
@@ -40,8 +51,13 @@ class FileSubmissionController extends Controller
         return view('supervisor.files.create', compact('school', 'subjectNames'));
     }
 
-    public function store(Request $request, School $school)
+    public function store(Request $request, Network $network, School $branch)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:' . config('uploads.max_size_kb', 102400),
@@ -100,8 +116,8 @@ class FileSubmissionController extends Controller
                  subject: $submission
                   );
 
-        return redirect()->route('supervisor.files.create', $school->slug)
+        return redirect()->to(tenant_route('supervisor.files.create', $school))
             ->with('upload_success', true)
-            ->with('success', __('messages.files.file_has_been_uploaded'));   
+            ->with('success', __('messages.files.file_has_been_uploaded'));
          }
 }

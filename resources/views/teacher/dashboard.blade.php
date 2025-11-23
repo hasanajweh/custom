@@ -17,12 +17,12 @@
 
                     <!-- Quick Action Buttons -->
                     <div class="flex flex-wrap gap-3">
-                        <a href="{{ route('teacher.files.create', $school->slug) }}"
+                        <a href="{{ safe_tenant_route('teacher.files.create', $school) }}"
                            class="group inline-flex items-center px-6 py-3 bg-white text-indigo-600 rounded-xl font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg">
                             <i class="ri-upload-cloud-line mr-2 text-xl group-hover:animate-bounce"></i>
                             {{ __('messages.files.upload_file') }}
                         </a>
-                        <a href="{{ route('teacher.files.index', $school->slug) }}"
+                        <a href="{{ safe_tenant_route('teacher.files.index', $school) }}"
                            class="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur text-white rounded-xl font-semibold hover:bg-white/30 transition-all border border-white/30">
                             <i class="ri-folder-line mr-2 text-xl"></i>
                             {{ __('messages.files.my_files') }}
@@ -98,7 +98,7 @@
                 <div class="p-6 border-b border-gray-100">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-semibold text-gray-900">{{ __('messages.dashboard.my_recent_files') }}</h2>
-                        <a href="{{ route('teacher.files.index', $school->slug) }}"
+                        <a href="{{ safe_tenant_route('teacher.files.index', $school) }}"
                            class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">{{ __('messages.actions.view_all') }} →</a>
                     </div>
                 </div>
@@ -140,12 +140,12 @@
                                         <i class="ri-download-line mr-1"></i>{{ $file->download_count ?: 0 }}
                                     </span>
                                     <div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <a href="{{ route('teacher.files.preview', [$school->slug, $file->id]) }}"
+                                        <a href="{{ safe_tenant_route('teacher.files.preview', $school, ['fileSubmission' => $file->id]) }}"
                                            target="_blank"
                                            class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                                             <i class="ri-eye-line"></i>
                                         </a>
-                                        <a href="{{ route('teacher.files.download', [$school->slug, $file->id]) }}"
+                                        <a href="{{ safe_tenant_route('teacher.files.download', $school, ['fileSubmission' => $file->id]) }}"
                                            class="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
                                             <i class="ri-download-line"></i>
                                         </a>
@@ -158,7 +158,7 @@
                                     <i class="ri-folder-open-line text-3xl text-gray-400"></i>
                                 </div>
                                 <p class="text-gray-500 mb-4">{{ __('messages.files.no_files_uploaded') }}</p>
-                                <a href="{{ route('teacher.files.create', $school->slug) }}"
+                                <a href="{{ safe_tenant_route('teacher.files.create', $school) }}"
                                    class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
                                     <i class="ri-upload-2-line mr-2"></i>
                                     {{ __('messages.files.upload_first_file') }}

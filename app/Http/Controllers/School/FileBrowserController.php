@@ -87,8 +87,8 @@ class FileBrowserController extends Controller
         // Get filter data
         $subjects = $school->subjects()->orderBy('name')->get();
         $grades = $school->grades()->orderBy('name')->get();
-        $teachers = User::whereHas('branches', function ($q) use ($school) {
-                $q->where('branches.id', $school->id);
+        $teachers = User::whereHas('schools', function ($q) use ($school) {
+                $q->where('schools.id', $school->id);
             })
             ->where('role', 'teacher')
             ->orderBy('name')
@@ -105,8 +105,8 @@ class FileBrowserController extends Controller
             'total_downloads' => FileSubmission::where('school_id', $school->id)
                 ->whereIn('submission_type', ['exam', 'worksheet', 'summary'])
                 ->sum('download_count'),
-            'active_teachers' => User::whereHas('branches', function ($q) use ($school) {
-                    $q->where('branches.id', $school->id);
+            'active_teachers' => User::whereHas('schools', function ($q) use ($school) {
+                    $q->where('schools.id', $school->id);
                 })
                 ->where('role', 'teacher')
                 ->whereHas('fileSubmissions', function ($q) {

@@ -1167,6 +1167,10 @@
                         <!-- English Option -->
                         <form method="POST" action="{{ route('language.switch', ['locale' => 'en']) }}" class="w-full">
                             @csrf
+                            @if($hasTenantContext)
+                                <input type="hidden" name="network" value="{{ $networkSlug }}">
+                                <input type="hidden" name="branch" value="{{ $schoolSlug }}">
+                            @endif
                             <button type="submit"
                                     class="language-option {{ app()->getLocale() === 'en' ? 'active' : '' }}">
                                 <img src="https://flagcdn.com/w20/us.png" alt="English" class="flag-icon">
@@ -1180,6 +1184,10 @@
                         <!-- Arabic Option -->
                         <form method="POST" action="{{ route('language.switch', ['locale' => 'ar']) }}" class="w-full">
                             @csrf
+                            @if($hasTenantContext)
+                                <input type="hidden" name="network" value="{{ $networkSlug }}">
+                                <input type="hidden" name="branch" value="{{ $schoolSlug }}">
+                            @endif
                             <button type="submit"
                                     class="language-option {{ app()->getLocale() === 'ar' ? 'active' : '' }}">
                                 <img src="https://flagcdn.com/w20/sa.png" alt="العربية" class="flag-icon">
@@ -1402,26 +1410,26 @@
                 </span></a>
 
             @elseif($hasTenantContext && Auth::user()->role === 'teacher')
-                <a href="{{ route('teacher.files.index', $schoolSlug) }}"
+                <a href="{{ safe_tenant_route('teacher.files.index', $school) }}"
                    class="sidebar-item {{ request()->routeIs('teacher.files.index') || request()->routeIs('teacher.files.show') ? 'active' : '' }}">
                     <i class="ri-file-list-3-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.my_files') }}</span>
                 </span></a>
 
-                <a href="{{ route('teacher.files.create', $schoolSlug) }}"
+                <a href="{{ safe_tenant_route('teacher.files.create', $school) }}"
                    class="sidebar-item {{ request()->routeIs('teacher.files.create') ? 'active' : '' }}">
                     <i class="ri-upload-cloud-2-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.upload_file') }}</span>
                 </span></a>
 
             @elseif($hasTenantContext && Auth::user()->role === 'supervisor')
-                <a href="{{ route('supervisor.reviews.index', $schoolSlug) }}"
+                <a href="{{ safe_tenant_route('supervisor.reviews.index', $school) }}"
                    class="sidebar-item {{ request()->routeIs('supervisor.reviews.*') ? 'active' : '' }}">
                     <i class="ri-file-search-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.review_files') }}</span>
                 </span></a>
 
-                <a href="{{ route('supervisor.files.create', $schoolSlug) }}"
+                <a href="{{ safe_tenant_route('supervisor.files.create', $school) }}"
                    class="sidebar-item {{ request()->routeIs('supervisor.files.create') ? 'active' : '' }}">
                     <i class="ri-upload-cloud-2-line"></i>
                     <span class="sidebar-text">{{ __('messages.navigation.upload_file') }}</span>
@@ -1452,6 +1460,10 @@
                     <!-- English Option -->
                     <form method="POST" action="{{ route('language.switch', ['locale' => 'en']) }}" class="w-full">
                         @csrf
+                        @if($hasTenantContext)
+                            <input type="hidden" name="network" value="{{ $networkSlug }}">
+                            <input type="hidden" name="branch" value="{{ $schoolSlug }}">
+                        @endif
                         <button type="submit"
                                 class="language-option {{ app()->getLocale() === 'en' ? 'active' : '' }}">
                             <img src="https://flagcdn.com/w20/us.png" alt="English" class="flag-icon">
@@ -1465,6 +1477,10 @@
                     <!-- Arabic Option -->
                     <form method="POST" action="{{ route('language.switch', ['locale' => 'ar']) }}" class="w-full">
                         @csrf
+                        @if($hasTenantContext)
+                            <input type="hidden" name="network" value="{{ $networkSlug }}">
+                            <input type="hidden" name="branch" value="{{ $schoolSlug }}">
+                        @endif
                         <button type="submit"
                                 class="language-option {{ app()->getLocale() === 'ar' ? 'active' : '' }}">
                             <img src="https://flagcdn.com/w20/sa.png" alt="العربية" class="flag-icon">
@@ -1883,6 +1899,8 @@
             });
     }
 
+    const networkSlug = '{{ $networkSlug }}';
+
     function handleTeacherPreviewClick(event, schoolSlug, fileId) {
         event.preventDefault();
 
@@ -1895,8 +1913,8 @@
         const title = button.getAttribute('data-title');
         const size = button.getAttribute('data-size');
         const extension = filename.split('.').pop().toLowerCase();
-        const downloadUrl = `/${schoolSlug}/teacher/files/${fileId}/download`;
-        const previewUrl = `/${schoolSlug}/teacher/files/${fileId}/preview`;
+        const downloadUrl = `/${networkSlug}/${schoolSlug}/teacher/files/${fileId}/download`;
+        const previewUrl = `/${networkSlug}/${schoolSlug}/teacher/files/${fileId}/preview`;
         const previewableExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'txt'];
         const isPreviewable = previewableExtensions.includes(extension);
 
@@ -1928,8 +1946,8 @@
         const title = button.getAttribute('data-title');
         const size = button.getAttribute('data-size');
         const extension = filename.split('.').pop().toLowerCase();
-        const downloadUrl = `/${schoolSlug}/supervisor/review-files/${fileId}/download`;
-        const previewUrl = `/${schoolSlug}/supervisor/review-files/${fileId}/preview`;
+        const downloadUrl = `/${networkSlug}/${schoolSlug}/supervisor/review-files/${fileId}/download`;
+        const previewUrl = `/${networkSlug}/${schoolSlug}/supervisor/review-files/${fileId}/preview`;
         const previewableExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'txt'];
         const isPreviewable = previewableExtensions.includes(extension);
 

@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Supervisor;
 
 use App\Http\Controllers\Controller;
+use App\Models\Network;
 use App\Models\School;
 use App\Models\FileSubmission;
 use App\Models\SupervisorSubject;
@@ -18,8 +19,13 @@ class ReviewController extends Controller
 {
     use HandlesS3Storage;
 
-    public function index(School $school)
+    public function index(Network $network, School $branch)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
         $supervisor = Auth::user();
 
         // Get supervisor's assigned subjects from PIVOT TABLE
@@ -79,8 +85,13 @@ class ReviewController extends Controller
         return view('supervisor.reviews.index', compact('school', 'files', 'subjects', 'grades'));
     }
 
-    public function show(School $school, FileSubmission $fileSubmission)
+    public function show(Network $network, School $branch, FileSubmission $fileSubmission)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
         $supervisor = Auth::user();
 
         // Get supervisor's assigned subjects from pivot table
@@ -110,8 +121,13 @@ class ReviewController extends Controller
     /**
      * ✅ UPDATED: Download file - uses trait method
      */
-    public function download(School $school, FileSubmission $fileSubmission)
+    public function download(Network $network, School $branch, FileSubmission $fileSubmission)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
         $supervisor = Auth::user();
 
         $subjectIds = SupervisorSubject::where('supervisor_id', $supervisor->id)
@@ -136,8 +152,13 @@ class ReviewController extends Controller
     /**
      * Preview file - REDIRECT DIRECTLY TO S3 URL
      */
-    public function preview(School $school, FileSubmission $fileSubmission)
+    public function preview(Network $network, School $branch, FileSubmission $fileSubmission)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
         $supervisor = Auth::user();
 
         $subjectIds = SupervisorSubject::where('supervisor_id', $supervisor->id)

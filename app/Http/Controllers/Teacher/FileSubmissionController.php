@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Teacher;
 use App\Http\Controllers\Controller;
 use App\Models\FileSubmission;
 use App\Traits\HandlesS3Storage;
+use App\Models\Network;
 use App\Models\School;
 use App\Http\Requests\StoreFileSubmissionRequest;
 use App\Models\Subject;
@@ -23,8 +24,13 @@ class FileSubmissionController extends Controller
 {
     use HandlesS3Storage;
 
-    public function dashboard(School $school)
+    public function dashboard(Network $network, School $branch)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
         $user = Auth::user();
 
         $totalUploads = FileSubmission::where('user_id', $user->id)
@@ -50,9 +56,13 @@ class FileSubmissionController extends Controller
         ));
     }
 
-    public function myFiles(School $school)
+    public function myFiles(Network $network, School $branch)
     {
-       
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
         $user = Auth::user();
         $subjects = $user->subjects()
             ->wherePivot('school_id', $school->id)
@@ -116,9 +126,13 @@ class FileSubmissionController extends Controller
         return view('teacher.files.index', compact('school', 'generalFiles', 'lessonPlans', 'subjects', 'grades'));
     }
 
-    public function create(School $school)
+    public function create(Network $network, School $branch)
     {
-        
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
         $user = Auth::user();
         $subjects = $user->subjects()
             ->wherePivot('school_id', $school->id)
@@ -143,8 +157,13 @@ class FileSubmissionController extends Controller
         ));
     }
 
-    public function store(StoreFileSubmissionRequest $request, School $school)
+    public function store(StoreFileSubmissionRequest $request, Network $network, School $branch)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
         Log::info('=== FILE UPLOAD START ===', [
             'user_id' => Auth::id(),
             'school_id' => $school->id,
@@ -262,8 +281,14 @@ class FileSubmissionController extends Controller
         }
     }
 
-    public function preview(School $school, FileSubmission $fileSubmission)
+    public function preview(Network $network, School $branch, FileSubmission $fileSubmission)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
+
         if ($fileSubmission->user_id !== Auth::id() || $fileSubmission->school_id !== $school->id) {
             abort(403);
         }
@@ -290,8 +315,14 @@ class FileSubmissionController extends Controller
         }
     }
 
-    public function show(School $school, FileSubmission $fileSubmission)
+    public function show(Network $network, School $branch, FileSubmission $fileSubmission)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
+
         if ($fileSubmission->user_id !== Auth::id() || $fileSubmission->school_id !== $school->id) {
             abort(403);
         }
@@ -301,8 +332,14 @@ class FileSubmissionController extends Controller
         return view('teacher.files.show', compact('school', 'fileSubmission'));
     }
 
-    public function download(School $school, FileSubmission $fileSubmission)
+    public function download(Network $network, School $branch, FileSubmission $fileSubmission)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
+
         if ($fileSubmission->user_id !== Auth::id() || $fileSubmission->school_id !== $school->id) {
             abort(403);
         }
@@ -315,8 +352,14 @@ class FileSubmissionController extends Controller
         return $this->downloadFile($fileSubmission);
     }
 
-    public function destroy(School $school, FileSubmission $fileSubmission)
+    public function destroy(Network $network, School $branch, FileSubmission $fileSubmission)
     {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $school = $branch;
+
         if ($fileSubmission->user_id !== Auth::id() || $fileSubmission->school_id !== $school->id) {
             abort(403);
         }
@@ -329,7 +372,7 @@ class FileSubmissionController extends Controller
                 'user_id' => Auth::id()
             ]);
 
-            return redirect()->route('teacher.files.index', $school->slug)
+            return redirect()->to(tenant_route('teacher.files.index', $school))
                 ->with('success', 'File deleted successfully.');
 
         } catch (\Exception $e) {

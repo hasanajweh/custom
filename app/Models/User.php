@@ -180,11 +180,21 @@ class User extends Authenticatable
         return $this->hasMany(SchoolUserRole::class);
     }
 
-    public function assignedSchools(): BelongsToMany
+    public function schools(): BelongsToMany
     {
         return $this->belongsToMany(School::class, 'school_user_roles')
             ->withPivot(['role', 'is_active'])
             ->withTimestamps();
+    }
+
+    public function branches(): BelongsToMany
+    {
+        return $this->schools();
+    }
+
+    public function assignedSchools(): BelongsToMany
+    {
+        return $this->schools();
     }
 
     public function network(): BelongsTo
