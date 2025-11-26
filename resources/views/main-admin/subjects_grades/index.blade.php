@@ -2,6 +2,18 @@
 
 @section('title', __('messages.main_admin.subjects_grades.title'))
 
+@push('styles')
+    @once
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+        <style>
+            .ts-wrapper.multi .ts-control { min-height: 2.75rem; border-radius: 0.75rem; padding-inline: 0.5rem; }
+            .ts-wrapper.multi .ts-control .item { background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; }
+            .ts-wrapper.multi .ts-control input { color: #312e81; }
+            .ts-dropdown { border-radius: 0.75rem; }
+        </style>
+    @endonce
+@endpush
+
 @section('content')
 <div class="container mx-auto px-4 py-6 space-y-6">
     <div class="flex items-center justify-between">
@@ -28,7 +40,7 @@
     @endif
 
     <div class="grid lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-1 bg-white rounded-xl shadow p-5 space-y-4">
+        <div class="lg:col-span-1 bg-white rounded-2xl shadow-lg p-6 space-y-5 border border-indigo-50">
             <div class="flex items-start justify-between">
                 <div>
                     <h2 class="text-lg font-semibold">{{ __('messages.main_admin.subjects_grades.create_title') }}</h2>
@@ -57,7 +69,7 @@
                     <input type="text" name="name" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-indigo-500" placeholder="{{ __('messages.labels.name') }}" required>
                 </div>
 
-                <div class="space-y-2">
+                <div class="space-y-3">
                     <div class="flex items-center justify-between">
                         <label class="text-sm text-gray-600">{{ __('messages.main_admin.subjects_grades.assign') }}</label>
                         <div class="space-x-2 text-xs">
@@ -67,31 +79,28 @@
                         </div>
                     </div>
                     <p class="text-xs text-gray-500">{{ __('messages.main_admin.subjects_grades.instructions') }}</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 border rounded-lg p-3 max-h-64 overflow-y-auto branch-list">
+                    <select name="branches[]" multiple class="tom-select w-full" data-placeholder="{{ __('messages.main_admin.subjects_grades.assign') }}">
                         @foreach($branches as $branch)
-                            <label class="flex items-center gap-2 px-2 py-2 rounded hover:bg-indigo-50 border border-transparent">
-                                <input type="checkbox" name="branches[]" value="{{ $branch->id }}" class="branch-checkbox text-indigo-600">
-                                <span class="text-sm font-medium">{{ $branch->name }}</span>
-                            </label>
+                            <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                         @endforeach
-                    </div>
+                    </select>
                 </div>
 
                 <div class="flex justify-end">
-                    <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700">{{ __('messages.actions.save') }}</button>
+                    <button class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-xl shadow hover:from-indigo-700 hover:to-purple-700 transition">{{ __('messages.actions.save') }}</button>
                 </div>
             </form>
         </div>
 
         <div class="lg:col-span-2 space-y-6">
-            <div class="bg-white rounded-xl shadow p-5 space-y-4">
+            <div class="bg-white rounded-2xl shadow-lg p-6 space-y-4 border border-indigo-50">
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-semibold">{{ __('messages.main_admin.subjects_grades.existing_subjects') }}</h2>
                     <span class="text-xs text-gray-500">{{ $subjects->count() }} {{ __('messages.main_admin.users.subjects_label') }}</span>
                 </div>
                 <div class="space-y-3">
                     @forelse($subjects as $subject)
-                        <div class="border rounded-lg p-4 space-y-3">
+                        <div class="border rounded-2xl p-4 space-y-3 bg-gradient-to-br from-white to-indigo-50/30 shadow-sm">
                             <div class="flex items-center justify-between">
                                 <div class="space-y-1 w-full">
                                     <p class="text-sm text-gray-500">{{ __('messages.labels.name') }}</p>
@@ -99,8 +108,8 @@
                                         @csrf
                                         @method('put')
                                         <div class="flex flex-col md:flex-row md:items-center gap-3">
-                                            <input type="text" name="name" value="{{ $subject->name }}" class="border rounded-lg p-2 w-full md:flex-1 focus:ring-1 focus:ring-indigo-500">
-                                            <button class="bg-gray-900 text-white px-4 py-2 rounded-lg">{{ __('messages.actions.update') }}</button>
+                                            <input type="text" name="name" value="{{ $subject->name }}" class="border rounded-xl p-2.5 w-full md:flex-1 focus:ring-2 focus:ring-indigo-500 bg-white shadow-inner" placeholder="{{ __('messages.labels.name') }}">
+                                            <button class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-xl shadow hover:from-indigo-700 hover:to-purple-700 transition">{{ __('messages.actions.update') }}</button>
                                         </div>
                                         <div class="space-y-2">
                                             <div class="flex items-center justify-between text-sm text-gray-600">
@@ -111,14 +120,11 @@
                                                     <button type="button" class="text-gray-600" data-clear-all>{{ __('messages.actions.deselect_all') }}</button>
                                                 </div>
                                             </div>
-                                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 border rounded-lg p-3 max-h-44 overflow-y-auto branch-list">
+                                            <select name="branches[]" multiple class="tom-select w-full" data-placeholder="{{ __('messages.main_admin.subjects_grades.assign') }}">
                                                 @foreach($branches as $branch)
-                                                    <label class="flex items-center gap-2 px-2 py-1 rounded hover:bg-indigo-50 border border-transparent">
-                                                        <input type="checkbox" name="branches[]" value="{{ $branch->id }}" class="branch-checkbox text-indigo-600" @checked($subject->schools->pluck('id')->contains($branch->id))>
-                                                        <span class="text-sm">{{ $branch->name }}</span>
-                                                    </label>
+                                                    <option value="{{ $branch->id }}" @selected($subject->schools->pluck('id')->contains($branch->id))>{{ $branch->name }}</option>
                                                 @endforeach
-                                            </div>
+                                            </select>
                                         </div>
                                     </form>
                                 </div>
@@ -142,14 +148,14 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow p-5 space-y-4">
+            <div class="bg-white rounded-2xl shadow-lg p-6 space-y-4 border border-indigo-50">
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-semibold">{{ __('messages.main_admin.subjects_grades.existing_grades') }}</h2>
                     <span class="text-xs text-gray-500">{{ $grades->count() }} {{ __('messages.main_admin.users.grades_label') }}</span>
                 </div>
                 <div class="space-y-3">
                     @forelse($grades as $grade)
-                        <div class="border rounded-lg p-4 space-y-3">
+                        <div class="border rounded-2xl p-4 space-y-3 bg-gradient-to-br from-white to-indigo-50/30 shadow-sm">
                             <div class="flex items-center justify-between">
                                 <div class="space-y-1 w-full">
                                     <p class="text-sm text-gray-500">{{ __('messages.labels.name') }}</p>
@@ -157,8 +163,8 @@
                                         @csrf
                                         @method('put')
                                         <div class="flex flex-col md:flex-row md:items-center gap-3">
-                                            <input type="text" name="name" value="{{ $grade->name }}" class="border rounded-lg p-2 w-full md:flex-1 focus:ring-1 focus:ring-indigo-500">
-                                            <button class="bg-gray-900 text-white px-4 py-2 rounded-lg">{{ __('messages.actions.update') }}</button>
+                                            <input type="text" name="name" value="{{ $grade->name }}" class="border rounded-xl p-2.5 w-full md:flex-1 focus:ring-2 focus:ring-indigo-500 bg-white shadow-inner" placeholder="{{ __('messages.labels.name') }}">
+                                            <button class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-xl shadow hover:from-indigo-700 hover:to-purple-700 transition">{{ __('messages.actions.update') }}</button>
                                         </div>
                                         <div class="space-y-2">
                                             <div class="flex items-center justify-between text-sm text-gray-600">
@@ -169,14 +175,11 @@
                                                     <button type="button" class="text-gray-600" data-clear-all>{{ __('messages.actions.deselect_all') }}</button>
                                                 </div>
                                             </div>
-                                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 border rounded-lg p-3 max-h-44 overflow-y-auto branch-list">
+                                            <select name="branches[]" multiple class="tom-select w-full" data-placeholder="{{ __('messages.main_admin.subjects_grades.assign') }}">
                                                 @foreach($branches as $branch)
-                                                    <label class="flex items-center gap-2 px-2 py-1 rounded hover:bg-indigo-50 border border-transparent">
-                                                        <input type="checkbox" name="branches[]" value="{{ $branch->id }}" class="branch-checkbox text-indigo-600" @checked($grade->schools->pluck('id')->contains($branch->id))>
-                                                        <span class="text-sm">{{ $branch->name }}</span>
-                                                    </label>
+                                                    <option value="{{ $branch->id }}" @selected($grade->schools->pluck('id')->contains($branch->id))>{{ $branch->name }}</option>
                                                 @endforeach
-                                            </div>
+                                            </select>
                                         </div>
                                     </form>
                                 </div>
@@ -204,18 +207,42 @@
 </div>
 
 @push('scripts')
+    @once
+        <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    @endonce
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.branch-list').forEach(list => {
-                const form = list.closest('form');
-                if (!form) return;
+            const isRtl = document.documentElement.dir === 'rtl';
 
-                const selectAll = form.querySelector('[data-select-all]');
-                const clearAll = form.querySelector('[data-clear-all]');
-                const checkboxes = list.querySelectorAll('.branch-checkbox');
+            document.querySelectorAll('.tom-select').forEach(select => {
+                const tom = new TomSelect(select, {
+                    plugins: ['remove_button'],
+                    persist: false,
+                    create: false,
+                    maxItems: null,
+                    allowEmptyOption: true,
+                    placeholder: select.dataset.placeholder || '',
+                    render: {
+                        option: function(data, escape) {
+                            return `<div class="py-2 px-3 flex items-center gap-2">${escape(data.text)}</div>`;
+                        }
+                    },
+                });
 
-                selectAll?.addEventListener('click', () => checkboxes.forEach(cb => cb.checked = true));
-                clearAll?.addEventListener('click', () => checkboxes.forEach(cb => cb.checked = false));
+                const container = select.closest('form');
+                const selectAll = container?.querySelector('[data-select-all]');
+                const clearAll = container?.querySelector('[data-clear-all]');
+
+                selectAll?.addEventListener('click', () => {
+                    tom.setValue(tom.options ? Object.keys(tom.options) : []);
+                });
+
+                clearAll?.addEventListener('click', () => tom.clear());
+
+                if (isRtl) {
+                    tom.control_input?.setAttribute('dir', 'rtl');
+                    tom.dropdown?.setAttribute('dir', 'rtl');
+                }
             });
         });
     </script>

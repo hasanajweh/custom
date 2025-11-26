@@ -3,21 +3,21 @@
 @section('title', __('Network Users'))
 
 @section('content')
-<div class="container mx-auto px-4 py-6 space-y-4">
+<div class="container mx-auto px-4 py-6 space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="text-2xl font-bold">@lang('Network users')</h1>
+            <h1 class="text-2xl font-bold text-gray-900">@lang('Network users')</h1>
             <p class="text-gray-600">@lang('Manage users across all branches in this network.')</p>
         </div>
-        <a href="{{ route('main-admin.users.create', ['network' => $network->slug]) }}" class="bg-indigo-600 text-white px-4 py-2 rounded shadow">
+        <a href="{{ route('main-admin.users.create', ['network' => $network->slug]) }}" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-xl shadow hover:from-indigo-700 hover:to-purple-700 transition">
             @lang('Add user')
         </a>
     </div>
 
-    <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white p-4 rounded shadow">
+    <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white p-5 rounded-2xl shadow-lg border border-indigo-50">
         <div>
-            <label class="text-sm text-gray-600 block">@lang('Role')</label>
-            <select name="role" class="w-full border rounded p-2">
+            <label class="text-sm text-gray-600 block mb-1">@lang('Role')</label>
+            <select name="role" class="w-full border border-indigo-100 rounded-xl p-3 bg-white focus:ring-2 focus:ring-indigo-500">
                 <option value="">@lang('All')</option>
                 <option value="admin" @selected(request('role')==='admin')>@lang('Admin')</option>
                 <option value="supervisor" @selected(request('role')==='supervisor')>@lang('Supervisor')</option>
@@ -25,19 +25,19 @@
             </select>
         </div>
         <div>
-            <label class="text-sm text-gray-600 block">@lang('Status')</label>
-            <select name="status" class="w-full border rounded p-2">
+            <label class="text-sm text-gray-600 block mb-1">@lang('Status')</label>
+            <select name="status" class="w-full border border-indigo-100 rounded-xl p-3 bg-white focus:ring-2 focus:ring-indigo-500">
                 <option value="">@lang('All')</option>
                 <option value="active" @selected(request('status')==='active')>@lang('Active')</option>
                 <option value="archived" @selected(request('status')==='archived')>@lang('Archived')</option>
             </select>
         </div>
         <div class="flex items-end">
-            <button class="bg-gray-800 text-white px-4 py-2 rounded">@lang('Filter')</button>
+            <button class="bg-gray-900 text-white px-4 py-3 rounded-xl shadow hover:bg-black transition w-full md:w-auto">@lang('Filter')</button>
         </div>
     </form>
 
-    <div class="bg-white shadow rounded overflow-x-auto">
+    <div class="bg-white shadow rounded-2xl overflow-x-auto border border-indigo-50">
         <table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50">
                 <tr>
