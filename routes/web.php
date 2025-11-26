@@ -32,7 +32,7 @@ use App\Http\Controllers\Teacher\TeacherDashboardController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\MainAdmin\DashboardController as MainAdminDashboardController;
 use App\Http\Controllers\MainAdmin\HierarchyController;
-use App\Http\Controllers\MainAdmin\SubjectGradeController;
+use App\Http\Controllers\MainAdmin\SubjectsGradesController;
 use App\Http\Controllers\MainAdmin\UserController as MainAdminUserController;
 use App\Models\Network;
 use App\Models\School;
@@ -52,9 +52,10 @@ use Illuminate\Support\Facades\Session;
 // LANGUAGE SWITCHING ROUTES
 // ===========================
 
-// Language switching route - works globally
-Route::match(['GET', 'POST'], '/language/{locale}', LanguageController::class)
-    ->name('language.switch');
+Route::get('/set-language/{locale}', function ($locale) {
+    session()->put('locale', $locale);
+    return back();
+})->name('set-language');
 
 // Get available languages (for AJAX)
 Route::get('/api/languages', [LanguageController::class, 'getLanguages'])
@@ -144,7 +145,7 @@ Route::post('/impersonate/leave', [ImpersonationController::class, 'stop'])
 // ===========================
 Route::prefix('{network:slug}/main-admin')
     ->as('main-admin.')
-    ->middleware(['setlocale'])
+    ->middleware(['setlocale', 'setNetwork'])
     ->scopeBindings()
     ->group(function () {
         Route::middleware('guest')->group(function () {
@@ -155,10 +156,10 @@ Route::prefix('{network:slug}/main-admin')
         Route::middleware(['auth', 'mainadmin'])->group(function () {
             Route::get('dashboard', [MainAdminDashboardController::class, 'index'])->name('dashboard');
             Route::get('hierarchy', [HierarchyController::class, 'index'])->name('hierarchy');
-            Route::get('subjects-grades', [SubjectGradeController::class, 'index'])->name('subjects-grades');
-            Route::post('subjects-grades', [SubjectGradeController::class, 'store'])->name('subjects-grades.store');
-            Route::put('subjects-grades/{type}/{id}', [SubjectGradeController::class, 'update'])->name('subjects-grades.update');
-            Route::delete('subjects-grades/{type}/{id}', [SubjectGradeController::class, 'destroy'])->name('subjects-grades.destroy');
+            Route::get('subjects-grades', [SubjectsGradesController::class, 'index'])->name('subjects-grades');
+            Route::post('subjects-grades', [SubjectsGradesController::class, 'store'])->name('subjects-grades.store');
+            Route::put('subjects-grades/{type}/{id}', [SubjectsGradesController::class, 'update'])->name('subjects-grades.update');
+            Route::delete('subjects-grades/{type}/{id}', [SubjectsGradesController::class, 'destroy'])->name('subjects-grades.destroy');
 
             Route::resource('users', MainAdminUserController::class)->except(['show']);
             Route::post('users/{user}/restore', [MainAdminUserController::class, 'restore'])->name('users.restore');

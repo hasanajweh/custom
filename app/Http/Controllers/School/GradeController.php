@@ -28,8 +28,20 @@ class GradeController extends Controller
     {
         $school = $this->validateContext($network, $branch);
 
-        $grades = $school->grades()->orderBy('name')->get();
-        $archivedGrades = $school->grades()->onlyTrashed()->orderBy('name')->get();
+        $grades = Grade::where('network_id', $network->id)
+            ->where(function ($query) use ($school) {
+                $query->whereHas('schools', fn($q) => $q->where('school_id', $school->id))
+                    ->orWhereNull('created_in');
+            })
+            ->with('schools')
+            ->orderBy('name')
+            ->get();
+
+        $archivedGrades = Grade::onlyTrashed()
+            ->where('network_id', $network->id)
+            ->whereHas('schools', fn($q) => $q->where('school_id', $school->id))
+            ->orderBy('name')
+            ->get();
 
         return view('school.admin.grades.index', compact('grades', 'archivedGrades', 'school', 'branch', 'network'));
     }
@@ -40,7 +52,15 @@ class GradeController extends Controller
 
         $request->validate(['name' => 'required|string|max:255']);
 
-        $school->grades()->create($request->only('name'));
+        $grade = Grade::create([
+            'name' => $request->input('name'),
+            'network_id' => $network->id,
+            'school_id' => $school->id,
+            'created_by' => Auth::id(),
+            'created_in' => $school->id,
+        ]);
+
+        $grade->schools()->syncWithoutDetaching([$school->id]);
 
         return redirect()->back()->with('success', __('messages.grades.grade_created'));
     }
@@ -49,7 +69,7 @@ class GradeController extends Controller
     {
         $school = $this->validateContext($network, $branch);
 
-        if ($grade->school_id !== $school->id) {
+        if ($grade->created_in !== $school->id) {
             abort(403);
         }
 
@@ -63,7 +83,7 @@ class GradeController extends Controller
         $school = $this->validateContext($network, $branch);
 
         $grade = Grade::withTrashed()
-            ->where('school_id', $school->id)
+            ->where('created_in', $school->id)
             ->findOrFail($gradeId);
 
         $grade->restore();

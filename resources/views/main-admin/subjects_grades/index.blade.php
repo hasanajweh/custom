@@ -11,6 +11,12 @@
         </div>
     </div>
 
+    @if(session('status'))
+        <div class="rounded-lg border border-green-200 bg-green-50 text-green-700 px-4 py-3">
+            {{ session('status') }}
+        </div>
+    @endif
+
     @if($errors->any())
         <div class="rounded-lg border border-red-200 bg-red-50 text-red-700 px-4 py-3">
             <ul class="list-disc list-inside space-y-1 text-sm">
@@ -55,12 +61,12 @@
                     <div class="flex items-center justify-between">
                         <label class="text-sm text-gray-600">{{ __('messages.main_admin.subjects_grades.assign') }}</label>
                         <div class="space-x-2 text-xs">
-                            <button type="button" class="text-indigo-700 font-semibold" data-select-all>{{ __('messages.actions.select_all') ?? 'Select all' }}</button>
+                            <button type="button" class="text-indigo-700 font-semibold" data-select-all>{{ __('messages.actions.select_all') }}</button>
                             <span class="text-gray-300">|</span>
-                            <button type="button" class="text-gray-600" data-clear-all>{{ __('messages.actions.deselect_all') ?? 'Deselect all' }}</button>
+                            <button type="button" class="text-gray-600" data-clear-all>{{ __('messages.actions.deselect_all') }}</button>
                         </div>
                     </div>
-                    <p class="text-xs text-gray-500">{{ __('messages.main_admin.subjects_grades.instructions') ?? 'Choose at least one school; this determines where the subject/grade is available.' }}</p>
+                    <p class="text-xs text-gray-500">{{ __('messages.main_admin.subjects_grades.instructions') }}</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 border rounded-lg p-3 max-h-64 overflow-y-auto branch-list">
                         @foreach($branches as $branch)
                             <label class="flex items-center gap-2 px-2 py-2 rounded hover:bg-indigo-50 border border-transparent">
@@ -87,7 +93,7 @@
                     @forelse($subjects as $subject)
                         <div class="border rounded-lg p-4 space-y-3">
                             <div class="flex items-center justify-between">
-                                <div class="space-y-1">
+                                <div class="space-y-1 w-full">
                                     <p class="text-sm text-gray-500">{{ __('messages.labels.name') }}</p>
                                     <form action="{{ route('main-admin.subjects-grades.update', ['network' => $network->slug, 'type' => 'subject', 'id' => $subject->id]) }}" method="post" class="space-y-3">
                                         @csrf
@@ -100,9 +106,9 @@
                                             <div class="flex items-center justify-between text-sm text-gray-600">
                                                 <span>{{ __('messages.main_admin.subjects_grades.assign') }}</span>
                                                 <div class="space-x-2 text-xs">
-                                                    <button type="button" class="text-indigo-700 font-semibold" data-select-all>{{ __('messages.actions.select_all') ?? 'Select all' }}</button>
+                                                    <button type="button" class="text-indigo-700 font-semibold" data-select-all>{{ __('messages.actions.select_all') }}</button>
                                                     <span class="text-gray-300">|</span>
-                                                    <button type="button" class="text-gray-600" data-clear-all>{{ __('messages.actions.deselect_all') ?? 'Deselect all' }}</button>
+                                                    <button type="button" class="text-gray-600" data-clear-all>{{ __('messages.actions.deselect_all') }}</button>
                                                 </div>
                                             </div>
                                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 border rounded-lg p-3 max-h-44 overflow-y-auto branch-list">
@@ -123,13 +129,15 @@
                                 </form>
                             </div>
                             <div class="flex flex-wrap gap-2 text-xs text-gray-600">
-                                @foreach($subject->schools as $school)
+                                @forelse($subject->schools as $school)
                                     <span class="px-2 py-1 bg-indigo-50 text-indigo-700 rounded-full">{{ $school->name }}</span>
-                                @endforeach
+                                @empty
+                                    <span class="text-gray-500 text-xs">{{ __('messages.main_admin.subjects_grades.unassigned') }}</span>
+                                @endforelse
                             </div>
                         </div>
                     @empty
-                        <p class="text-sm text-gray-500">{{ __('messages.main_admin.subjects_grades.no_subjects') ?? 'No subjects created yet.' }}</p>
+                        <p class="text-sm text-gray-500">{{ __('messages.main_admin.subjects_grades.no_subjects') }}</p>
                     @endforelse
                 </div>
             </div>
@@ -156,9 +164,9 @@
                                             <div class="flex items-center justify-between text-sm text-gray-600">
                                                 <span>{{ __('messages.main_admin.subjects_grades.assign') }}</span>
                                                 <div class="space-x-2 text-xs">
-                                                    <button type="button" class="text-indigo-700 font-semibold" data-select-all>{{ __('messages.actions.select_all') ?? 'Select all' }}</button>
+                                                    <button type="button" class="text-indigo-700 font-semibold" data-select-all>{{ __('messages.actions.select_all') }}</button>
                                                     <span class="text-gray-300">|</span>
-                                                    <button type="button" class="text-gray-600" data-clear-all>{{ __('messages.actions.deselect_all') ?? 'Deselect all' }}</button>
+                                                    <button type="button" class="text-gray-600" data-clear-all>{{ __('messages.actions.deselect_all') }}</button>
                                                 </div>
                                             </div>
                                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 border rounded-lg p-3 max-h-44 overflow-y-auto branch-list">
@@ -179,13 +187,15 @@
                                 </form>
                             </div>
                             <div class="flex flex-wrap gap-2 text-xs text-gray-600">
-                                @foreach($grade->schools as $school)
+                                @forelse($grade->schools as $school)
                                     <span class="px-2 py-1 bg-indigo-50 text-indigo-700 rounded-full">{{ $school->name }}</span>
-                                @endforeach
+                                @empty
+                                    <span class="text-gray-500 text-xs">{{ __('messages.main_admin.subjects_grades.unassigned') }}</span>
+                                @endforelse
                             </div>
                         </div>
                     @empty
-                        <p class="text-sm text-gray-500">{{ __('messages.main_admin.subjects_grades.no_grades') ?? 'No grades created yet.' }}</p>
+                        <p class="text-sm text-gray-500">{{ __('messages.main_admin.subjects_grades.no_grades') }}</p>
                     @endforelse
                 </div>
             </div>

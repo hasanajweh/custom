@@ -98,19 +98,29 @@ class School extends Model
     }
 
     /**
-     * Get all subjects for this school
+     * Subjects assigned to this school (network-wide)
      */
-    public function subjects(): HasMany
+    public function subjects(): BelongsToMany
     {
-        return $this->hasMany(Subject::class);
+        return $this->belongsToMany(Subject::class, 'subject_school')->withTimestamps();
     }
 
     /**
-     * Get all grades for this school
+     * Grades assigned to this school (network-wide)
      */
-    public function grades(): HasMany
+    public function grades(): BelongsToMany
     {
-        return $this->hasMany(Grade::class);
+        return $this->belongsToMany(Grade::class, 'grade_school')->withTimestamps();
+    }
+
+    public function createdSubjects(): HasMany
+    {
+        return $this->hasMany(Subject::class, 'created_in');
+    }
+
+    public function createdGrades(): HasMany
+    {
+        return $this->hasMany(Grade::class, 'created_in');
     }
 
     /**
