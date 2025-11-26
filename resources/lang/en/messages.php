@@ -754,6 +754,7 @@ return [
         'dark_mode' => 'Dark Mode',
         'light_mode' => 'Light Mode',
         'toggle_dark_mode' => 'Toggle dark mode',
+        'toggle_language' => 'Toggle language',
         'loading' => 'Loading...',
         'loading_preview' => 'Loading preview...',
         'please_wait' => 'Please wait...',
@@ -1230,6 +1231,12 @@ return [
     'invalid_network_access' => 'You cannot access this network with the provided account.',
     'plan' => 'Plan',
     'branches_plan' => 'Branches Plan',
+    'languages' => [
+        'en' => 'English',
+        'ar' => 'Arabic',
+    ],
+    'language_switched' => 'Language switched to :language.',
+    'invalid_language' => 'Invalid language selection.',
     'main_admin_label' => 'Main Admin',
     'log_in' => 'Log in',
     'email' => 'Email',
@@ -1279,6 +1286,7 @@ return [
         'hierarchy' => [
             'title' => 'Network hierarchy',
             'heading' => 'Hierarchy',
+            'subtitle' => 'Overview of branch structure, teams, and coverage.',
         ],
         'subjects_grades' => [
             'title' => 'Subjects & Grades',

@@ -40,7 +40,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Session;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,18 +51,7 @@ use Illuminate\Support\Facades\Session;
 // LANGUAGE SWITCHING ROUTES
 // ===========================
 
-Route::get('/set-language/{locale}', function ($locale) {
-    session()->put('locale', $locale);
-    return back();
-})->name('set-language');
-
-// Get available languages (for AJAX)
-Route::get('/api/languages', [LanguageController::class, 'getLanguages'])
-    ->name('language.list');
-
-// Get current language (for AJAX)
-Route::get('/api/language/current', [LanguageController::class, 'getCurrentLanguage'])
-    ->name('language.current');
+Route::post('/set-locale', [LanguageController::class, 'update'])->name('locale.update');
 
 // ===========================
 // SUPER ADMIN ROUTES

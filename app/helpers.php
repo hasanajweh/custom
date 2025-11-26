@@ -324,7 +324,7 @@ if (!function_exists('switchLocaleUrl')) {
      */
     function switchLocaleUrl($locale, $keepQuery = true)
     {
-        return route('set-language', ['locale' => $locale]);
+        return route('locale.update');
     }
 }
 
