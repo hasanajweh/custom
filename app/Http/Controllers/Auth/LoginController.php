@@ -10,16 +10,12 @@ use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
-    public function showLoginForm(Request $request)
+    public function showLoginForm(Network $network)
     {
-        if ($request->route('network')) {
-            return view('main-admin.login', ['network' => $request->route('network')]);
-        }
-
-        return view('auth.login');
+        return view('main-admin.login', ['network' => $network]);
     }
 
-    public function login(Request $request)
+    public function login(Request $request, Network $network)
     {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
@@ -28,9 +24,6 @@ class LoginController extends Controller
 
         // Check if user exists
         $user = \App\Models\User::where('email', $credentials['email'])->first();
-
-        /** @var Network|null $network */
-        $network = $request->route('network');
 
         if ($user) {
             if ($user->isMainAdmin() && $network && $user->network_id !== $network->id) {
@@ -84,20 +77,12 @@ class LoginController extends Controller
         };
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request, Network $network)
     {
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
-        /** @var Network|string|null $network */
-        $network = $request->route('network') ?? $request->user()?->network;
-
-        // Route model binding guarantees an object, but guard against plain slug strings
-        if (is_string($network)) {
-            $network = Network::where('slug', $network)->first();
-        }
 
         if ($network) {
             return redirect()->route('main-admin.login', ['network' => $network->slug]);
