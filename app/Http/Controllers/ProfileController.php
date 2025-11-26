@@ -68,24 +68,4 @@ class ProfileController extends Controller
             ->with('success', 'Password updated successfully.');
     }
 
-    public function updateLanguage(Request $request, Network $network, School $branch)
-    {
-        $school = $this->validateContext($network, $branch);
-
-        $request->validate([
-            'locale' => ['required', 'in:en,ar'],
-        ]);
-
-        $user = Auth::user();
-        $user->update(['locale' => $request->locale]);
-
-        app()->setLocale($request->locale);
-        session()->put('locale', $request->locale);
-
-        $fallback = url()->previous() ?: tenant_route('profile.edit', $school);
-
-        return redirect()->to($fallback)
-            ->with('success', __('messages.language_switched', ['language' => $request->locale]))
-            ->with('locale', $request->locale);
-    }
 }
