@@ -11,6 +11,11 @@ return [
         'version' => 'Version',
     ],
 
+    'language' => [
+        'english' => 'English',
+        'arabic' => 'Arabic',
+    ],
+
     // Common Actions & Buttons
     'actions' => [
         'save' => 'Save',
@@ -145,6 +150,15 @@ return [
     // Dashboard
     'dashboard' => [
         'dashboard' => 'Dashboard',
+        'title' => 'Dashboard',
+        'network_overview' => 'Overview of all branches',
+        'total_branches' => 'Branches',
+        'plans' => 'Plans across branches',
+        'subjects' => 'Subjects',
+        'grades' => 'Grades',
+        'team_distribution' => 'Team distribution',
+        'admins' => 'Admins',
+        'last_72_hours' => 'Last 72 hours',
         'admin_dashboard' => 'Admin Dashboard',
         'teacher_dashboard' => 'Teacher Dashboard',
         'supervisor_dashboard' => 'Supervisor Dashboard',
@@ -1014,7 +1028,8 @@ return [
 
     // Roles
     'roles' => [
-        'admin' => 'Administrator',
+        'main_admin' => 'Network Main Admin',
+        'admin' => 'Branch Admin',
         'teacher' => 'Teacher',
         'supervisor' => 'Supervisor',
         'user' => 'User',
@@ -1259,6 +1274,12 @@ return [
     'last_72_hours_label' => 'Last 72 hours',
 
     'main_admin' => [
+        'menu' => [
+            'dashboard' => 'Dashboard',
+            'network_users' => 'Network users',
+            'network_tree' => 'Network hierarchy',
+            'subjects_grades' => 'Subjects & Grades',
+        ],
         'navigation' => [
             'section' => 'Network management',
             'users' => 'Network users',
@@ -1293,6 +1314,10 @@ return [
             'heading' => 'Subjects & Grades',
             'subtitle' => 'Manage shared subjects and grades across branches.',
             'create_title' => 'Create subject or grade',
+            'assign_to' => 'Assign to branches',
+            'type_subjects' => 'Subjects',
+            'type_grades' => 'Grades',
+            'name_label' => 'Name',
             'type' => 'Type',
             'assign' => 'Assign to branches',
             'existing_subjects' => 'Existing subjects',
@@ -1304,8 +1329,14 @@ return [
             'no_subjects' => 'No subjects created yet.',
             'no_grades' => 'No grades created yet.',
             'unassigned' => 'Not assigned to any school.',
+            'assigned_branches' => 'Assign to branches',
+            'select_all' => 'Select All',
+            'deselect_all' => 'Deselect All',
         ],
     ],
+
+    'branches' => 'Branches',
+    'network' => 'Network',
 ];
 
 

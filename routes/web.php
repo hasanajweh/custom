@@ -51,7 +51,9 @@ use Illuminate\Support\Facades\App;
 // LANGUAGE SWITCHING ROUTES
 // ===========================
 
-Route::post('/set-locale', [LanguageController::class, 'update'])->name('locale.update');
+Route::post('/set-locale', [LanguageController::class, 'update'])
+    ->middleware(['web', 'setlocale'])
+    ->name('locale.update');
 
 // ===========================
 // SUPER ADMIN ROUTES
