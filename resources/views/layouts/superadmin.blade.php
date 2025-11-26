@@ -1,5 +1,5 @@
   <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" class="h-full {{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -174,7 +174,24 @@
                         <div class="flex flex-1 items-center">
                             <h1 class="text-xl font-semibold text-white">@yield('page-title', 'Dashboard')</h1>
                         </div>
-                        <div class="ml-4 flex items-center space-x-4">
+                        <div class="ml-4 flex items-center space-x-4 {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}">
+                            @php
+                                $currentLocale = app()->getLocale();
+                                $nextLocale = $currentLocale === 'ar' ? 'en' : 'ar';
+
+                                $label = $currentLocale === 'ar'
+                                    ? __('messages.language.english')
+                                    : __('messages.language.arabic');
+                            @endphp
+
+                            <form action="{{ route('locale.update') }}" method="POST" class="inline">
+                                @csrf
+                                <input type="hidden" name="locale" value="{{ $nextLocale }}">
+                                <button type="submit" class="inline-flex items-center gap-2 text-sm font-medium text-gray-200 hover:text-white">
+                                    <span>{{ $label }}</span>
+                                </button>
+                            </form>
+
                             <!-- Notifications -->
                             <button type="button" class="rounded-full bg-gray-700 p-1.5 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800">
                                 <span class="sr-only">View notifications</span>

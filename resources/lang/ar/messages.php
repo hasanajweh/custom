@@ -11,6 +11,11 @@ return [
         'version' => 'الإصدار',
     ],
 
+    'language' => [
+        'english' => 'الإنجليزية',
+        'arabic' => 'العربية',
+    ],
+
     // Common Actions & Buttons
     'actions' => [
         'save' => 'حفظ',
@@ -145,6 +150,15 @@ return [
     // Dashboard
     'dashboard' => [
         'dashboard' => 'لوحة التحكم',
+        'title' => 'لوحة التحكم',
+        'network_overview' => 'نظرة عامة على جميع الفروع',
+        'total_branches' => 'الفروع',
+        'plans' => 'الخطط عبر الفروع',
+        'subjects' => 'المواد',
+        'grades' => 'الصفوف',
+        'team_distribution' => 'توزيع الفريق',
+        'admins' => 'المدراء',
+        'last_72_hours' => 'آخر 72 ساعة',
         'admin_dashboard' => 'لوحة تحكم المدير',
         'teacher_dashboard' => 'لوحة تحكم المعلم',
         'supervisor_dashboard' => 'لوحة تحكم المشرف',
@@ -1021,7 +1035,8 @@ return [
 
     // Roles
     'roles' => [
-        'admin' => 'مدير',
+        'main_admin' => 'مدير الشبكة',
+        'admin' => 'مدير الفرع',
         'teacher' => 'معلم',
         'supervisor' => 'مشرف',
         'user' => 'مستخدم',
@@ -1259,6 +1274,12 @@ return [
     'last_72_hours_label' => 'آخر 72 ساعة',
 
     'main_admin' => [
+        'menu' => [
+            'dashboard' => 'لوحة التحكم',
+            'network_users' => 'مستخدمي الشبكة',
+            'network_tree' => 'هيكل الشبكة',
+            'subjects_grades' => 'المواد والصفوف',
+        ],
         'navigation' => [
             'section' => 'إدارة الشبكة',
             'users' => 'مستخدمو الشبكة',
@@ -1293,6 +1314,10 @@ return [
             'heading' => 'المواد والمراحل',
             'subtitle' => 'إدارة المواد والمراحل المشتركة عبر الفروع.',
             'create_title' => 'إنشاء مادة أو مرحلة',
+            'assign_to' => 'تعيين للفروع',
+            'type_subjects' => 'المواد',
+            'type_grades' => 'الصفوف',
+            'name_label' => 'الاسم',
             'type' => 'النوع',
             'assign' => 'تعيين للفروع',
             'existing_subjects' => 'المواد المتاحة',
@@ -1304,6 +1329,12 @@ return [
             'no_subjects' => 'لا توجد مواد بعد.',
             'no_grades' => 'لا توجد مراحل بعد.',
             'unassigned' => 'غير معين لأي مدرسة.',
+            'assigned_branches' => 'الفروع المعيّنة',
+            'select_all' => 'تحديد الكل',
+            'deselect_all' => 'إلغاء تحديد الكل',
         ],
     ],
+
+    'branches' => 'الفروع',
+    'network' => 'الشبكة',
 ];
