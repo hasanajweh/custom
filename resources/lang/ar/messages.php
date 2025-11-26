@@ -801,6 +801,7 @@ return [
         'dark_mode' => 'الوضع الليلي',
         'light_mode' => 'الوضع النهاري',
         'toggle_dark_mode' => 'تبديل الوضع الليلي',
+        'toggle_language' => 'تبديل اللغة',
         'loading' => 'جاري التحميل...',
         'loading_preview' => 'جاري تحميل المعاينة...',
         'please_wait' => 'يرجى الانتظار...',
@@ -1230,6 +1231,12 @@ return [
     'invalid_network_access' => 'لا يمكن الوصول إلى هذه الشبكة بهذا الحساب.',
     'plan' => 'الخطة',
     'branches_plan' => 'خطة الفروع',
+    'languages' => [
+        'en' => 'الإنجليزية',
+        'ar' => 'العربية',
+    ],
+    'language_switched' => 'تم تغيير اللغة إلى :language.',
+    'invalid_language' => 'اختيار لغة غير صالح.',
     'main_admin_label' => 'المدير الرئيسي',
     'log_in' => 'تسجيل الدخول',
     'email' => 'البريد الإلكتروني',
@@ -1279,6 +1286,7 @@ return [
         'hierarchy' => [
             'title' => 'هيكل الشبكة',
             'heading' => 'الهيكل',
+            'subtitle' => 'نظرة شاملة على هيكلة الفروع والفرق والتغطية.',
         ],
         'subjects_grades' => [
             'title' => 'المواد والمراحل',

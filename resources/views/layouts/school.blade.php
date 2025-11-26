@@ -1149,64 +1149,22 @@
 
             <!-- Right Navigation -->
             <div class="flex items-center space-x-4 {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}">
-                <!-- Enhanced Language Switcher (Desktop) -->
-                <div class="language-switcher desktop-language-switcher">
-                    <button onclick="toggleLanguageDropdown(event, 'languageDropdown')"
-                            class="language-btn"
-                            type="button"
-                            aria-label="{{ __('messages.ui.toggle_language') }}">
+                <form action="{{ route('locale.update') }}" method="POST" class="language-switcher desktop-language-switcher">
+                    @csrf
+                    <input type="hidden" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
+                    <button type="submit" class="language-btn" aria-label="{{ __('messages.ui.toggle_language') }}">
                         <div class="flex items-center gap-2">
                             @if(app()->getLocale() === 'ar')
                                 <img src="https://flagcdn.com/w20/sa.png" alt="العربية" class="flag-icon">
-                                <span class="hidden sm:inline">العربية</span>
+                                <span class="hidden sm:inline">{{ __('messages.languages.ar') }}</span>
                             @else
                                 <img src="https://flagcdn.com/w20/us.png" alt="English" class="flag-icon">
-                                <span class="hidden sm:inline">English</span>
+                                <span class="hidden sm:inline">{{ __('messages.languages.en') }}</span>
                             @endif
                         </div>
-                        <i class="ri-arrow-down-s-line text-lg"></i>
+                        <i class="ri-repeat-line text-lg"></i>
                     </button>
-
-                    <div id="languageDropdown" class="language-dropdown">
-                        <!-- English Option -->
-                        <form method="POST" action="{{ tenant_route('profile.language.update', $school) }}" class="w-full">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="locale" value="en">
-                            @if($hasTenantContext)
-                                <input type="hidden" name="network" value="{{ $networkSlug }}">
-                                <input type="hidden" name="branch" value="{{ $schoolSlug }}">
-                            @endif
-                            <button type="submit"
-                                    class="language-option {{ app()->getLocale() === 'en' ? 'active' : '' }}">
-                                <img src="https://flagcdn.com/w20/us.png" alt="English" class="flag-icon">
-                                <span>English</span>
-                                @if(app()->getLocale() === 'en')
-                                    <i class="ri-check-line {{ app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto' }} text-blue-600"></i>
-                                @endif
-                            </button>
-                        </form>
-
-                        <!-- Arabic Option -->
-                        <form method="POST" action="{{ tenant_route('profile.language.update', $school) }}" class="w-full">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="locale" value="ar">
-                            @if($hasTenantContext)
-                                <input type="hidden" name="network" value="{{ $networkSlug }}">
-                                <input type="hidden" name="branch" value="{{ $schoolSlug }}">
-                            @endif
-                            <button type="submit"
-                                    class="language-option {{ app()->getLocale() === 'ar' ? 'active' : '' }}">
-                                <img src="https://flagcdn.com/w20/sa.png" alt="العربية" class="flag-icon">
-                                <span>العربية</span>
-                                @if(app()->getLocale() === 'ar')
-                                    <i class="ri-check-line {{ app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto' }} text-blue-600"></i>
-                                @endif
-                            </button>
-                        </form>
-                    </div>
-                </div>
+                </form>
 
                 <!-- Enhanced User Dropdown -->
                 <div class="relative">
@@ -1452,45 +1410,22 @@
                     <i class="ri-arrow-down-s-line text-lg"></i>
                 </button>
 
-                <div id="languageDropdownMobile" class="language-dropdown">
-                    <!-- English Option -->
-                    <form method="POST" action="{{ tenant_route('profile.language.update', $school) }}" class="w-full">
-                        @csrf
-                        @method('PATCH')
-                        <input type="hidden" name="locale" value="en">
-                        @if($hasTenantContext)
-                            <input type="hidden" name="network" value="{{ $networkSlug }}">
-                            <input type="hidden" name="branch" value="{{ $schoolSlug }}">
-                        @endif
-                        <button type="submit"
-                                class="language-option {{ app()->getLocale() === 'en' ? 'active' : '' }}">
-                            <img src="https://flagcdn.com/w20/us.png" alt="English" class="flag-icon">
-                            <span>English</span>
-                            @if(app()->getLocale() === 'en')
-                                <i class="ri-check-line {{ app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto' }} text-blue-600"></i>
-                            @endif
-                        </button>
-                    </form>
-
-                    <!-- Arabic Option -->
-                    <form method="POST" action="{{ tenant_route('profile.language.update', $school) }}" class="w-full">
-                        @csrf
-                        @method('PATCH')
-                        <input type="hidden" name="locale" value="ar">
-                        @if($hasTenantContext)
-                            <input type="hidden" name="network" value="{{ $networkSlug }}">
-                            <input type="hidden" name="branch" value="{{ $schoolSlug }}">
-                        @endif
-                        <button type="submit"
-                                class="language-option {{ app()->getLocale() === 'ar' ? 'active' : '' }}">
-                            <img src="https://flagcdn.com/w20/sa.png" alt="العربية" class="flag-icon">
-                            <span>العربية</span>
+                <form action="{{ route('locale.update') }}" method="POST" class="language-switcher w-full">
+                    @csrf
+                    <input type="hidden" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
+                    <button type="submit" class="language-btn w-full" aria-label="{{ __('messages.ui.toggle_language') }}">
+                        <div class="flex items-center gap-2">
                             @if(app()->getLocale() === 'ar')
-                                <i class="ri-check-line {{ app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto' }} text-blue-600"></i>
+                                <img src="https://flagcdn.com/w20/sa.png" alt="العربية" class="flag-icon">
+                                <span>{{ __('messages.languages.ar') }}</span>
+                            @else
+                                <img src="https://flagcdn.com/w20/us.png" alt="English" class="flag-icon">
+                                <span>{{ __('messages.languages.en') }}</span>
                             @endif
-                        </button>
-                    </form>
-                </div>
+                        </div>
+                        <i class="ri-repeat-line text-lg"></i>
+                    </button>
+                </form>
             </div>
         </div>
 

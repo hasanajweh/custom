@@ -1,5 +1,5 @@
 <x-guest-layout>
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-700 p-6" dir="rtl">
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-700 p-6" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
         <div class="bg-white shadow-2xl rounded-2xl w-full max-w-3xl grid md:grid-cols-2 overflow-hidden">
             <div class="bg-gradient-to-br from-indigo-700 to-purple-700 text-white p-8 flex flex-col justify-center">
                 <h1 class="text-3xl font-bold mb-2">{{ $network instanceof \App\Models\Network ? $network->name : $network }}</h1>
@@ -10,6 +10,15 @@
                 </div>
             </div>
             <div class="p-8">
+                <div class="flex justify-end mb-4">
+                    <form action="{{ route('locale.update') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
+                        <button type="submit" class="text-sm text-indigo-600 font-semibold hover:underline">
+                            {{ app()->getLocale() === 'ar' ? __('messages.languages.en') : __('messages.languages.ar') }}
+                        </button>
+                    </form>
+                </div>
                 <h2 class="text-xl font-semibold text-gray-900 mb-4">@lang('messages.log_in')
                     <span class="text-sm text-gray-500">(@lang('messages.main_admin_label'))</span>
                 </h2>
