@@ -1,22 +1,3 @@
-@php
-    $assignmentData = collect(old('assignments', []));
-
-    if (isset($user)) {
-        $assignmentData = $user->schoolRoles
-            ->groupBy('school_id')
-            ->map(function ($roles) use ($user) {
-                $schoolId = $roles->first()->school_id;
-
-                return [
-                    'roles' => $roles->pluck('role')->all(),
-                    'subjects' => $user->subjects->where('pivot.school_id', $schoolId)->pluck('id')->all(),
-                    'grades' => $user->grades->where('pivot.school_id', $schoolId)->pluck('id')->all(),
-                ];
-            })
-            ->merge($assignmentData);
-    }
-@endphp
-
 <div class="grid md:grid-cols-2 gap-4">
     <div>
         <label class="text-sm text-gray-600 block mb-1">@lang('Name')</label>
@@ -56,7 +37,10 @@
     <div class="grid gap-4">
         @foreach($branches as $branch)
             @php
-                $branchData = $assignmentData[$branch->id] ?? ['roles' => [], 'subjects' => [], 'grades' => []];
+                $branchData = $assignments[$branch->id] ?? ['roles' => [], 'subjects' => [], 'grades' => []];
+                $branchRoles = $branchData['roles'] ?? [];
+                $branchSubjects = $branchData['subjects'] ?? [];
+                $branchGrades = $branchData['grades'] ?? [];
             @endphp
             <div class="bg-white border border-indigo-50 rounded-2xl p-5 shadow-sm space-y-4">
                 <div class="flex items-center justify-between">
@@ -72,7 +56,7 @@
                         <label class="text-sm text-gray-600 block mb-2">@lang('messages.roles_label')</label>
                         <select name="assignments[{{ $branch->id }}][roles][]" multiple class="tom-select w-full" data-placeholder="@lang('Select roles')">
                             @foreach(['admin' => __('Admin'), 'supervisor' => __('Supervisor'), 'teacher' => __('Teacher')] as $roleKey => $label)
-                                <option value="{{ $roleKey }}" @selected(in_array($roleKey, $branchData['roles']))>{{ $label }}</option>
+                                <option value="{{ $roleKey }}" @selected(in_array($roleKey, $branchRoles))>{{ $label }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -80,7 +64,7 @@
                         <label class="text-sm text-gray-600 block mb-2">@lang('Subjects')</label>
                         <select name="assignments[{{ $branch->id }}][subjects][]" multiple class="tom-select w-full" data-placeholder="@lang('Select subjects')">
                             @foreach($branch->subjects as $subject)
-                                <option value="{{ $subject->id }}" @selected(in_array($subject->id, $branchData['subjects']))>{{ $subject->name }}</option>
+                                <option value="{{ $subject->id }}" @selected(in_array($subject->id, $branchSubjects))>{{ $subject->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -88,7 +72,7 @@
                         <label class="text-sm text-gray-600 block mb-2">@lang('Grades')</label>
                         <select name="assignments[{{ $branch->id }}][grades][]" multiple class="tom-select w-full" data-placeholder="@lang('Select grades')">
                             @foreach($branch->grades as $grade)
-                                <option value="{{ $grade->id }}" @selected(in_array($grade->id, $branchData['grades']))>{{ $grade->name }}</option>
+                                <option value="{{ $grade->id }}" @selected(in_array($grade->id, $branchGrades))>{{ $grade->name }}</option>
                             @endforeach
                         </select>
                     </div>

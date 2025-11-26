@@ -49,9 +49,12 @@ class UserController extends Controller
     {
         $branches = $network->branches()->with(['subjects', 'grades'])->get();
 
+        $assignments = $this->normalizeAssignmentsForView(request()->old('assignments', []), $branches);
+
         return view('main-admin.users.create', [
             'network' => $network,
             'branches' => $branches,
+            'assignments' => $assignments,
         ]);
     }
 
@@ -84,10 +87,30 @@ class UserController extends Controller
         $branches = $network->branches()->with(['subjects', 'grades'])->get();
         $user->load(['schoolRoles', 'subjects', 'grades']);
 
+        $assignments = request()->old('assignments');
+
+        if (is_null($assignments)) {
+            $assignments = $user->schoolRoles
+                ->groupBy('school_id')
+                ->map(function ($roles) use ($user) {
+                    $schoolId = $roles->first()->school_id;
+
+                    return [
+                        'roles' => $roles->pluck('role')->all(),
+                        'subjects' => $user->subjects->where('pivot.school_id', $schoolId)->pluck('id')->all(),
+                        'grades' => $user->grades->where('pivot.school_id', $schoolId)->pluck('id')->all(),
+                    ];
+                })
+                ->toArray();
+        }
+
+        $assignments = $this->normalizeAssignmentsForView($assignments ?? [], $branches);
+
         return view('main-admin.users.edit', [
             'network' => $network,
             'user' => $user,
             'branches' => $branches,
+            'assignments' => $assignments,
         ]);
     }
 
@@ -221,5 +244,22 @@ class UserController extends Controller
 
         $user->grades()->wherePivot('school_id', $schoolId)->detach();
         $user->grades()->attach($gradeSync);
+    }
+
+    protected function normalizeAssignmentsForView(array $assignments, $branches): array
+    {
+        foreach ($branches as $branch) {
+            $branchId = $branch->id;
+
+            if (!isset($assignments[$branchId])) {
+                $assignments[$branchId] = [];
+            }
+
+            $assignments[$branchId]['roles'] = $assignments[$branchId]['roles'] ?? [];
+            $assignments[$branchId]['subjects'] = $assignments[$branchId]['subjects'] ?? [];
+            $assignments[$branchId]['grades'] = $assignments[$branchId]['grades'] ?? [];
+        }
+
+        return $assignments;
     }
 }
