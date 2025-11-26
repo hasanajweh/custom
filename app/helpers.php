@@ -324,20 +324,7 @@ if (!function_exists('switchLocaleUrl')) {
      */
     function switchLocaleUrl($locale, $keepQuery = true)
     {
-        $currentUrl = request()->url();
-        $queryString = $keepQuery ? request()->getQueryString() : null;
-
-        // Get current route parameters
-        $routeParams = Route::current() ? Route::current()->parameters() : [];
-
-        // Update locale in route
-        $url = route('language.switch', ['locale' => $locale]);
-
-        if ($queryString) {
-            $url .= '?' . $queryString;
-        }
-
-        return $url;
+        return route('set-language', ['locale' => $locale]);
     }
 }
 

@@ -28,8 +28,20 @@ class SubjectController extends Controller
     {
         $school = $this->validateContext($network, $branch);
 
-        $subjects = $school->subjects()->orderBy('name')->get();
-        $archivedSubjects = $school->subjects()->onlyTrashed()->orderBy('name')->get();
+        $subjects = Subject::where('network_id', $network->id)
+            ->where(function ($query) use ($school) {
+                $query->whereHas('schools', fn($q) => $q->where('school_id', $school->id))
+                    ->orWhereNull('created_in');
+            })
+            ->with('schools')
+            ->orderBy('name')
+            ->get();
+
+        $archivedSubjects = Subject::onlyTrashed()
+            ->where('network_id', $network->id)
+            ->whereHas('schools', fn($q) => $q->where('school_id', $school->id))
+            ->orderBy('name')
+            ->get();
 
         return view('school.admin.subjects.index', compact('subjects', 'archivedSubjects', 'school', 'branch', 'network'));
     }
@@ -40,7 +52,15 @@ class SubjectController extends Controller
 
         $request->validate(['name' => 'required|string|max:255']);
 
-        $school->subjects()->create($request->only('name'));
+        $subject = Subject::create([
+            'name' => $request->input('name'),
+            'network_id' => $network->id,
+            'school_id' => $school->id,
+            'created_by' => Auth::id(),
+            'created_in' => $school->id,
+        ]);
+
+        $subject->schools()->syncWithoutDetaching([$school->id]);
 
         return redirect()->back()->with('success', __('messages.subjects.subject_created'));
     }
@@ -49,7 +69,7 @@ class SubjectController extends Controller
     {
         $school = $this->validateContext($network, $branch);
 
-        if ($subject->school_id !== $school->id) {
+        if ($subject->created_in !== $school->id) {
             abort(403);
         }
 
@@ -63,7 +83,7 @@ class SubjectController extends Controller
         $school = $this->validateContext($network, $branch);
 
         $subject = Subject::withTrashed()
-            ->where('school_id', $school->id)
+            ->where('created_in', $school->id)
             ->findOrFail($subjectId);
 
         $subject->restore();

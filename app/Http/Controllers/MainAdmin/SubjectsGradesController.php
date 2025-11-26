@@ -8,28 +8,23 @@ use App\Models\Network;
 use App\Models\School;
 use App\Models\Subject;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
-class SubjectGradeController extends Controller
+class SubjectsGradesController extends Controller
 {
     public function index(Network $network): View
     {
         $branches = $network->branches()->get();
-        $subjects = Subject::with(['schools'])
-            ->where(function ($query) use ($network) {
-                $query->where('network_id', $network->id)
-                    ->orWhereNull('school_id');
-            })
+        $subjects = Subject::where('network_id', $network->id)
+            ->with('schools')
             ->get();
 
-        $grades = Grade::with(['schools'])
-            ->where(function ($query) use ($network) {
-                $query->where('network_id', $network->id)
-                    ->orWhereNull('school_id');
-            })
+        $grades = Grade::where('network_id', $network->id)
+            ->with('schools')
             ->get();
 
-        return view('main-admin.subjects-grades', [
+        return view('main-admin.subjects_grades.index', [
             'network' => $network,
             'branches' => $branches,
             'subjects' => $subjects,
@@ -46,35 +41,40 @@ class SubjectGradeController extends Controller
             'branches.*' => ['exists:schools,id'],
         ]);
 
-        $branches = School::where('network_id', $network->id)
+        $branchIds = School::where('network_id', $network->id)
             ->whereIn('id', $data['branches'])
             ->pluck('id');
 
-        if ($branches->isEmpty()) {
+        if ($branchIds->isEmpty()) {
             return back()->withErrors([
-                'branches' => __('messages.main_admin.subjects_grades.invalid_branch_selection')
-                    ?? __('messages.validation.select_at_least_one_school')
-                    ?? 'Please select at least one school from this network.',
+                'branches' => __('messages.validation.select_at_least_one_school') ?? __('Please select at least one school.'),
             ])->withInput();
         }
 
-        $primarySchool = $branches->first();
+        $creatorSchool = auth()->user()?->school_id;
+        $primarySchool = $branchIds->first();
 
-        if ($data['type'] === 'subject') {
-            $subject = Subject::create([
-                'name' => $data['name'],
-                'network_id' => $network->id,
-                'school_id' => $primarySchool,
-            ]);
-            $subject->schools()->sync($branches);
-        } else {
-            $grade = Grade::create([
-                'name' => $data['name'],
-                'network_id' => $network->id,
-                'school_id' => $primarySchool,
-            ]);
-            $grade->schools()->sync($branches);
-        }
+        DB::transaction(function () use ($data, $network, $branchIds, $creatorSchool, $primarySchool) {
+            if ($data['type'] === 'subject') {
+                $subject = Subject::create([
+                    'name' => $data['name'],
+                    'network_id' => $network->id,
+                    'school_id' => $primarySchool,
+                    'created_by' => auth()->id(),
+                    'created_in' => $creatorSchool,
+                ]);
+                $subject->schools()->sync($branchIds);
+            } else {
+                $grade = Grade::create([
+                    'name' => $data['name'],
+                    'network_id' => $network->id,
+                    'school_id' => $primarySchool,
+                    'created_by' => auth()->id(),
+                    'created_in' => $creatorSchool,
+                ]);
+                $grade->schools()->sync($branchIds);
+            }
+        });
 
         return back()->with('status', __('messages.main_admin.subjects_grades.saved'));
     }
@@ -89,27 +89,30 @@ class SubjectGradeController extends Controller
             'branches.*' => ['exists:schools,id'],
         ]);
 
-        $branches = School::where('network_id', $network->id)
+        $branchIds = School::where('network_id', $network->id)
             ->whereIn('id', $data['branches'])
             ->pluck('id');
 
-        if ($branches->isEmpty()) {
+        if ($branchIds->isEmpty()) {
             return back()->withErrors([
-                'branches' => __('messages.main_admin.subjects_grades.invalid_branch_selection')
-                    ?? __('messages.validation.select_at_least_one_school')
-                    ?? 'Please select at least one school from this network.',
+                'branches' => __('messages.validation.select_at_least_one_school') ?? __('Please select at least one school.'),
             ])->withInput();
         }
 
         if ($type === 'subject') {
             $item = Subject::where('network_id', $network->id)->findOrFail($id);
-            $item->update(['name' => $data['name'], 'network_id' => $network->id]);
-            $item->schools()->sync($branches);
         } else {
             $item = Grade::where('network_id', $network->id)->findOrFail($id);
-            $item->update(['name' => $data['name'], 'network_id' => $network->id]);
-            $item->schools()->sync($branches);
         }
+
+        DB::transaction(function () use ($item, $data, $branchIds, $type) {
+            $item->update([
+                'name' => $data['name'],
+                'school_id' => $branchIds->first(),
+            ]);
+
+            $item->schools()->sync($branchIds);
+        });
 
         return back()->with('status', __('messages.main_admin.subjects_grades.updated'));
     }
@@ -122,6 +125,7 @@ class SubjectGradeController extends Controller
             ? Subject::where('network_id', $network->id)->findOrFail($id)
             : Grade::where('network_id', $network->id)->findOrFail($id);
 
+        $item->schools()->detach();
         $item->delete();
 
         return back()->with('status', __('messages.main_admin.subjects_grades.archived'));

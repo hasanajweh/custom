@@ -1160,8 +1160,7 @@
 
                     <div id="languageDropdown" class="language-dropdown">
                         <!-- English Option -->
-                        <form method="GET" action="{{ url()->current() }}" class="w-full">
-                            <input type="hidden" name="lang" value="en">
+                        <form method="GET" action="{{ route('set-language', ['locale' => 'en']) }}" class="w-full">
                             <button type="submit"
                                     class="language-option {{ app()->getLocale() === 'en' ? 'active' : '' }}">
                                 <img src="https://flagcdn.com/w20/us.png" alt="English" class="flag-icon">
@@ -1173,8 +1172,7 @@
                         </form>
 
                         <!-- Arabic Option -->
-                        <form method="GET" action="{{ url()->current() }}" class="w-full">
-                            <input type="hidden" name="lang" value="ar">
+                        <form method="GET" action="{{ route('set-language', ['locale' => 'ar']) }}" class="w-full">
                             <button type="submit"
                                     class="language-option {{ app()->getLocale() === 'ar' ? 'active' : '' }}">
                                 <img src="https://flagcdn.com/w20/sa.png" alt="العربية" class="flag-icon">
@@ -1349,8 +1347,7 @@
 
                 <div id="languageDropdownMobile" class="language-dropdown">
                     <!-- English Option -->
-                    <form method="GET" action="{{ url()->current() }}" class="w-full">
-                        <input type="hidden" name="lang" value="en">
+                    <form method="GET" action="{{ route('set-language', ['locale' => 'en']) }}" class="w-full">
                         <button type="submit"
                                 class="language-option {{ app()->getLocale() === 'en' ? 'active' : '' }}">
                             <img src="https://flagcdn.com/w20/us.png" alt="English" class="flag-icon">
@@ -1362,8 +1359,7 @@
                     </form>
 
                     <!-- Arabic Option -->
-                    <form method="GET" action="{{ url()->current() }}" class="w-full">
-                        <input type="hidden" name="lang" value="ar">
+                    <form method="GET" action="{{ route('set-language', ['locale' => 'ar']) }}" class="w-full">
                         <button type="submit"
                                 class="language-option {{ app()->getLocale() === 'ar' ? 'active' : '' }}">
                             <img src="https://flagcdn.com/w20/sa.png" alt="العربية" class="flag-icon">
