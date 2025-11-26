@@ -213,15 +213,14 @@ Route::prefix('{network:slug}/{branch:slug}')
             // ===========================
             // PROFILE ROUTES (ALL USERS)
             // ===========================
-            Route::controller(ProfileController::class)
-                ->prefix('profile')
-                ->name('profile.')
-                ->group(function () {
-                    Route::get('/', 'edit')->name('edit');
-                    Route::patch('/', 'update')->name('update');
-                    Route::patch('/password', 'updatePassword')->name('password.update');
-                    Route::patch('/language', 'updateLanguage')->name('language.update');
-                });
+                    Route::controller(ProfileController::class)
+                        ->prefix('profile')
+                        ->name('profile.')
+                        ->group(function () {
+                            Route::get('/', 'edit')->name('edit');
+                            Route::patch('/', 'update')->name('update');
+                            Route::patch('/password', 'updatePassword')->name('password.update');
+                        });
 
             // ===========================
             // TEACHER ROUTES

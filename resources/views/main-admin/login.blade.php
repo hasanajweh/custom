@@ -14,8 +14,8 @@
                     <form action="{{ route('locale.update') }}" method="POST">
                         @csrf
                         <input type="hidden" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
-                        <button type="submit" class="text-sm text-indigo-600 font-semibold hover:underline">
-                            {{ app()->getLocale() === 'ar' ? __('messages.languages.en') : __('messages.languages.ar') }}
+                        <button type="submit" class="lang-toggle-btn">
+                            {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
                         </button>
                     </form>
                 </div>

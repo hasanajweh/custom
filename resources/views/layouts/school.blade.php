@@ -1149,20 +1149,11 @@
 
             <!-- Right Navigation -->
             <div class="flex items-center space-x-4 {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}">
-                <form action="{{ route('locale.update') }}" method="POST" class="language-switcher desktop-language-switcher">
+                <form action="{{ route('locale.update') }}" method="POST">
                     @csrf
                     <input type="hidden" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
-                    <button type="submit" class="language-btn" aria-label="{{ __('messages.ui.toggle_language') }}">
-                        <div class="flex items-center gap-2">
-                            @if(app()->getLocale() === 'ar')
-                                <img src="https://flagcdn.com/w20/sa.png" alt="العربية" class="flag-icon">
-                                <span class="hidden sm:inline">{{ __('messages.languages.ar') }}</span>
-                            @else
-                                <img src="https://flagcdn.com/w20/us.png" alt="English" class="flag-icon">
-                                <span class="hidden sm:inline">{{ __('messages.languages.en') }}</span>
-                            @endif
-                        </div>
-                        <i class="ri-repeat-line text-lg"></i>
+                    <button type="submit" class="lang-toggle-btn">
+                        {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
                     </button>
                 </form>
 
@@ -1393,40 +1384,13 @@
 
         <!-- Mobile Language Switcher (Moved here) -->
         <div class="mobile-language-switcher">
-            <div class="language-switcher">
-                <button onclick="toggleLanguageDropdown(event, 'languageDropdownMobile')"
-                        class="language-btn"
-                        type="button"
-                        aria-label="{{ __('messages.ui.toggle_language') }}">
-                    <div class="flex items-center gap-2">
-                        @if(app()->getLocale() === 'ar')
-                            <img src="https://flagcdn.com/w20/sa.png" alt="العربية" class="flag-icon">
-                            <span>العربية</span>
-                        @else
-                            <img src="https://flagcdn.com/w20/us.png" alt="English" class="flag-icon">
-                            <span>English</span>
-                        @endif
-                    </div>
-                    <i class="ri-arrow-down-s-line text-lg"></i>
+            <form action="{{ route('locale.update') }}" method="POST">
+                @csrf
+                <input type="hidden" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
+                <button type="submit" class="lang-toggle-btn">
+                    {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
                 </button>
-
-                <form action="{{ route('locale.update') }}" method="POST" class="language-switcher w-full">
-                    @csrf
-                    <input type="hidden" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
-                    <button type="submit" class="language-btn w-full" aria-label="{{ __('messages.ui.toggle_language') }}">
-                        <div class="flex items-center gap-2">
-                            @if(app()->getLocale() === 'ar')
-                                <img src="https://flagcdn.com/w20/sa.png" alt="العربية" class="flag-icon">
-                                <span>{{ __('messages.languages.ar') }}</span>
-                            @else
-                                <img src="https://flagcdn.com/w20/us.png" alt="English" class="flag-icon">
-                                <span>{{ __('messages.languages.en') }}</span>
-                            @endif
-                        </div>
-                        <i class="ri-repeat-line text-lg"></i>
-                    </button>
-                </form>
-            </div>
+            </form>
         </div>
 
         <div class="sidebar-footer">
