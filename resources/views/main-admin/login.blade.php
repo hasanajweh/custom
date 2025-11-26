@@ -2,7 +2,7 @@
     <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-700 p-6" dir="rtl">
         <div class="bg-white shadow-2xl rounded-2xl w-full max-w-3xl grid md:grid-cols-2 overflow-hidden">
             <div class="bg-gradient-to-br from-indigo-700 to-purple-700 text-white p-8 flex flex-col justify-center">
-                <h1 class="text-3xl font-bold mb-2">{{ $network->name }}</h1>
+                <h1 class="text-3xl font-bold mb-2">{{ $network instanceof \App\Models\Network ? $network->name : $network }}</h1>
                 <p class="text-white/80 mb-6">@lang('messages.network_overview')</p>
                 <div class="text-sm text-white/80 space-y-2">
                     <p>@lang('messages.app.name') — {{ __('messages.app.tagline') }}</p>
@@ -13,7 +13,7 @@
                 <h2 class="text-xl font-semibold text-gray-900 mb-4">@lang('messages.log_in')
                     <span class="text-sm text-gray-500">(@lang('messages.main_admin_label'))</span>
                 </h2>
-                <form method="POST" action="{{ route('main-admin.login', ['network' => $network->slug ?? $network]) }}" class="space-y-4">
+                <form method="POST" action="{{ route('main-admin.login', ['network' => $network instanceof \App\Models\Network ? $network->slug : $network]) }}" class="space-y-4">
                     @csrf
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1" for="email">@lang('messages.email')</label>
