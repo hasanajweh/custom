@@ -7,14 +7,28 @@
     <div class="min-h-screen flex flex-col lg:flex-row" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
         <!-- Language Switcher -->
         <div class="absolute top-4 {{ app()->getLocale() === 'ar' ? 'left-4' : 'right-4' }} z-50">
-            <form action="{{ route('locale.update') }}" method="POST">
+            <form id="lang-switcher" method="POST">
                 @csrf
-                <input type="hidden" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
-                <button type="submit" class="lang-toggle-btn">
+                <button type="button" onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')" class="lang-toggle-btn">
                     {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
                 </button>
             </form>
         </div>
+
+        <script>
+        function switchLocale(locale) {
+            fetch("{{ route('locale.update') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('#lang-switcher input[name=_token]').value,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ locale: locale })
+            }).then(() => {
+                window.location.reload(); // Reload SAME URL
+            });
+        }
+        </script>
         <!-- Left Side - App Info (no tenant context required) -->
         <div class="lg:w-1/2 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 p-8 lg:p-16 flex items-center justify-center relative overflow-hidden">
             <!-- Background Pattern -->

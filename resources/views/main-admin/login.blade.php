@@ -11,10 +11,9 @@
             </div>
             <div class="p-8">
                 <div class="flex justify-end mb-4">
-                    <form action="{{ route('locale.update') }}" method="POST">
+                    <form id="lang-switcher" method="POST">
                         @csrf
-                        <input type="hidden" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
-                        <button type="submit" class="lang-toggle-btn">
+                        <button type="button" onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')" class="lang-toggle-btn">
                             {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
                         </button>
                     </form>
@@ -55,4 +54,19 @@
             </div>
         </div>
     </div>
+
+    <script>
+    function switchLocale(locale) {
+        fetch("{{ route('locale.update') }}", {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": document.querySelector('#lang-switcher input[name=_token]').value,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ locale: locale })
+        }).then(() => {
+            window.location.reload(); // Reload SAME URL
+        });
+    }
+    </script>
 </x-guest-layout>

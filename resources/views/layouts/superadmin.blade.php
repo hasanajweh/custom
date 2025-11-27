@@ -175,22 +175,27 @@
                             <h1 class="text-xl font-semibold text-white">@yield('page-title', 'Dashboard')</h1>
                         </div>
                         <div class="ml-4 flex items-center space-x-4 {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}">
-                            @php
-                                $currentLocale = app()->getLocale();
-                                $nextLocale = $currentLocale === 'ar' ? 'en' : 'ar';
-
-                                $label = $currentLocale === 'ar'
-                                    ? __('messages.language.english')
-                                    : __('messages.language.arabic');
-                            @endphp
-
-                            <form action="{{ route('locale.update') }}" method="POST" class="inline">
+                            <form id="lang-switcher" method="POST">
                                 @csrf
-                                <input type="hidden" name="locale" value="{{ $nextLocale }}">
-                                <button type="submit" class="inline-flex items-center gap-2 text-sm font-medium text-gray-200 hover:text-white">
-                                    <span>{{ $label }}</span>
+                                <button type="button" onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')" class="inline-flex items-center gap-2 text-sm font-medium text-gray-200 hover:text-white">
+                                    {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
                                 </button>
                             </form>
+
+                            <script>
+                            function switchLocale(locale) {
+                                fetch("{{ route('locale.update') }}", {
+                                    method: "POST",
+                                    headers: {
+                                        "X-CSRF-TOKEN": document.querySelector('#lang-switcher input[name=_token]').value,
+                                        "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify({ locale: locale })
+                                }).then(() => {
+                                    window.location.reload(); // Reload SAME URL
+                                });
+                            }
+                            </script>
 
                             <!-- Notifications -->
                             <button type="button" class="rounded-full bg-gray-700 p-1.5 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800">

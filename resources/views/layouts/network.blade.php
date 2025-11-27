@@ -1145,10 +1145,9 @@
 
             <!-- Right Navigation -->
             <div class="flex items-center space-x-4 {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}">
-                <form action="{{ route('locale.update') }}" method="POST" class="inline">
+                <form id="lang-switcher" method="POST">
                     @csrf
-                    <input type="hidden" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
-                    <button type="submit" class="text-sm">
+                    <button type="button" onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')" class="text-sm">
                         {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
                     </button>
                 </form>
@@ -1296,10 +1295,9 @@
 
         <!-- Mobile Language Switcher (Moved here) -->
         <div class="mobile-language-switcher">
-            <form action="{{ route('locale.update') }}" method="POST" class="inline">
+            <form id="lang-switcher" method="POST">
                 @csrf
-                <input type="hidden" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
-                <button type="submit" class="text-sm">
+                <button type="button" onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')" class="text-sm">
                     {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
                 </button>
             </form>
@@ -1321,6 +1319,19 @@
 </main>
 
 <script>
+    function switchLocale(locale) {
+        fetch("{{ route('locale.update') }}", {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": document.querySelector('#lang-switcher input[name=_token]').value,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ locale: locale })
+        }).then(() => {
+            window.location.reload(); // Reload SAME URL
+        });
+    }
+
     // ========================================
     // UNIVERSAL PWA SERVICE WORKER - ALL BROWSERS
     // ========================================
