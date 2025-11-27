@@ -3,43 +3,51 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
-use App\Models\Network;
 use App\Models\School;
-use App\Services\TenantContext;
-use Illuminate\Http\RedirectResponse;
+use App\Models\SchoolUserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ContextSwitchController extends Controller
 {
-    public function switch(Request $request, Network $network, School $branch): RedirectResponse
+    public function switch(Request $request)
     {
-        $validated = $request->validate([
-            'school_id' => ['required', 'integer'],
-            'role' => ['required', 'string'],
-        ]);
-
         $user = Auth::user();
-        $school = School::findOrFail($validated['school_id']);
 
-        abort_unless($school->network_id === $network->id, 404);
+        $schoolId = $request->input('school_id');
+        $role     = $request->input('role');
 
-        $hasAssignment = $user->schoolUserRoles()
-            ->where('school_id', $school->id)
-            ->where('role', $validated['role'])
-            ->exists();
-
-        if (! $hasAssignment) {
-            abort(403, 'Unauthorized context selection.');
+        // Validate school exists
+        $school = School::find($schoolId);
+        if (!$school) {
+            return response()->json(['status' => 'error', 'message' => 'Invalid school'], 422);
         }
 
-        TenantContext::setActiveContext($school->id, $validated['role']);
+        // Validate user has this role in this school
+        $hasRole = SchoolUserRole::where('user_id', $user->id)
+            ->where('school_id', $schoolId)
+            ->where('role', $role)
+            ->exists();
 
-        return match ($validated['role']) {
-            'admin' => redirect()->to(tenant_route('school.admin.dashboard', $school)),
-            'teacher' => redirect()->to(tenant_route('teacher.dashboard', $school)),
-            'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $school)),
-            default => redirect()->back(),
-        };
+        if (!$hasRole) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized role'], 403);
+        }
+
+        // SAVE CONTEXT IN SESSION
+        session([
+            'active_school_id' => $schoolId,
+            'active_role' => $role,
+        ]);
+
+        // Redirect based on role:
+        return response()->json([
+            'status' => 'ok',
+            'redirect' => match($role) {
+                'admin' => tenant_route('school.admin.dashboard', $school),
+                'teacher' => tenant_route('teacher.dashboard', $school),
+                'supervisor' => tenant_route('supervisor.dashboard', $school),
+                default => '/'
+            }
+        ]);
     }
 }

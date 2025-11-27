@@ -48,9 +48,9 @@ class VerifyTenantAccess
             abort(404);
         }
 
-        $hasRoleInSchool = $user?->schoolUserRoles()->where('school_id', $school->id)->exists();
+        $userSchools = $user?->schoolUserRoles()->pluck('school_id')->toArray();
 
-        if (! $user || ! $hasRoleInSchool) {
+        if (! $user || ! in_array($school->id, $userSchools)) {
             SecurityLogger::logTenantIsolationBreach(
                 (int) $school->id,
                 $user?->school_id ?? 0,
@@ -59,7 +59,7 @@ class VerifyTenantAccess
             abort(403, 'Unauthorized access to this school.');
         }
 
-        if ($user && $hasRoleInSchool) {
+        if ($user && in_array($school->id, $userSchools)) {
             TenantContext::setActiveContext($school->id, TenantContext::currentRole() ?? $user->role);
         }
 
