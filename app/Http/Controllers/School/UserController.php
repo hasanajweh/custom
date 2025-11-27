@@ -9,6 +9,7 @@ use App\Models\Subject;
 use App\Models\Grade;
 use App\Models\SupervisorSubject;
 use App\Models\Network;
+use App\Models\SchoolUserRole;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
@@ -140,15 +141,18 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'in:teacher,supervisor,admin'],
+            'roles' => ['required', 'array', 'min:1'],
+            'roles.*' => ['required', Rule::in(['teacher', 'supervisor', 'admin'])],
         ];
 
-        if ($request->role === 'supervisor') {
+        $selectedRoles = collect($request->input('roles', []));
+
+        if ($selectedRoles->contains('supervisor')) {
             $rules['subject_ids'] = ['required', 'array', 'min:1'];
             $rules['subject_ids.*'] = ['exists:subjects,id'];
         }
 
-        if ($request->role === 'teacher') {
+        if ($selectedRoles->contains('teacher')) {
             $rules['teacher_subject_ids'] = ['required', 'array', 'min:1'];
             $rules['teacher_subject_ids.*'] = [
                 'integer',
@@ -160,8 +164,11 @@ class UserController extends Controller
                 Rule::exists('grades', 'id')->where('school_id', $school->id),
             ];
         }
-        
+
         $validated = $request->validate($rules);
+
+        $roles = collect($validated['roles'])->unique()->values()->all();
+        $primaryRole = collect(['admin', 'supervisor', 'teacher'])->first(fn ($role) => in_array($role, $roles, true)) ?? $roles[0];
 
         DB::beginTransaction();
 
@@ -170,13 +177,22 @@ class UserController extends Controller
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'role' => $validated['role'],
+                'role' => $primaryRole,
                 'school_id' => $school->id,
+                'network_id' => $school->network_id,
                 'email_verified_at' => now(),
                 'is_active' => true,
             ]);
 
-            if ($request->role === 'supervisor' && isset($validated['subject_ids'])) {
+            foreach ($roles as $role) {
+                SchoolUserRole::updateOrCreate([
+                    'user_id' => $user->id,
+                    'school_id' => $school->id,
+                    'role' => $role,
+                ]);
+            }
+
+            if ($selectedRoles->contains('supervisor') && isset($validated['subject_ids'])) {
                 foreach ($validated['subject_ids'] as $subjectId) {
                     SupervisorSubject::create([
                         'supervisor_id' => $user->id,
@@ -186,7 +202,7 @@ class UserController extends Controller
                 }
             }
 
-            if ($user->isTeacher() && isset($validated['teacher_subject_ids'], $validated['teacher_grade_ids'])) {
+            if (in_array('teacher', $roles, true) && isset($validated['teacher_subject_ids'], $validated['teacher_grade_ids'])) {
                 $user->syncTeacherSubjects($validated['teacher_subject_ids'], $school->id);
                 $user->syncTeacherGrades($validated['teacher_grade_ids'], $school->id);
             }
@@ -221,6 +237,7 @@ class UserController extends Controller
 
         $selectedTeacherSubjectIds = $user->subjects()->pluck('subjects.id')->toArray();
         $selectedTeacherGradeIds = $user->grades()->pluck('grades.id')->toArray();
+        $selectedRoles = $user->schoolUserRoles()->where('school_id', $school->id)->pluck('role')->all();
 
         return view('school.admin.users.edit', compact(
             'school',
@@ -230,6 +247,7 @@ class UserController extends Controller
             'selectedSupervisorSubjectIds',
             'selectedTeacherSubjectIds',
             'selectedTeacherGradeIds',
+            'selectedRoles',
             'branch',
             'network'
         ));
@@ -245,19 +263,22 @@ class UserController extends Controller
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'role' => ['required', 'in:teacher,supervisor,admin'],
+            'roles' => ['required', 'array', 'min:1'],
+            'roles.*' => ['required', Rule::in(['teacher', 'supervisor', 'admin'])],
         ];
 
         if ($request->filled('password')) {
             $rules['password'] = ['confirmed', Rules\Password::defaults()];
         }
 
-        if ($request->role === 'supervisor') {
+        $selectedRoles = collect($request->input('roles', []));
+
+        if ($selectedRoles->contains('supervisor')) {
             $rules['subject_ids'] = ['required', 'array', 'min:1'];
             $rules['subject_ids.*'] = ['exists:subjects,id'];
         }
-        
-        if ($request->role === 'teacher') {
+
+        if ($selectedRoles->contains('teacher')) {
             $rules['teacher_subject_ids'] = ['required', 'array', 'min:1'];
             $rules['teacher_subject_ids.*'] = [
                 'integer',
@@ -271,13 +292,16 @@ class UserController extends Controller
         }
         $validated = $request->validate($rules);
 
+        $roles = collect($validated['roles'])->unique()->values()->all();
+        $primaryRole = collect(['admin', 'supervisor', 'teacher'])->first(fn ($role) => in_array($role, $roles, true)) ?? $roles[0];
+
         DB::beginTransaction();
 
         try {
             $data = [
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-                'role' => $validated['role'],
+                'role' => $primaryRole,
             ];
 
             if ($request->filled('password')) {
@@ -286,7 +310,24 @@ class UserController extends Controller
 
             $user->update($data);
 
-            if ($request->role === 'supervisor' && isset($validated['subject_ids'])) {
+            $existingRoles = $user->schoolUserRoles()->where('school_id', $school->id)->pluck('role')->all();
+
+            foreach (array_diff($existingRoles, $roles) as $roleToRemove) {
+                $user->schoolUserRoles()
+                    ->where('school_id', $school->id)
+                    ->where('role', $roleToRemove)
+                    ->delete();
+            }
+
+            foreach ($roles as $role) {
+                SchoolUserRole::updateOrCreate([
+                    'user_id' => $user->id,
+                    'school_id' => $school->id,
+                    'role' => $role,
+                ]);
+            }
+
+            if ($selectedRoles->contains('supervisor') && isset($validated['subject_ids'])) {
                 SupervisorSubject::where('supervisor_id', $user->id)->delete();
 
                 foreach ($validated['subject_ids'] as $subjectId) {
@@ -296,14 +337,14 @@ class UserController extends Controller
                         'school_id' => $school->id,
                     ]);
                 }
-            } else if ($request->role !== 'supervisor') {
+            } else if (! $selectedRoles->contains('supervisor')) {
                 SupervisorSubject::where('supervisor_id', $user->id)->delete();
             }
 
-            if ($request->role === 'teacher' && isset($validated['teacher_subject_ids'], $validated['teacher_grade_ids'])) {
+            if ($selectedRoles->contains('teacher') && isset($validated['teacher_subject_ids'], $validated['teacher_grade_ids'])) {
                 $user->syncTeacherSubjects($validated['teacher_subject_ids'], $school->id);
                 $user->syncTeacherGrades($validated['teacher_grade_ids'], $school->id);
-            } elseif ($request->role !== 'teacher') {
+            } elseif (! $selectedRoles->contains('teacher')) {
                 $user->subjects()->detach();
                 $user->grades()->detach();
             }

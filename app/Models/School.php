@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Models\SchoolUserRole;
 
 class School extends Model
 {
@@ -39,9 +40,14 @@ class School extends Model
         return $this->belongsTo(Network::class);
     }
 
-    public function userRoles(): HasMany
+    public function schoolUserRoles(): HasMany
     {
         return $this->hasMany(SchoolUserRole::class);
+    }
+
+    public function userRoles(): HasMany
+    {
+        return $this->schoolUserRoles();
     }
 
     public function assignedUsers(): BelongsToMany

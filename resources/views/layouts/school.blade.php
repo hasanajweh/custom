@@ -10,6 +10,10 @@
         $branch = $branch ?? request()->route('branch');
         $network = $network ?? request()->route('network') ?? $school?->network ?? auth()->user()?->network;
 
+        $currentSchool = \App\Services\TenantContext::currentSchool();
+        $currentRole = \App\Services\TenantContext::currentRole() ?? auth()->user()?->role;
+        $availableContexts = auth()->user() ? \App\Services\TenantContext::availableContextsForUser(auth()->user()) : collect();
+
         $schoolName = $school?->name ?? config('app.name');
         $schoolSlug = $school?->slug ?? '';
         $networkSlug = $network?->slug ?? $school?->network?->slug ?? auth()->user()?->network?->slug ?? '';
@@ -1168,7 +1172,7 @@
                             class="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}"
                             aria-label="{{ __('messages.navigation.open_user_menu') }}">
                         @php
-                            $role = strtolower(Auth::user()->role);
+                            $role = strtolower($currentRole ?? Auth::user()->role);
                             $bgColors = [
                                 'teacher' => 'bg-blue-600',
                                 'supervisor' => 'bg-indigo-600',
@@ -1191,7 +1195,7 @@
 
                         <div class="hidden sm:block text-left {{ app()->getLocale() === 'ar' ? 'text-right' : '' }}">
                             <p class="text-sm font-bold text-gray-700">{{ Auth::user()->name }}</p>
-                            <p class="text-xs text-gray-500 font-medium">{{ __('messages.roles.' . Auth::user()->role) }}</p>
+                            <p class="text-xs text-gray-500 font-medium">{{ __('messages.roles.' . $role) }}</p>
                         </div>
                         <i class="ri-arrow-down-s-line text-gray-400"></i>
                     </button>
@@ -1214,11 +1218,45 @@
 
                                 <div class="flex-1 min-w-0">
                                     <p class="font-bold text-gray-900">{{ Auth::user()->name }}</p>
-                                    <p class="text-sm text-gray-600 font-semibold">{{ __('messages.roles.' . Auth::user()->role) }}</p>
+                                    <p class="text-sm text-gray-600 font-semibold">{{ __('messages.roles.' . $role) }}</p>
                                     <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
                                 </div>
                             </div>
                         </div>
+
+                        @if(($availableContexts->count() ?? 0) > 1)
+                            <div class="p-4 border-b border-gray-100 space-y-3">
+                                <div class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                    <i class="ri-shuffle-line text-indigo-500 text-lg"></i>
+                                    <span>{{ __('messages.dashboard.switch_context') ?? 'Switch school / role' }}</span>
+                                </div>
+                                <p class="text-xs text-gray-500">
+                                    {{ __('messages.dashboard.current_context') ?? 'Current:' }}
+                                    <span class="font-semibold text-gray-800">{{ ($currentSchool?->name) ?? $schoolName }}</span>
+                                    — <span class="text-indigo-600 font-semibold">{{ __('messages.roles.' . $role) }}</span>
+                                </p>
+                                <div class="space-y-2">
+                                    @foreach($availableContexts as $context)
+                                        @php
+                                            $isActiveContext = $currentSchool?->id === $context['school']->id && $role === $context['role'];
+                                        @endphp
+                                        <form method="POST" action="{{ tenant_route('tenant.context.switch', $context['school']) }}">
+                                            @csrf
+                                            <input type="hidden" name="school_id" value="{{ $context['school']->id }}">
+                                            <input type="hidden" name="role" value="{{ $context['role'] }}">
+                                            <button type="submit" class="w-full flex items-center justify-between px-3 py-2 rounded-lg border {{ $isActiveContext ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50' }}">
+                                                <span class="text-sm text-gray-800">
+                                                    {{ $context['school']->name }} — {{ __('messages.roles.' . $context['role']) }}
+                                                </span>
+                                                @if($isActiveContext)
+                                                    <span class="text-indigo-600 text-xs font-semibold flex items-center gap-1"><i class="ri-check-line"></i>{{ __('messages.dashboard.active') ?? 'Active' }}</span>
+                                                @endif
+                                            </button>
+                                        </form>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
 
                         <!-- Menu Items -->
                         <div class="py-1">
