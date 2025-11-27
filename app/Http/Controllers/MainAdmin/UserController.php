@@ -9,7 +9,6 @@ use App\Models\Network;
 use App\Models\SchoolUserRole;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
@@ -61,20 +60,49 @@ class UserController extends Controller
     public function store(StoreNetworkUserRequest $request, Network $network): RedirectResponse
     {
         $data = $request->validated();
-        $assignments = $this->filterAssignments($data['assignments'] ?? [], $network);
+        $assignments = $this->normalizeAssignments($data['assignments'] ?? [], $network);
 
-        $primarySchoolId = Arr::first($assignments)['school_id'] ?? null;
+        $primarySchoolId = array_key_first($assignments);
 
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'network_id' => $network->id,
-            'school_id' => $primarySchoolId,
-            'is_active' => true,
-        ]);
+        DB::transaction(function () use ($data, $network, $assignments, $primarySchoolId) {
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'network_id' => $network->id,
+                'school_id' => $primarySchoolId,
+                'is_active' => true,
+            ]);
 
-        $this->syncAssignments($user, $assignments, $network);
+            foreach ($assignments as $schoolId => $items) {
+                foreach ($items['roles'] as $role) {
+                    SchoolUserRole::create([
+                        'user_id' => $user->id,
+                        'school_id' => $schoolId,
+                        'role' => $role,
+                        'is_active' => true,
+                    ]);
+                }
+
+                $subjects = [];
+                foreach ($items['subjects'] as $subjectId) {
+                    $subjects[$subjectId] = ['school_id' => $schoolId];
+                }
+
+                if (!empty($subjects)) {
+                    $user->subjects()->attach($subjects);
+                }
+
+                $grades = [];
+                foreach ($items['grades'] as $gradeId) {
+                    $grades[$gradeId] = ['school_id' => $schoolId];
+                }
+
+                if (!empty($grades)) {
+                    $user->grades()->attach($grades);
+                }
+            }
+        });
 
         return redirect()->route('main-admin.users.index', ['network' => $network->slug])
             ->with('status', __('User created successfully.'));
@@ -119,8 +147,8 @@ class UserController extends Controller
         abort_unless($user->network_id === $network->id, 404);
 
         $data = $request->validated();
-        $assignments = $this->filterAssignments($data['assignments'] ?? [], $network);
-        $primarySchoolId = Arr::first($assignments)['school_id'] ?? null;
+        $assignments = $this->normalizeAssignments($data['assignments'] ?? [], $network);
+        $primarySchoolId = array_key_first($assignments);
 
         $user->fill([
             'name' => $data['name'],
@@ -160,28 +188,29 @@ class UserController extends Controller
             ->with('status', __('User restored successfully.'));
     }
 
-    protected function filterAssignments(array $assignments, Network $network): array
+    protected function normalizeAssignments(array $assignments, Network $network): array
     {
-        $allowedSchools = $network->branches()->pluck('id')->toArray();
+        $allowedSchools = $network->branches()->pluck('id')->all();
+        $normalized = [];
 
-        return collect($assignments)
-            ->map(function ($assignment, $key) use ($allowedSchools) {
-                $schoolId = $assignment['school_id'] ?? $key;
+        foreach ($assignments as $key => $assignment) {
+            $schoolId = (int) ($assignment['school_id'] ?? $key);
 
-                if (!in_array($schoolId, $allowedSchools)) {
-                    return null;
-                }
+            if (!in_array($schoolId, $allowedSchools, true)) {
+                continue;
+            }
 
-                return [
-                    'school_id' => (int) $schoolId,
-                    'roles' => array_values(array_unique($assignment['roles'] ?? [])),
-                    'subjects' => $assignment['subjects'] ?? [],
-                    'grades' => $assignment['grades'] ?? [],
-                ];
-            })
-            ->filter()
-            ->values()
-            ->all();
+            $normalized[$schoolId] = [
+                'school_id' => $schoolId,
+                'roles' => array_values(array_unique($assignment['roles'] ?? [])),
+                'subjects' => array_values(array_unique($assignment['subjects'] ?? [])),
+                'grades' => array_values(array_unique($assignment['grades'] ?? [])),
+            ];
+        }
+
+        ksort($normalized);
+
+        return $normalized;
     }
 
     protected function syncAssignments(User $user, array $assignments, Network $network): void
@@ -209,9 +238,7 @@ class UserController extends Controller
                     }
                 }
 
-                if (in_array('teacher', $assignment['roles']) || in_array('supervisor', $assignment['roles'])) {
-                    $this->syncSubjectsAndGrades($user, $schoolId, $assignment['subjects'] ?? [], $assignment['grades'] ?? []);
-                }
+                $this->syncSubjectsAndGrades($user, $schoolId, $assignment['subjects'] ?? [], $assignment['grades'] ?? []);
             }
 
             foreach ($existing as $key => $role) {
