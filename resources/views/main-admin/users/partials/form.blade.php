@@ -37,10 +37,9 @@
     <div class="grid gap-4">
         @foreach($branches as $branch)
             @php
-                $branchData = $assignments[$branch->id] ?? ['roles' => [], 'subjects' => [], 'grades' => []];
-                $branchRoles = $branchData['roles'] ?? [];
-                $branchSubjects = $branchData['subjects'] ?? [];
-                $branchGrades = $branchData['grades'] ?? [];
+                $branchRoles = $assignments[$branch->id]['roles'] ?? [];
+                $branchSubjects = $assignments[$branch->id]['subjects'] ?? [];
+                $branchGrades = $assignments[$branch->id]['grades'] ?? [];
             @endphp
             <div class="bg-white border border-indigo-50 rounded-2xl p-5 shadow-sm space-y-4">
                 <div class="flex items-center justify-between">
