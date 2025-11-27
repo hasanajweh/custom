@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Logging\SecurityLogger;
 use App\Models\Network;
 use App\Support\SchoolResolver;
+use App\Services\TenantContext;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,13 +48,19 @@ class VerifyTenantAccess
             abort(404);
         }
 
-        if (! $user || $user->school_id !== $school->id) {
+        $hasRoleInSchool = $user?->schoolUserRoles()->where('school_id', $school->id)->exists();
+
+        if (! $user || ! $hasRoleInSchool) {
             SecurityLogger::logTenantIsolationBreach(
                 (int) $school->id,
                 $user?->school_id ?? 0,
             );
 
             abort(403, 'Unauthorized access to this school.');
+        }
+
+        if ($user && $hasRoleInSchool) {
+            TenantContext::setActiveContext($school->id, TenantContext::currentRole() ?? $user->role);
         }
 
         return $next($request);

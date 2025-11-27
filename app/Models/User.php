@@ -11,8 +11,9 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\SchoolUserRole;
 
 class User extends Authenticatable
 {
@@ -175,9 +176,14 @@ class User extends Authenticatable
         return $this->belongsTo(School::class);
     }
 
-    public function schoolRoles(): HasMany
+    public function schoolUserRoles(): HasMany
     {
         return $this->hasMany(SchoolUserRole::class);
+    }
+
+    public function schoolRoles(): HasMany
+    {
+        return $this->schoolUserRoles();
     }
 
     public function schools(): BelongsToMany

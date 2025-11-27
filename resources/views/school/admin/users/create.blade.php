@@ -60,24 +60,25 @@
                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             </div>
 
-            <!-- Role -->
+            @php($oldRoles = old('roles', []))
             <div>
-                <label for="role" class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
                     {{ __('messages.users.user_role') }} <span class="text-red-500">*</span>
                 </label>
-                <select id="role" name="role" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        onchange="toggleRoleFields()">
-                    <option value="">{{ __('messages.users.select_role') }}</option>
-                    <option value="teacher" {{ old('role') === 'teacher' ? 'selected' : '' }}>{{ __('messages.roles.teacher') }}</option>
-                    <option value="supervisor" {{ old('role') === 'supervisor' ? 'selected' : '' }}>{{ __('messages.roles.supervisor') }}</option>
-                    <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>{{ __('messages.roles.admin') }}</option>
-                </select>
-                @error('role') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="roleCheckboxes">
+                    @foreach(['teacher' => __('messages.roles.teacher'), 'supervisor' => __('messages.roles.supervisor'), 'admin' => __('messages.roles.admin')] as $value => $label)
+                        <label class="flex items-center gap-2 px-4 py-3 border rounded-lg cursor-pointer hover:border-blue-500">
+                            <input type="checkbox" name="roles[]" value="{{ $value }}" class="rounded text-blue-600" onchange="toggleRoleFields()" {{ in_array($value, $oldRoles) ? 'checked' : '' }}>
+                            <span class="text-sm text-gray-800">{{ $label }}</span>
+                        </label>
+                    @endforeach
+                </div>
+                @error('roles') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                @error('roles.*') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>
 
             <!-- Supervisor Subjects -->
-            <div id="supervisorSubjectField" class="{{ old('role') === 'supervisor' ? '' : 'hidden' }}">
+            <div id="supervisorSubjectField" class="{{ in_array('supervisor', $oldRoles) ? '' : 'hidden' }}">
                 <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.users.subjects') }}</label>
                 <div x-data="multiSelect({options: {{ $subjects->map(fn($s)=>['id'=>$s->id,'name'=>$s->name]) }}, name:'subject_ids', old:{{ json_encode(old('subject_ids', [])) }}})" class="space-y-2">
                     <div class="flex items-center gap-4 text-sm text-blue-600 font-medium">
@@ -101,7 +102,7 @@
             </div>
 
             <!-- Teacher Grades -->
-            <div id="teacherGradeField" class="{{ old('role') === 'teacher' ? '' : 'hidden' }}">
+            <div id="teacherGradeField" class="{{ in_array('teacher', $oldRoles) ? '' : 'hidden' }}">
                 <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.users.grades') }}</label>
                 <div x-data="multiSelect({options: {{ $grades->map(fn($g)=>['id'=>$g->id,'name'=>$g->name]) }}, name:'teacher_grade_ids', old:{{ json_encode(old('teacher_grade_ids', [])) }}})" class="space-y-2">
                     <div class="flex items-center gap-4 text-sm text-green-600 font-medium">
@@ -125,7 +126,7 @@
             </div>
 
             <!-- Teacher Subjects -->
-            <div id="teacherSubjectField" class="{{ old('role') === 'teacher' ? '' : 'hidden' }}">
+            <div id="teacherSubjectField" class="{{ in_array('teacher', $oldRoles) ? '' : 'hidden' }}">
                 <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.users.subjects') }}</label>
                 <div x-data="multiSelect({options: {{ $subjects->map(fn($s)=>['id'=>$s->id,'name'=>$s->name]) }}, name:'teacher_subject_ids', old:{{ json_encode(old('teacher_subject_ids', [])) }}})" class="space-y-2">
                     <div class="flex items-center gap-4 text-sm text-purple-600 font-medium">
@@ -167,10 +168,10 @@
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 <script>
 function toggleRoleFields() {
-    const role = document.getElementById('role').value;
+    const selectedRoles = Array.from(document.querySelectorAll('input[name="roles[]"]:checked')).map(input => input.value);
     ['supervisorSubjectField', 'teacherGradeField', 'teacherSubjectField'].forEach(id => document.getElementById(id).classList.add('hidden'));
-    if (role === 'supervisor') document.getElementById('supervisorSubjectField').classList.remove('hidden');
-    if (role === 'teacher') {
+    if (selectedRoles.includes('supervisor')) document.getElementById('supervisorSubjectField').classList.remove('hidden');
+    if (selectedRoles.includes('teacher')) {
         document.getElementById('teacherGradeField').classList.remove('hidden');
         document.getElementById('teacherSubjectField').classList.remove('hidden');
     }
