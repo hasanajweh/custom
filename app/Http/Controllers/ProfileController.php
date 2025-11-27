@@ -29,7 +29,10 @@ class ProfileController extends Controller
     {
         $school = $this->validateContext($network, $branch);
 
-        return view('profile.edit', compact('school'));
+        return view('profile.edit', [
+            'school' => $school,
+            'user' => Auth::user(),
+        ]);
     }
 
     public function update(Request $request, Network $network, School $branch)
@@ -38,13 +41,12 @@ class ProfileController extends Controller
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.Auth::id()],
+            'email' => ['sometimes'],
         ]);
 
         $user = Auth::user();
         $user->update([
             'name' => $request->name,
-            'email' => $request->email,
         ]);
 
         return redirect()->to(tenant_route('profile.edit', $school))

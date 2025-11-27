@@ -8,9 +8,8 @@ class SetLocale
 {
     public function handle($request, Closure $next)
     {
-        $locale = session('locale', 'ar'); // DEFAULT LANGUAGE = ARABIC
+        $locale = session('locale', 'ar');
         app()->setLocale($locale);
-
         return $next($request);
     }
 }
