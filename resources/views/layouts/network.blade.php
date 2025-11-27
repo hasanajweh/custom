@@ -106,6 +106,11 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
 
 
+    @if(app()->getLocale() === 'ar')
+        <link rel="stylesheet" href="/css/rtl.css">
+    @endif
+
+
     <style>
         :root {
             --primary: #2563EB;
@@ -1140,20 +1145,11 @@
 
             <!-- Right Navigation -->
             <div class="flex items-center space-x-4 {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}">
-                @php
-                    $currentLocale = app()->getLocale();
-                    $nextLocale = $currentLocale === 'ar' ? 'en' : 'ar';
-
-                    $label = $currentLocale === 'ar'
-                        ? __('messages.language.english')
-                        : __('messages.language.arabic');
-                @endphp
-
                 <form action="{{ route('locale.update') }}" method="POST" class="inline">
                     @csrf
-                    <input type="hidden" name="locale" value="{{ $nextLocale }}">
-                    <button type="submit" class="lang-toggle-btn inline-flex items-center gap-2 text-sm font-medium">
-                        <span>{{ $label }}</span>
+                    <input type="hidden" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
+                    <button type="submit" class="text-sm">
+                        {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
                     </button>
                 </form>
 
@@ -1302,9 +1298,9 @@
         <div class="mobile-language-switcher">
             <form action="{{ route('locale.update') }}" method="POST" class="inline">
                 @csrf
-                <input type="hidden" name="locale" value="{{ $nextLocale }}">
-                <button type="submit" class="lang-toggle-btn inline-flex items-center gap-2 text-sm font-medium">
-                    <span>{{ $label }}</span>
+                <input type="hidden" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
+                <button type="submit" class="text-sm">
+                    {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
                 </button>
             </form>
         </div>
