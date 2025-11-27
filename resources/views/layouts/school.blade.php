@@ -12,7 +12,6 @@
 
         $currentSchool = \App\Services\TenantContext::currentSchool();
         $currentRole = \App\Services\TenantContext::currentRole() ?? auth()->user()?->role;
-        $availableContexts = auth()->user() ? \App\Services\TenantContext::availableContextsForUser(auth()->user()) : collect();
 
         $schoolName = $school?->name ?? config('app.name');
         $schoolSlug = $school?->slug ?? '';
@@ -1224,38 +1223,59 @@
                             </div>
                         </div>
 
-                        @if(($availableContexts->count() ?? 0) > 1)
-                            <div class="p-4 border-b border-gray-100 space-y-3">
-                                <div class="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                                    <i class="ri-shuffle-line text-indigo-500 text-lg"></i>
-                                    <span>{{ __('messages.dashboard.switch_context') ?? 'Switch school / role' }}</span>
-                                </div>
-                                <p class="text-xs text-gray-500">
-                                    {{ __('messages.dashboard.current_context') ?? 'Current:' }}
-                                    <span class="font-semibold text-gray-800">{{ ($currentSchool?->name) ?? $schoolName }}</span>
-                                    — <span class="text-indigo-600 font-semibold">{{ __('messages.roles.' . $role) }}</span>
-                                </p>
-                                <div class="space-y-2">
-                                    @foreach($availableContexts as $context)
-                                        @php
-                                            $isActiveContext = $currentSchool?->id === $context['school']->id && $role === $context['role'];
-                                        @endphp
-                                        <form method="POST" action="{{ tenant_route('tenant.context.switch', $context['school']) }}">
-                                            @csrf
-                                            <input type="hidden" name="school_id" value="{{ $context['school']->id }}">
-                                            <input type="hidden" name="role" value="{{ $context['role'] }}">
-                                            <button type="submit" class="w-full flex items-center justify-between px-3 py-2 rounded-lg border {{ $isActiveContext ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50' }}">
-                                                <span class="text-sm text-gray-800">
-                                                    {{ $context['school']->name }} — {{ __('messages.roles.' . $context['role']) }}
-                                                </span>
-                                                @if($isActiveContext)
-                                                    <span class="text-indigo-600 text-xs font-semibold flex items-center gap-1"><i class="ri-check-line"></i>{{ __('messages.dashboard.active') ?? 'Active' }}</span>
-                                                @endif
-                                            </button>
-                                        </form>
-                                    @endforeach
-                                </div>
-                            </div>
+                        @php
+                            $contexts = Auth::user()->schoolUserRoles()
+                                ->with('school')
+                                ->get()
+                                ->map(fn($r) => [
+                                    'school_id' => $r->school->id,
+                                    'school_name' => $r->school->name,
+                                    'role' => $r->role,
+                                ]);
+                        @endphp
+
+                        @if($contexts->count() > 1)
+                        <div class="mt-2 px-3 py-2 rounded bg-slate-100">
+                            <label class="block text-sm mb-1 text-slate-600">
+                                @lang('messages.switch_context')
+                            </label>
+                            <select id="context-switcher" 
+                                    class="w-full rounded border-slate-300 text-sm"
+                                    onchange="switchContext()">
+                                <option value="">-- Select --</option>
+                                @foreach($contexts as $ctx)
+                                    <option 
+                                        value="{{ json_encode($ctx) }}"
+                                        @if(session('active_school_id') == $ctx['school_id'] && session('active_role') == $ctx['role']) selected @endif
+                                    >
+                                        {{ $ctx['school_name'] }} — @lang('messages.roles.' . $ctx['role'])
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <script>
+                        function switchContext() {
+                            let data = document.getElementById("context-switcher").value;
+                            if (!data) return;
+                            let ctx = JSON.parse(data);
+
+                            fetch("{{ route('tenant.context.switch') }}", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                                },
+                                body: JSON.stringify(ctx)
+                            })
+                            .then(r => r.json())
+                            .then(res => {
+                                if (res.redirect) {
+                                    window.location.href = res.redirect;
+                                }
+                            });
+                        }
+                        </script>
                         @endif
 
                         <!-- Menu Items -->

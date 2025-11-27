@@ -37,6 +37,7 @@ use App\Http\Controllers\MainAdmin\UserController as MainAdminUserController;
 use App\Http\Controllers\Tenant\ContextSwitchController;
 use App\Models\Network;
 use App\Models\School;
+use App\Models\SchoolUserRole;
 use App\Services\TenantContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -197,7 +198,29 @@ Route::prefix('{network:slug}/{branch:slug}')
                     abort(404, 'Access denied to this network.');
                 }
 
-                $role = TenantContext::currentRole();
+                $role = session('active_role');
+
+                if (! $role) {
+                    $roles = SchoolUserRole::where('user_id', Auth::id())
+                        ->where('school_id', $branch->id)
+                        ->pluck('role')
+                        ->toArray();
+
+                    if (in_array('admin', $roles)) {
+                        $role = 'admin';
+                    } elseif (in_array('supervisor', $roles)) {
+                        $role = 'supervisor';
+                    } elseif (in_array('teacher', $roles)) {
+                        $role = 'teacher';
+                    }
+
+                    if ($role) {
+                        session([
+                            'active_school_id' => $branch->id,
+                            'active_role' => $role,
+                        ]);
+                    }
+                }
 
                 if (! $role) {
                     abort(403, 'Invalid user role.');
@@ -211,7 +234,7 @@ Route::prefix('{network:slug}/{branch:slug}')
                 };
             })->name('dashboard');
 
-            Route::post('/context/switch', [ContextSwitchController::class, 'switch'])
+            Route::post('/context-switch', [ContextSwitchController::class, 'switch'])
                 ->name('tenant.context.switch');
 
             // ===========================
