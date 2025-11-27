@@ -1145,12 +1145,13 @@
 
             <!-- Right Navigation -->
             <div class="flex items-center space-x-4 {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}">
-                <form id="lang-switcher" method="POST">
-                    @csrf
-                    <button type="button" onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')" class="text-sm">
-                        {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
-                    </button>
-                </form>
+                <button 
+                    type="button"
+                    onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')"
+                    class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                >
+                    {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
+                </button>
 
                 <!-- Enhanced User Dropdown -->
                 <div class="relative">
@@ -1295,12 +1296,13 @@
 
         <!-- Mobile Language Switcher (Moved here) -->
         <div class="mobile-language-switcher">
-            <form id="lang-switcher" method="POST">
-                @csrf
-                <button type="button" onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')" class="text-sm">
-                    {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
-                </button>
-            </form>
+            <button 
+                type="button"
+                onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')"
+                class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+            >
+                {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
+            </button>
         </div>
 
         <div class="sidebar-footer">
@@ -1319,18 +1321,18 @@
 </main>
 
 <script>
-    function switchLocale(locale) {
-        fetch("{{ route('locale.update') }}", {
-            method: "POST",
-            headers: {
-                "X-CSRF-TOKEN": document.querySelector('#lang-switcher input[name=_token]').value,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ locale: locale })
-        }).then(() => {
-            window.location.reload(); // Reload SAME URL
-        });
-    }
+function switchLocale(locale) {
+    fetch("{{ route('locale.update') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({ locale })
+    }).then(r => r.json()).then(() => {
+        window.location.reload();
+    });
+}
 
     // ========================================
     // UNIVERSAL PWA SERVICE WORKER - ALL BROWSERS

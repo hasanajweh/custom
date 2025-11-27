@@ -12,10 +12,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->web(append: [
-            \App\Http\Middleware\IdentifyTenant::class,
-            \App\Http\Middleware\SetNetwork::class,
-        ]);
+        $middleware->web(
+            prepend: [
+                \App\Http\Middleware\SetLocale::class,
+            ],
+            append: [
+                \App\Http\Middleware\IdentifyTenant::class,
+                \App\Http\Middleware\SetNetwork::class,
+            ]
+        );
 
         $middleware->alias([
             'verify.tenant' => \App\Http\Middleware\VerifyTenantAccess::class,

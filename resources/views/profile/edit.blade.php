@@ -74,12 +74,13 @@
                             <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
                                 {{ __('messages.profile.email_address') }}
                             </label>
-                            <input type="email"
-                                   id="email"
-                                   name="email"
-                                   value="{{ old('email', Auth::user()->email) }}"
-                                   required
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input 
+    type="email" 
+    name="email" 
+    value="{{ $user->email }}" 
+    class="form-input w-full bg-gray-200 text-gray-600 cursor-not-allowed"
+    disabled
+/>
                             @error('email')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
