@@ -10,24 +10,29 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans text-gray-900 antialiased bg-gray-50">
-    @php
-        $currentLocale = app()->getLocale();
-        $nextLocale = $currentLocale === 'ar' ? 'en' : 'ar';
-
-        $label = $currentLocale === 'ar'
-            ? __('messages.language.english')
-            : __('messages.language.arabic');
-    @endphp
-
     <div class="flex justify-end p-4">
-        <form action="{{ route('locale.update') }}" method="POST" class="inline">
+        <form id="lang-switcher" method="POST">
             @csrf
-            <input type="hidden" name="locale" value="{{ $nextLocale }}">
-            <button type="submit" class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800">
-                <span>{{ $label }}</span>
+            <button type="button" onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')" class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800">
+                {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
             </button>
         </form>
     </div>
+
+    <script>
+    function switchLocale(locale) {
+        fetch("{{ route('locale.update') }}", {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": document.querySelector('#lang-switcher input[name=_token]').value,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ locale: locale })
+        }).then(() => {
+            window.location.reload(); // Reload SAME URL
+        });
+    }
+    </script>
 
     @yield('content')
 </body>
