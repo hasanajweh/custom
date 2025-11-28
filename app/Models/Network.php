@@ -28,6 +28,11 @@ class Network extends Model
         return $this->hasMany(School::class, 'network_id');
     }
 
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class, 'network_id');
+    }
+
     public function schools(): HasMany
     {
         return $this->hasMany(School::class, 'network_id');
