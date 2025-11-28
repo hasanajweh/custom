@@ -877,11 +877,6 @@ return [
             'heading' => 'Unauthorized Access',
             'message' => 'You need to log in to access this resource.',
         ],
-        '402' => [
-            'title' => 'Payment Required',
-            'heading' => 'Payment Required',
-            'message' => 'Payment is required to access this resource.',
-        ],
         '403' => [
             'title' => 'Forbidden',
             'heading' => 'Access Denied',

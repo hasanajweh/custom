@@ -81,7 +81,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         // Check if user is active (not deactivated)
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             Auth::logout();
             return back()->withErrors([
                 'email' => 'Your account has been deactivated. Please contact your administrator.',
@@ -89,7 +89,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         // Check if school is active
-        if (!$branch->isActiveWithNetwork()) {
+        if (! $branch->isActiveWithNetwork()) {
             Auth::logout();
             return back()->withErrors([
                 'email' => 'This school is currently inactive. Please contact support.',
@@ -97,7 +97,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         // Check for active subscription (skip for super admin)
-        if (!$user->is_super_admin && !$branch->hasActiveSubscription()) {
+        if (! $user->is_super_admin && ! $branch->hasActiveSubscription()) {
             // Allow admin's first login to set up subscription
             if ($branch->subscriptions()->count() === 0 && $user->role === 'admin') {
                 SecurityLogger::logSuccessfulLogin($user);
@@ -135,7 +135,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('superadmin.dashboard');
         }
 
-        return redirect()->intended(tenant_dashboard_route($branch, $user));
+        return redirect()->to(tenant_dashboard_route($branch, $user));
     }
 
     /**
