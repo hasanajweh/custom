@@ -8,6 +8,7 @@ use App\Http\Requests\MainAdmin\UpdateNetworkUserRequest;
 use App\Models\Network;
 use App\Models\SchoolUserRole;
 use App\Models\User;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -19,23 +20,38 @@ class UserController extends Controller
     {
         $branches = $network->branches()->withCount('users')->get();
 
-        $usersQuery = User::with(['assignedSchools', 'schoolRoles' => fn ($query) => $query->with('school')])
-            ->withTrashed()
-            ->where('network_id', $network->id);
+        $users = $network->allUsers(true);
+
+        $users->load(['assignedSchools', 'schoolRoles' => fn($query) => $query->with('school')]);
 
         if (request('role')) {
-            $usersQuery->whereHas('schoolRoles', function ($query) {
-                $query->where('role', request('role'));
+            $users = $users->filter(function (User $user) {
+                return $user->schoolRoles->contains('role', request('role'));
             });
         }
 
         if (request('status') === 'archived') {
-            $usersQuery->onlyTrashed();
+            $users = $users->filter(fn (User $user) => $user->trashed());
         } elseif (request('status') === 'active') {
-            $usersQuery->whereNull('deleted_at');
+            $users = $users->filter(fn (User $user) => !$user->trashed());
         }
 
-        $users = $usersQuery->latest()->paginate(20)->withQueryString();
+        $users = $users
+            ->sortByDesc('created_at')
+            ->values();
+
+        $perPage = 20;
+        $page = request('page', 1);
+        $users = new LengthAwarePaginator(
+            $users->forPage($page, $perPage),
+            $users->count(),
+            $perPage,
+            $page,
+            [
+                'path' => request()->url(),
+                'query' => request()->query(),
+            ]
+        );
 
         return view('main-admin.users.index', [
             'network' => $network,
@@ -104,7 +120,7 @@ class UserController extends Controller
             }
         });
 
-        return redirect()->route('main-admin.users.index', ['network' => $network->slug])
+        return redirect()->route('main-admin.users.create', ['network' => $network->slug])
             ->with('status', __('User created successfully.'));
     }
 
@@ -152,7 +168,6 @@ class UserController extends Controller
 
         $user->fill([
             'name' => $data['name'],
-            'email' => $data['email'],
             'school_id' => $primarySchoolId,
             'is_active' => $data['is_active'],
         ]);

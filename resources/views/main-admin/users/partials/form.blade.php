@@ -5,7 +5,17 @@
     </div>
     <div>
         <label class="text-sm text-gray-600 block mb-1">@lang('Email')</label>
-        <input type="email" name="email" value="{{ old('email', $user->email ?? '') }}" class="w-full border border-indigo-100 rounded-xl p-3 bg-white shadow-inner focus:ring-2 focus:ring-indigo-500" required>
+        <input
+            type="email"
+            name="email"
+            value="{{ old('email', $user->email ?? '') }}"
+            class="w-full border border-indigo-100 rounded-xl p-3 bg-white shadow-inner focus:ring-2 focus:ring-indigo-500 {{ isset($user) ? 'bg-gray-100 cursor-not-allowed' : '' }}"
+            @if(isset($user)) disabled readonly @endif
+            required
+        >
+        @isset($user)
+            <p class="text-xs text-gray-500 mt-1">@lang('Email cannot be changed once created.')</p>
+        @endisset
     </div>
     <div>
         <label class="text-sm text-gray-600 block mb-1">@lang('Password')</label>
