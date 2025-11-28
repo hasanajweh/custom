@@ -200,11 +200,16 @@ if (!function_exists('tenant_dashboard_route')) {
     {
         $user = $user ?: auth()->user();
 
-        if ($user && $user->role === 'admin') {
-            return tenant_route('school.admin.dashboard', $school, $parameters, $absolute);
+        if (! $user) {
+            return tenant_route('dashboard', $school, $parameters, $absolute);
         }
 
-        return tenant_route('dashboard', $school, $parameters, $absolute);
+        return match ($user->role) {
+            'admin' => tenant_route('school.admin.dashboard', $school, $parameters, $absolute),
+            'teacher' => tenant_route('teacher.dashboard', $school, $parameters, $absolute),
+            'supervisor' => tenant_route('supervisor.dashboard', $school, $parameters, $absolute),
+            default => tenant_route('dashboard', $school, $parameters, $absolute),
+        };
     }
 }
 
