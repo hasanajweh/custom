@@ -8,9 +8,10 @@
         $network = $network ?? $school?->network ?? Auth::user()?->network;
         $hasTenantContext = $school && $network;
         $schoolSlug = $school?->slug;
+        $activeRole = $activeContextRole ?? Auth::user()?->role;
     @endphp
     @php
-        $dashboardRouteName = Auth::user()?->role === 'admin'
+        $dashboardRouteName = $activeRole === 'admin'
             ? 'school.admin.dashboard'
             : 'dashboard';
         $dashboardUrl = $hasTenantContext ? tenant_route($dashboardRouteName, $school) : null;
@@ -33,14 +34,14 @@
                 {{-- Tenant Links --}}                    
                 @if ($hasTenantContext)
                     <li><x-nav-link :href="$dashboardUrl" :active="request()->routeIs('dashboard') || request()->routeIs('school.admin.dashboard')">Dashboard</x-nav-link></li>
-                    @if (auth()->user()->role === 'teacher')
+                    @if ($activeRole === 'teacher')
                         <li><x-nav-link :href="tenant_route('teacher.files.index', $school)" :active="request()->routeIs('teacher.files.*')">My Files</x-nav-link></li>
                         <li><x-nav-link :href="tenant_route('notifications.index', $school)" :active="request()->routeIs('notifications.*')" class="flex items-center">Notifications @if(auth()->user()->unreadNotifications->count() > 0)<span class="ml-auto w-6 min-w-max whitespace-nowrap rounded-full bg-red-500 px-2.5 py-0.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-red-500">{{ auth()->user()->unreadNotifications->count() }}</span>@endif</x-nav-link></li>
                     @endif
-                    @if (auth()->user()->role === 'supervisor')
+                    @if ($activeRole === 'supervisor')
                         <li><x-nav-link :href="tenant_route('supervisor.reviews.index', $school)" :active="request()->routeIs('supervisor.reviews.*')">Review Files</x-nav-link></li>
                     @endif
-                    @if (auth()->user()->role === 'admin')
+                    @if ($activeRole === 'admin')
                         <li><x-nav-link :href="tenant_route('school.admin.users.index', $school)" :active="request()->routeIs('school.admin.users.*')">Manage Users</x-nav-link></li>
                         <li><x-nav-link :href="tenant_route('school.admin.subjects.index', $school)" :active="request()->routeIs('school.admin.subjects.*')">Manage Subjects</x-nav-link></li>
                         <li><x-nav-link :href="tenant_route('school.admin.grades.index', $school)" :active="request()->routeIs('school.admin.grades.*')">Manage Grades</x-nav-link></li>

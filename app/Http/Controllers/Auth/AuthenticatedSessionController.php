@@ -7,8 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Logging\SecurityLogger;
 use App\Models\Network;
 use App\Models\School;
-use App\Providers\RouteServiceProvider;
-use App\Services\TenantContext;
+use App\Services\ActiveContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -142,17 +141,28 @@ class AuthenticatedSessionController extends Controller
                 ->first(fn ($role) => in_array($role, $assignedRoles))
                 ?? $assignedRoles[0];
 
-        TenantContext::setActiveContext($branch->id, $effectiveRole);
+        $ctx = $user->schoolRoles()
+            ->where('school_id', $branch->id)
+            ->first();
 
-        $user->setAttribute('role', $effectiveRole);
+        if ($ctx) {
+            ActiveContext::setSchool($branch->id);
+            ActiveContext::setRole($ctx->role);
+        } else {
+            ActiveContext::setSchool($branch->id);
+            if (! empty($user->role)) {
+                ActiveContext::setRole($user->role);
+            }
+        }
+
+        $user->setAttribute('role', $ctx?->role ?? $effectiveRole);
         $user->setAttribute('school_id', $branch->id);
 
-        // Redirect based on user role
         if ($user->is_super_admin) {
             return redirect()->route('superadmin.dashboard');
         }
 
-        return redirect()->to(tenant_dashboard_route($branch, $user));
+        return redirect()->route('dashboard', [$network, $branch]);
     }
 
     /**
@@ -162,6 +172,8 @@ class AuthenticatedSessionController extends Controller
     {
         // Simply logout without logging (method doesn't exist)
         Auth::guard('web')->logout();
+
+        ActiveContext::clear();
 
         $request->session()->invalidate();
 

@@ -10,15 +10,12 @@ class SchoolUserRole extends Model
 {
     use HasFactory;
 
+    protected $table = 'school_user_roles';
+
     protected $fillable = [
         'user_id',
         'school_id',
         'role',
-        'is_active',
-    ];
-
-    protected $casts = [
-        'is_active' => 'boolean',
     ];
 
     public function user(): BelongsTo

@@ -183,19 +183,30 @@ class User extends Authenticatable
 
     public function schoolRoles(): HasMany
     {
-        return $this->schoolUserRoles();
+        return $this->hasMany(\App\Models\SchoolUserRole::class);
     }
 
     public function schools(): BelongsToMany
     {
         return $this->belongsToMany(School::class, 'school_user_roles')
-            ->withPivot(['role', 'is_active'])
+            ->withPivot('role')
             ->withTimestamps();
     }
 
     public function branches(): BelongsToMany
     {
         return $this->schools();
+    }
+
+    /**
+     * Return all available (school, role) contexts for this user
+     * eager-loaded with school + network.
+     */
+    public function availableContexts()
+    {
+        return $this->schoolRoles()
+            ->with(['school.network'])
+            ->get();
     }
 
     public function assignedSchools(): BelongsToMany
