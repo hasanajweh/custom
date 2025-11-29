@@ -49,19 +49,38 @@ class VerifyTenantAccess
         }
 
         $userSchools = $user?->schoolUserRoles()->pluck('school_id')->toArray();
+        $availableRoles = $user?->schoolUserRoles()
+            ->where('school_id', $school->id)
+            ->pluck('role')
+            ->toArray();
 
-        if (! $user || ! in_array($school->id, $userSchools)) {
+        if (! $user || ! in_array($school->id, $userSchools) || empty($availableRoles)) {
             SecurityLogger::logTenantIsolationBreach(
                 (int) $school->id,
                 $user?->school_id ?? 0,
             );
 
-            abort(403, 'Unauthorized access to this school.');
+            return redirect()
+                ->to(safe_tenant_route('login', $school))
+                ->with('error', __('messages.auth.unauthorized'));
         }
 
-        if ($user && in_array($school->id, $userSchools)) {
-            TenantContext::setActiveContext($school->id, TenantContext::currentRole() ?? $user->role);
+        $activeRole = null;
+        $sessionRole = session('active_role');
+
+        if ($sessionRole && in_array($sessionRole, $availableRoles)) {
+            $activeRole = $sessionRole;
+        } elseif ($user->role && in_array($user->role, $availableRoles)) {
+            $activeRole = $user->role;
+        } else {
+            $activeRole = collect(['admin', 'supervisor', 'teacher'])
+                ->first(fn ($role) => in_array($role, $availableRoles))
+                ?? $availableRoles[0];
         }
+
+        TenantContext::setActiveContext($school->id, $activeRole);
+        $user->setAttribute('role', $activeRole);
+        $user->setAttribute('school_id', $school->id);
 
         return $next($request);
     }
