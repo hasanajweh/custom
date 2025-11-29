@@ -13,52 +13,39 @@ class ContextSwitchController extends Controller
 {
     public function switch(Request $request): RedirectResponse
     {
-        $user = Auth::user();
-        if (! $user) {
+        if (! Auth::check()) {
             abort(403, 'Not authenticated');
         }
 
         $validated = $request->validate([
             'school_id' => 'required|integer|exists:schools,id',
-            'role'      => 'required|string|in:admin,teacher,supervisor',
+            'role' => 'required|string|in:admin,teacher,supervisor',
         ]);
 
+        $user = $request->user();
         $schoolId = (int) $validated['school_id'];
-        $role     = $validated['role'];
+        $role = $validated['role'];
 
-        $hasContext = SchoolUserRole::where('user_id', $user->id)
+        $context = SchoolUserRole::where('user_id', $user->id)
             ->where('school_id', $schoolId)
             ->where('role', $role)
-            ->exists();
+            ->first();
 
-        if (! $hasContext) {
+        if (! $context) {
             abort(403, 'You do not have this role in this school.');
         }
 
-        ActiveContext::setSchool($schoolId);
+        $school = School::with('network')->findOrFail($schoolId);
+
+        ActiveContext::setSchool($school->id);
         ActiveContext::setRole($role);
 
-        $school = School::with('network')->findOrFail($schoolId);
-        $network = $school->network;
+        $target = match ($role) {
+            'admin' => tenant_route('school.admin.dashboard', $school),
+            'teacher' => tenant_route('teacher.dashboard', $school),
+            'supervisor' => tenant_route('supervisor.dashboard', $school),
+        };
 
-        if (! $network) {
-            abort(500, 'School has no network.');
-        }
-
-        switch ($role) {
-            case 'admin':
-                $url = tenant_route('school.admin.dashboard', $school);
-                break;
-            case 'teacher':
-                $url = tenant_route('teacher.dashboard', $school);
-                break;
-            case 'supervisor':
-                $url = tenant_route('supervisor.dashboard', $school);
-                break;
-            default:
-                abort(500, 'Unknown role.');
-        }
-
-        return redirect()->to($url);
+        return redirect()->to($target);
     }
 }

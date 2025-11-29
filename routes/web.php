@@ -198,35 +198,30 @@ Route::prefix('{network:slug}/{branch:slug}')
                 }
 
                 $user = Auth::user();
+
                 if (! $user) {
                     abort(403, 'Not authenticated.');
                 }
 
-                // Determine active context from session or defaults
                 $activeSchool = ActiveContext::getSchool();
-                $activeRole   = ActiveContext::getRole();
 
                 if (! $activeSchool || $activeSchool->id !== $branch->id) {
                     ActiveContext::setSchool($branch->id);
                     $activeSchool = $branch;
                 }
 
-                if (! $activeRole) {
-                    $context = $user->schoolRoles()
-                        ->where('school_id', $branch->id)
-                        ->first();
+                $activeRole = ActiveContext::getRole();
+                $context = $user->schoolRoles()
+                    ->where('school_id', $branch->id)
+                    ->first();
 
-                    if ($context) {
-                        ActiveContext::setRole($context->role);
-                        $activeRole = $context->role;
-                    } else {
-                        if (! empty($user->role)) {
-                            ActiveContext::setRole($user->role);
-                            $activeRole = $user->role;
-                        } else {
-                            abort(403, 'No role assigned for this school.');
-                        }
-                    }
+                if (! $context) {
+                    abort(403, 'No role assigned for this school.');
+                }
+
+                if (! $activeRole || $context->role !== $activeRole) {
+                    ActiveContext::setRole($context->role);
+                    $activeRole = $context->role;
                 }
 
                 return match ($activeRole) {
@@ -237,8 +232,8 @@ Route::prefix('{network:slug}/{branch:slug}')
                 };
             })->name('dashboard');
 
-            Route::post('/context-switch', [ContextSwitchController::class, 'switch'])
-                ->name('tenant.context.switch');
+            Route::post('/switch-context', [ContextSwitchController::class, 'switch'])
+                ->name('tenant.switch.context');
 
             // ===========================
             // PROFILE ROUTES (ALL USERS)

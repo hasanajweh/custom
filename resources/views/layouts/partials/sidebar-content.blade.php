@@ -11,6 +11,8 @@
         $activeRole = $activeContextRole ?? Auth::user()?->role;
     @endphp
     @php
+        $activeRole = $activeRole ?? \App\Services\ActiveContext::getRole();
+
         $dashboardRouteName = $activeRole === 'admin'
             ? 'school.admin.dashboard'
             : 'dashboard';

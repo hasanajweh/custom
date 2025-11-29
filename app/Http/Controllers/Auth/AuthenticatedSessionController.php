@@ -135,27 +135,17 @@ class AuthenticatedSessionController extends Controller
         // Keep user logged in for 30 days (remember me = true)
         Auth::login($user, true);
 
-        $effectiveRole = $user->role && in_array($user->role, $assignedRoles)
-            ? $user->role
-            : collect(['admin', 'supervisor', 'teacher'])
-                ->first(fn ($role) => in_array($role, $assignedRoles))
-                ?? $assignedRoles[0];
-
-        $ctx = $user->schoolRoles()
+        $context = $user->schoolRoles()
             ->where('school_id', $branch->id)
             ->first();
 
-        if ($ctx) {
+        if ($context) {
             ActiveContext::setSchool($branch->id);
-            ActiveContext::setRole($ctx->role);
-        } else {
-            ActiveContext::setSchool($branch->id);
-            if (! empty($user->role)) {
-                ActiveContext::setRole($user->role);
-            }
+            ActiveContext::setRole($context->role);
+
+            $user->setAttribute('role', $context->role);
         }
 
-        $user->setAttribute('role', $ctx?->role ?? $effectiveRole);
         $user->setAttribute('school_id', $branch->id);
 
         if ($user->is_super_admin) {

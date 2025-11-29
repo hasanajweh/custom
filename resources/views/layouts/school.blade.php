@@ -11,7 +11,27 @@
         $network = $network ?? request()->route('network') ?? $school?->network ?? auth()->user()?->network;
 
         $currentSchool = \App\Services\ActiveContext::getSchool();
-        $currentRole = \App\Services\ActiveContext::getRole() ?? auth()->user()?->role;
+        $currentRole = \App\Services\ActiveContext::getRole();
+
+        if (! $currentSchool && $school) {
+            \App\Services\ActiveContext::setSchool($school->id);
+            $currentSchool = $school;
+        }
+
+        if (! $currentRole && auth()->user()) {
+            $context = auth()->user()->schoolUserRoles()
+                ->where('school_id', $school?->id)
+                ->first();
+
+            if ($context) {
+                \App\Services\ActiveContext::setRole($context->role);
+                $currentRole = $context->role;
+            }
+        }
+
+        $availableContexts = auth()->user()?->availableContexts();
+        $activeContextSchool = $currentSchool;
+        $activeContextRole = $currentRole;
 
         $schoolName = $school?->name ?? config('app.name');
         $schoolSlug = $school?->slug ?? '';
@@ -1171,7 +1191,7 @@
                             class="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}"
                             aria-label="{{ __('messages.navigation.open_user_menu') }}">
                         @php
-                            $role = strtolower($currentRole ?? Auth::user()->role);
+                            $role = strtolower($currentRole ?? '');
                             $bgColors = [
                                 'teacher' => 'bg-blue-600',
                                 'supervisor' => 'bg-indigo-600',
@@ -1235,7 +1255,7 @@
                                         $networkCtx = $schoolCtx?->network;
                                     @endphp
                                     @if($schoolCtx && $networkCtx)
-                                        <form method="POST" action="{{ route('tenant.context.switch', ['network' => $networkCtx->slug, 'branch' => $schoolCtx->slug]) }}" class="w-full">
+                                        <form method="POST" action="{{ route('tenant.switch.context', ['network' => $networkCtx->slug, 'branch' => $schoolCtx->slug]) }}" class="w-full">
                                             @csrf
                                             <input type="hidden" name="school_id" value="{{ $schoolCtx->id }}">
                                             <input type="hidden" name="role" value="{{ $ctx->role }}">
@@ -1273,7 +1293,7 @@
                                 <span>{{ __('messages.navigation.profile') }}</span>
                             </a>
 
-                            @if(Auth::user()->role === 'admin')
+                            @if($currentRole === 'admin')
                                 <a href="{{ tenant_route('school.admin.activity-logs.index', $school) }}"
                                    class="dropdown-item">
                                     <i class="ri-history-line text-indigo-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
@@ -1315,112 +1335,17 @@
     </div>
 
     <div class="sidebar-content">
-        <nav class="space-y-1">
-            @php
-                $networkSlug = $networkSlug ?? auth()->user()?->network?->slug;
-                $dashboardUrl = $isMainAdmin
-                    ? ($networkSlug ? route('main-admin.dashboard', ['network' => $networkSlug]) : '#')
-                    : ($hasTenantContext
-                        ? (Auth::user()->role === 'admin'
-                            ? tenant_route('school.admin.dashboard', $school)
-                            : tenant_route('dashboard', $school))
-                        : '#');
-            @endphp
-            <a href="{{ $dashboardUrl }}"
-               class="sidebar-item {{ request()->routeIs('dashboard') || request()->routeIs('main-admin.dashboard') || request()->routeIs('school.admin.dashboard') ? 'active' : '' }}">
-                <i class="ri-dashboard-3-line"></i>
-                <span class="sidebar-text">{{ __('messages.navigation.dashboard') }}</span>
-            </span></a>
+        @php($activeSidebarRole = $currentRole)
 
-            @if($isMainAdmin)
-                <div class="sidebar-divider">
-                    <div class="sidebar-divider-line"></div>
-                    <div class="sidebar-divider-title">
-                        {{ __('messages.main_admin.navigation.section') }}
-                    </div>
-                </div>
-
-                <a href="{{ $networkSlug ? route('main-admin.users.index', ['network' => $networkSlug]) : '#' }}"
-                   class="sidebar-item {{ request()->routeIs('main-admin.users.*') ? 'active' : '' }}">
-                    <i class="ri-team-line"></i>
-                    <span class="sidebar-text">{{ __('messages.main_admin.navigation.users') }}</span>
-                </span></a>
-
-                <a href="{{ $networkSlug ? route('main-admin.hierarchy', ['network' => $networkSlug]) : '#' }}"
-                   class="sidebar-item {{ request()->routeIs('main-admin.hierarchy') ? 'active' : '' }}">
-                    <i class="ri-git-branch-line"></i>
-                    <span class="sidebar-text">{{ __('messages.main_admin.navigation.hierarchy') }}</span>
-                </span></a>
-
-                <a href="{{ $networkSlug ? route('main-admin.subjects-grades', ['network' => $networkSlug]) : '#' }}"
-                   class="sidebar-item {{ request()->routeIs('main-admin.subjects-grades*') ? 'active' : '' }}">
-                    <i class="ri-book-2-line"></i>
-                    <span class="sidebar-text">{{ __('messages.main_admin.navigation.subjects_grades') }}</span>
-                </span></a>
-            @elseif($hasTenantContext && Auth::user()->role === 'admin')
-                <a href="{{ tenant_route('school.admin.users.index', $school) }}"
-                   class="sidebar-item {{ request()->routeIs('school.admin.users.*') ? 'active' : '' }}">
-                    <i class="ri-team-line"></i>
-                    <span class="sidebar-text">{{ __('messages.navigation.manage_users') }}</span>
-                </span></a>
-
-                <a href="{{ tenant_route('school.admin.subjects.index', $school) }}"
-                   class="sidebar-item {{ request()->routeIs('school.admin.subjects.*') ? 'active' : '' }}">
-                    <i class="ri-book-2-line"></i>
-                    <span class="sidebar-text">{{ __('messages.navigation.subjects') }}</span>
-                </span></a>
-
-                <a href="{{ tenant_route('school.admin.grades.index', $school) }}"
-                   class="sidebar-item {{ request()->routeIs('school.admin.grades.*') ? 'active' : '' }}">
-                    <i class="ri-graduation-cap-line"></i>
-                    <span class="sidebar-text">{{ __('messages.navigation.grades') }}</span>
-                </span></a>
-
-                <a href="{{ tenant_route('school.admin.file-browser.index', $school) }}"
-                   class="sidebar-item {{ request()->routeIs('school.admin.file-browser.*') ? 'active' : '' }}">
-                    <i class="ri-folder-3-line"></i>
-                    <span class="sidebar-text">{{ __('messages.navigation.file_browser') }}</span>
-                </span></a>
-
-                <a href="{{ tenant_route('school.admin.plans.index', $school) }}"
-                   class="sidebar-item {{ request()->routeIs('school.admin.plans.*') ? 'active' : '' }}">
-                    <i class="ri-calendar-check-line"></i>
-                    <span class="sidebar-text">{{ __('messages.navigation.plans') }}</span>
-                </span></a>
-
-                <a href="{{ tenant_route('school.admin.supervisors.index', $school) }}"
-                   class="sidebar-item {{ request()->routeIs('school.admin.supervisors.*') ? 'active' : '' }}">
-                    <i class="ri-user-star-line"></i>
-                    <span class="sidebar-text">{{ __('messages.navigation.supervisors') }}</span>
-                </span></a>
-
-            @elseif($hasTenantContext && Auth::user()->role === 'teacher')
-                <a href="{{ tenant_route('teacher.files.index', $school) }}"
-                   class="sidebar-item {{ request()->routeIs('teacher.files.index') || request()->routeIs('teacher.files.show') ? 'active' : '' }}">
-                    <i class="ri-file-list-3-line"></i>
-                    <span class="sidebar-text">{{ __('messages.navigation.my_files') }}</span>
-                </span></a>
-
-                <a href="{{ tenant_route('teacher.files.create', $school) }}"
-                   class="sidebar-item {{ request()->routeIs('teacher.files.create') ? 'active' : '' }}">
-                    <i class="ri-upload-cloud-2-line"></i>
-                    <span class="sidebar-text">{{ __('messages.navigation.upload_file') }}</span>
-                </span></a>
-
-            @elseif($hasTenantContext && Auth::user()->role === 'supervisor')
-                <a href="{{ tenant_route('supervisor.reviews.index', $school) }}"
-                   class="sidebar-item {{ request()->routeIs('supervisor.reviews.*') ? 'active' : '' }}">
-                    <i class="ri-file-search-line"></i>
-                    <span class="sidebar-text">{{ __('messages.navigation.review_files') }}</span>
-                </span></a>
-
-                <a href="{{ tenant_route('supervisor.files.create', $school) }}"
-                   class="sidebar-item {{ request()->routeIs('supervisor.files.create') ? 'active' : '' }}">
-                    <i class="ri-upload-cloud-2-line"></i>
-                    <span class="sidebar-text">{{ __('messages.navigation.upload_file') }}</span>
-                </span></a>
-            @endif
-        </nav>
+        @if($isMainAdmin)
+            @include('layouts.partials.admin-sidebar')
+        @elseif($hasTenantContext && $activeSidebarRole === 'admin')
+            @include('layouts.partials.admin-sidebar')
+        @elseif($hasTenantContext && $activeSidebarRole === 'teacher')
+            @include('layouts.partials.teacher-sidebar')
+        @elseif($hasTenantContext && $activeSidebarRole === 'supervisor')
+            @include('layouts.partials.supervisor-sidebar')
+        @endif
 
         <!-- Mobile Language Switcher (Moved here) -->
         <div class="mobile-language-switcher">
