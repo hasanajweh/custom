@@ -198,39 +198,41 @@ Route::prefix('{network:slug}/{branch:slug}')
                     abort(404, 'Access denied to this network.');
                 }
 
-                $role = session('active_role');
+                $user = Auth::user();
 
-                if (! $role) {
-                    $roles = SchoolUserRole::where('user_id', Auth::id())
-                        ->where('school_id', $branch->id)
-                        ->pluck('role')
-                        ->toArray();
+                $availableRoles = SchoolUserRole::where('user_id', $user->id)
+                    ->where('school_id', $branch->id)
+                    ->pluck('role')
+                    ->toArray();
 
-                    if (in_array('admin', $roles)) {
-                        $role = 'admin';
-                    } elseif (in_array('supervisor', $roles)) {
-                        $role = 'supervisor';
-                    } elseif (in_array('teacher', $roles)) {
-                        $role = 'teacher';
-                    }
-
-                    if ($role) {
-                        session([
-                            'active_school_id' => $branch->id,
-                            'active_role' => $role,
-                        ]);
-                    }
+                if (empty($availableRoles)) {
+                    return redirect()
+                        ->to(safe_tenant_route('logout', $branch))
+                        ->with('error', __('messages.auth.unauthorized'));
                 }
 
-                if (! $role) {
-                    abort(403, 'Invalid user role.');
+                $role = null;
+                $preferredRole = session('active_role');
+
+                if ($preferredRole && in_array($preferredRole, $availableRoles)) {
+                    $role = $preferredRole;
+                } elseif ($user->role && in_array($user->role, $availableRoles)) {
+                    $role = $user->role;
+                } else {
+                    $role = collect(['admin', 'supervisor', 'teacher'])
+                        ->first(fn ($candidate) => in_array($candidate, $availableRoles))
+                        ?? $availableRoles[0];
                 }
+
+                TenantContext::setActiveContext($branch->id, $role);
+                $user->setAttribute('role', $role);
+                $user->setAttribute('school_id', $branch->id);
 
                 return match($role) {
                     'admin' => redirect()->to(tenant_route('school.admin.dashboard', $branch)),
                     'teacher' => redirect()->to(tenant_route('teacher.dashboard', $branch)),
                     'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $branch)),
-                    default => abort(403, 'Invalid user role.')
+                    default => redirect()->to(tenant_route('dashboard', $branch)),
                 };
             })->name('dashboard');
 

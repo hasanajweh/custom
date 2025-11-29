@@ -1214,6 +1214,61 @@
                             </div>
                         </div>
 
+                        @php
+                            $contexts = Auth::user()->schoolUserRoles()
+                                ->with('school')
+                                ->get()
+                                ->map(fn($r) => [
+                                    'school_id' => $r->school->id,
+                                    'school_name' => $r->school->name,
+                                    'role' => $r->role,
+                                ]);
+                        @endphp
+
+                        @if($contexts->count() > 1)
+                        <div class="mt-2 px-3 py-2 rounded bg-slate-100">
+                            <label class="block text-sm mb-1 text-slate-600">
+                                @lang('messages.switch_context')
+                            </label>
+                            <form id="context-switcher-form" method="POST" action="{{ route('tenant.context.switch') }}">
+                                @csrf
+                                <input type="hidden" name="school_id" id="switch-school-id">
+                                <input type="hidden" name="role" id="switch-role">
+                                <select id="context-switcher"
+                                        class="w-full rounded border-slate-300 text-sm"
+                                        onchange="switchContext()">
+                                    <option value="">-- Select --</option>
+                                    @foreach($contexts as $ctx)
+                                        <option
+                                            data-school="{{ $ctx['school_id'] }}"
+                                            data-role="{{ $ctx['role'] }}"
+                                            value="{{ $ctx['school_id'] }}|{{ $ctx['role'] }}"
+                                            @if(session('active_school_id') == $ctx['school_id'] && session('active_role') == $ctx['role']) selected @endif
+                                        >
+                                            {{ $ctx['school_name'] }} — @lang('messages.roles.' . $ctx['role'])
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </form>
+                        </div>
+
+                        <script>
+                        function switchContext() {
+                            const selector = document.getElementById('context-switcher');
+                            const option = selector.options[selector.selectedIndex];
+
+                            if (!option || !option.dataset.school) {
+                                return;
+                            }
+
+                            document.getElementById('switch-school-id').value = option.dataset.school;
+                            document.getElementById('switch-role').value = option.dataset.role;
+
+                            document.getElementById('context-switcher-form').submit();
+                        }
+                        </script>
+                        @endif
+
                         <!-- Menu Items -->
                         <div class="py-1">
                             @php

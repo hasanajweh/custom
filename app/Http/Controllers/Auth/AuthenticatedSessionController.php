@@ -8,6 +8,7 @@ use App\Logging\SecurityLogger;
 use App\Models\Network;
 use App\Models\School;
 use App\Providers\RouteServiceProvider;
+use App\Services\TenantContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -70,8 +71,13 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('main-admin.dashboard', ['network' => $user->network?->slug]);
         }
 
+        $assignedRoles = $user->schoolUserRoles()
+            ->where('school_id', $branch->id)
+            ->pluck('role')
+            ->toArray();
+
         // Check if user belongs to this school
-        if ($user->school_id !== $branch->id) {
+        if (empty($assignedRoles)) {
             SecurityLogger::logTenantIsolationBreach($branch->id, $user->school_id);
             Auth::logout();
 
@@ -129,6 +135,17 @@ class AuthenticatedSessionController extends Controller
 
         // Keep user logged in for 30 days (remember me = true)
         Auth::login($user, true);
+
+        $effectiveRole = $user->role && in_array($user->role, $assignedRoles)
+            ? $user->role
+            : collect(['admin', 'supervisor', 'teacher'])
+                ->first(fn ($role) => in_array($role, $assignedRoles))
+                ?? $assignedRoles[0];
+
+        TenantContext::setActiveContext($branch->id, $effectiveRole);
+
+        $user->setAttribute('role', $effectiveRole);
+        $user->setAttribute('school_id', $branch->id);
 
         // Redirect based on user role
         if ($user->is_super_admin) {

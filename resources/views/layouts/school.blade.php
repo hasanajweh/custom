@@ -1239,41 +1239,41 @@
                             <label class="block text-sm mb-1 text-slate-600">
                                 @lang('messages.switch_context')
                             </label>
-                            <select id="context-switcher" 
-                                    class="w-full rounded border-slate-300 text-sm"
-                                    onchange="switchContext()">
-                                <option value="">-- Select --</option>
-                                @foreach($contexts as $ctx)
-                                    <option 
-                                        value="{{ json_encode($ctx) }}"
-                                        @if(session('active_school_id') == $ctx['school_id'] && session('active_role') == $ctx['role']) selected @endif
-                                    >
-                                        {{ $ctx['school_name'] }} — @lang('messages.roles.' . $ctx['role'])
-                                    </option>
-                                @endforeach
-                            </select>
+                            <form id="context-switcher-form" method="POST" action="{{ route('tenant.context.switch') }}">
+                                @csrf
+                                <input type="hidden" name="school_id" id="switch-school-id">
+                                <input type="hidden" name="role" id="switch-role">
+                                <select id="context-switcher"
+                                        class="w-full rounded border-slate-300 text-sm"
+                                        onchange="switchContext()">
+                                    <option value="">-- Select --</option>
+                                    @foreach($contexts as $ctx)
+                                        <option
+                                            data-school="{{ $ctx['school_id'] }}"
+                                            data-role="{{ $ctx['role'] }}"
+                                            value="{{ $ctx['school_id'] }}|{{ $ctx['role'] }}"
+                                            @if(session('active_school_id') == $ctx['school_id'] && session('active_role') == $ctx['role']) selected @endif
+                                        >
+                                            {{ $ctx['school_name'] }} — @lang('messages.roles.' . $ctx['role'])
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </form>
                         </div>
 
                         <script>
                         function switchContext() {
-                            let data = document.getElementById("context-switcher").value;
-                            if (!data) return;
-                            let ctx = JSON.parse(data);
+                            const selector = document.getElementById('context-switcher');
+                            const option = selector.options[selector.selectedIndex];
 
-                            fetch("{{ route('tenant.context.switch') }}", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                                },
-                                body: JSON.stringify(ctx)
-                            })
-                            .then(r => r.json())
-                            .then(res => {
-                                if (res.redirect) {
-                                    window.location.href = res.redirect;
-                                }
-                            });
+                            if (!option || !option.dataset.school) {
+                                return;
+                            }
+
+                            document.getElementById('switch-school-id').value = option.dataset.school;
+                            document.getElementById('switch-role').value = option.dataset.role;
+
+                            document.getElementById('context-switcher-form').submit();
                         }
                         </script>
                         @endif

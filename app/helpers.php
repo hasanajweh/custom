@@ -3,6 +3,7 @@
 use App\Models\Branch;
 use App\Models\Network;
 use App\Models\School;
+use App\Services\TenantContext;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -199,16 +200,19 @@ if (!function_exists('tenant_dashboard_route')) {
     function tenant_dashboard_route($school, $user = null, array $parameters = [], bool $absolute = true): string
     {
         $user = $user ?: auth()->user();
+        $resolvedSchool = $school ?: TenantContext::currentSchool();
 
         if (! $user) {
-            return tenant_route('dashboard', $school, $parameters, $absolute);
+            return tenant_route('dashboard', $resolvedSchool, $parameters, $absolute);
         }
 
-        return match ($user->role) {
-            'admin' => tenant_route('school.admin.dashboard', $school, $parameters, $absolute),
-            'teacher' => tenant_route('teacher.dashboard', $school, $parameters, $absolute),
-            'supervisor' => tenant_route('supervisor.dashboard', $school, $parameters, $absolute),
-            default => tenant_route('dashboard', $school, $parameters, $absolute),
+        $role = TenantContext::currentRole() ?? $user->role;
+
+        return match ($role) {
+            'admin' => tenant_route('school.admin.dashboard', $resolvedSchool, $parameters, $absolute),
+            'teacher' => tenant_route('teacher.dashboard', $resolvedSchool, $parameters, $absolute),
+            'supervisor' => tenant_route('supervisor.dashboard', $resolvedSchool, $parameters, $absolute),
+            default => tenant_route('dashboard', $resolvedSchool, $parameters, $absolute),
         };
     }
 }
