@@ -1032,6 +1032,10 @@ return [
         'super_admin' => 'Super Admin',
     ],
 
+    'role_admin' => 'Branch Admin',
+    'role_teacher' => 'Teacher',
+    'role_supervisor' => 'Supervisor',
+
     // File Types & Extensions
     'file_types' => [
         'pdf' => 'PDF Document',

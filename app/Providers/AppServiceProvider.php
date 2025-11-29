@@ -11,6 +11,8 @@ use App\Listeners\LogFailedLogin;
 use App\Listeners\LogSuccessfulLogin;
 use App\Models\School;               // <-- Add this import
 use App\Services\CacheService;
+use Illuminate\Support\Facades\Auth;
+use App\Services\ActiveContext;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -45,6 +47,18 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             if (app()->has(School::class)) {
                 $view->with('school', app(School::class));
+            }
+
+            $user = Auth::user();
+
+            if ($user) {
+                $contexts = $user->availableContexts();
+                $activeSchool = ActiveContext::getSchool();
+                $activeRole   = ActiveContext::getRole();
+
+                $view->with('availableContexts', $contexts);
+                $view->with('activeContextSchool', $activeSchool);
+                $view->with('activeContextRole', $activeRole);
             }
         });
         

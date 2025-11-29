@@ -4,8 +4,8 @@ namespace App\Http\Middleware;
 
 use App\Logging\SecurityLogger;
 use App\Models\Network;
+use App\Models\SchoolUserRole;
 use App\Support\SchoolResolver;
-use App\Services\TenantContext;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,8 +20,6 @@ class VerifyTenantAccess
         $school = SchoolResolver::resolve($schoolParam);
         $network = $request->route('network');
         $user = $request->user();
-        $activeSchoolId = session('active_school_id');
-        $activeRole = session('active_role');
 
         // If no school in route, continue
         if (! $school) {
@@ -63,46 +61,13 @@ class VerifyTenantAccess
                 ->with('error', __('messages.auth.unauthorized'));
         }
 
-        $effectiveSchoolId = null;
+        $hasContext = SchoolUserRole::where('user_id', $user?->id)
+            ->where('school_id', $school?->id)
+            ->exists();
 
-        if ($activeSchoolId && in_array($activeSchoolId, $userSchools ?? [])) {
-            $effectiveSchoolId = $activeSchoolId;
-        } elseif ($school && in_array($school->id, $userSchools ?? [])) {
-            $effectiveSchoolId = $school->id;
-        } elseif ($user?->school_id && in_array($user->school_id, $userSchools ?? [])) {
-            $effectiveSchoolId = $user->school_id;
-        } elseif (! empty($userSchools)) {
-            $effectiveSchoolId = $userSchools[0];
+        if (! $hasContext && $user?->school_id !== ($school?->id)) {
+            abort(403, 'Access denied to this school.');
         }
-
-        if (! $effectiveSchoolId) {
-            return redirect()
-                ->to(route('login'))
-                ->with('error', __('messages.auth.unauthorized'));
-        }
-
-        $availableRoles = $user?->schoolUserRoles()
-            ->where('school_id', $effectiveSchoolId)
-            ->pluck('role')
-            ->toArray();
-
-        if (empty($availableRoles)) {
-            return redirect()
-                ->to(route('login'))
-                ->with('error', __('messages.auth.unauthorized'));
-        }
-
-        if ($activeRole && in_array($activeRole, $availableRoles)) {
-            $resolvedRole = $activeRole;
-        } elseif ($user?->role && in_array($user->role, $availableRoles)) {
-            $resolvedRole = $user->role;
-        } else {
-            $resolvedRole = collect(['admin', 'supervisor', 'teacher'])
-                ->first(fn ($role) => in_array($role, $availableRoles))
-                ?? $availableRoles[0];
-        }
-
-        TenantContext::setActiveContext($effectiveSchoolId, $resolvedRole);
 
         return $next($request);
     }

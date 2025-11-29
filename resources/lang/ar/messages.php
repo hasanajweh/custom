@@ -1039,6 +1039,10 @@ return [
         'super_admin' => 'المدير العام',
     ],
 
+    'role_admin' => 'مدير الفرع',
+    'role_teacher' => 'معلم',
+    'role_supervisor' => 'مشرف',
+
     // File Types & Extensions
     'file_types' => [
         'pdf' => 'مستند PDF',

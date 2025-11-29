@@ -3,7 +3,7 @@
 use App\Models\Branch;
 use App\Models\Network;
 use App\Models\School;
-use App\Services\TenantContext;
+use App\Services\ActiveContext;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -210,13 +210,13 @@ if (!function_exists('tenant_dashboard_route')) {
     function tenant_dashboard_route($school, $user = null, array $parameters = [], bool $absolute = true): string
     {
         $user = $user ?: auth()->user();
-        $resolvedSchool = $school ?: TenantContext::currentSchool();
+        $resolvedSchool = $school ?: ActiveContext::getSchool();
 
         if (! $user) {
             return tenant_route('dashboard', $resolvedSchool, $parameters, $absolute);
         }
 
-        $role = TenantContext::currentRole() ?? $user->role;
+        $role = ActiveContext::getRole() ?? $user->role;
 
         return match ($role) {
             'admin' => tenant_route('school.admin.dashboard', $resolvedSchool, $parameters, $absolute),

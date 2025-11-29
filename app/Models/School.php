@@ -50,10 +50,15 @@ class School extends Model
         return $this->schoolUserRoles();
     }
 
+    public function schoolRoles(): HasMany
+    {
+        return $this->hasMany(SchoolUserRole::class, 'school_id');
+    }
+
     public function assignedUsers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'school_user_roles')
-            ->withPivot(['role', 'is_active'])
+            ->withPivot(['role'])
             ->withTimestamps();
     }
 

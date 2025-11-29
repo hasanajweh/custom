@@ -34,11 +34,10 @@ use App\Http\Controllers\MainAdmin\DashboardController as MainAdminDashboardCont
 use App\Http\Controllers\MainAdmin\HierarchyController;
 use App\Http\Controllers\MainAdmin\SubjectsGradesController;
 use App\Http\Controllers\MainAdmin\UserController as MainAdminUserController;
-use App\Http\Controllers\SwitchContextController;
+use App\Http\Controllers\ContextSwitchController;
 use App\Models\Network;
 use App\Models\School;
-use App\Models\SchoolUserRole;
-use App\Services\TenantContext;
+use App\Services\ActiveContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -55,10 +54,6 @@ use Illuminate\Support\Facades\App;
 // ===========================
 
 Route::post('/set-locale', [LanguageController::class, 'update'])->name('locale.update');
-
-Route::post('/switch-context', [SwitchContextController::class, 'switch'])
-    ->middleware(['auth'])
-    ->name('context.switch');
 
 // ===========================
 // SUPER ADMIN ROUTES
@@ -203,40 +198,47 @@ Route::prefix('{network:slug}/{branch:slug}')
                 }
 
                 $user = Auth::user();
-
-                $availableRoles = SchoolUserRole::where('user_id', $user->id)
-                    ->where('school_id', $branch->id)
-                    ->pluck('role')
-                    ->toArray();
-
-                if (empty($availableRoles)) {
-                    return redirect()
-                        ->to(safe_tenant_route('logout', $branch))
-                        ->with('error', __('messages.auth.unauthorized'));
+                if (! $user) {
+                    abort(403, 'Not authenticated.');
                 }
 
-                $effectiveRole = session('active_role', $user->role);
-                $effectiveSchool = session('active_school_id', $user->school_id) ?? $branch->id;
+                // Determine active context from session or defaults
+                $activeSchool = ActiveContext::getSchool();
+                $activeRole   = ActiveContext::getRole();
 
-                if ($effectiveSchool !== $branch->id) {
-                    $effectiveSchool = $branch->id;
+                if (! $activeSchool || $activeSchool->id !== $branch->id) {
+                    ActiveContext::setSchool($branch->id);
+                    $activeSchool = $branch;
                 }
 
-                if (! in_array($effectiveRole, $availableRoles)) {
-                    $effectiveRole = collect(['admin', 'supervisor', 'teacher'])
-                        ->first(fn ($candidate) => in_array($candidate, $availableRoles))
-                        ?? $availableRoles[0];
+                if (! $activeRole) {
+                    $context = $user->schoolRoles()
+                        ->where('school_id', $branch->id)
+                        ->first();
+
+                    if ($context) {
+                        ActiveContext::setRole($context->role);
+                        $activeRole = $context->role;
+                    } else {
+                        if (! empty($user->role)) {
+                            ActiveContext::setRole($user->role);
+                            $activeRole = $user->role;
+                        } else {
+                            abort(403, 'No role assigned for this school.');
+                        }
+                    }
                 }
 
-                session(['active_role' => $effectiveRole, 'active_school_id' => $effectiveSchool]);
-
-                return match($effectiveRole) {
+                return match ($activeRole) {
                     'admin' => redirect()->to(tenant_route('school.admin.dashboard', $branch)),
                     'teacher' => redirect()->to(tenant_route('teacher.dashboard', $branch)),
                     'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $branch)),
-                    default => abort(403, 'Invalid role'),
+                    default => abort(403, 'Invalid user role.')
                 };
             })->name('dashboard');
+
+            Route::post('/context-switch', [ContextSwitchController::class, 'switch'])
+                ->name('tenant.context.switch');
 
             // ===========================
             // PROFILE ROUTES (ALL USERS)

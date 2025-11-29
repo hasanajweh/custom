@@ -1,8 +1,12 @@
 <?php
+
 namespace App\Http\Middleware;
+
+use App\Services\ActiveContext;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+
 class EnsureUserHasRole
 {
     /**
@@ -16,6 +20,11 @@ class EnsureUserHasRole
             abort(403);
         }
 
+        $activeRole = ActiveContext::getRole();
+
+        if (! $activeRole) {
+            $activeRole = $user->role;
+        }
 
         $allowedRoles = $this->normalizeRoles($roles);
 
@@ -23,13 +32,14 @@ class EnsureUserHasRole
             return $next($request);
         }
 
-        if (empty($allowedRoles) || ! in_array($user->role, $allowedRoles, true)) {
-            abort(403);
+        if (empty($allowedRoles) || ! in_array($activeRole, $allowedRoles, true)) {
+            abort(403, 'You do not have the required role for this context.');
         }
+
         return $next($request);
     }
 
-     /**
+    /**
      * Normalize the accepted roles into a flat array.
      *
      * @param  array<int, string>  $roles
