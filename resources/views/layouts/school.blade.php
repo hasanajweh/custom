@@ -1239,43 +1239,22 @@
                             <label class="block text-sm mb-1 text-slate-600">
                                 @lang('messages.switch_context')
                             </label>
-                            <form id="context-switcher-form" method="POST" action="{{ route('tenant.context.switch') }}">
-                                @csrf
-                                <input type="hidden" name="school_id" id="switch-school-id">
-                                <input type="hidden" name="role" id="switch-role">
-                                <select id="context-switcher"
-                                        class="w-full rounded border-slate-300 text-sm"
-                                        onchange="switchContext()">
-                                    <option value="">-- Select --</option>
-                                    @foreach($contexts as $ctx)
-                                        <option
-                                            data-school="{{ $ctx['school_id'] }}"
-                                            data-role="{{ $ctx['role'] }}"
-                                            value="{{ $ctx['school_id'] }}|{{ $ctx['role'] }}"
-                                            @if(session('active_school_id') == $ctx['school_id'] && session('active_role') == $ctx['role']) selected @endif
-                                        >
-                                            {{ $ctx['school_name'] }} — @lang('messages.roles.' . $ctx['role'])
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </form>
+                            <div class="space-y-2">
+                                @foreach($contexts as $ctx)
+                                    <form method="POST" action="{{ route('context.switch') }}" class="w-full">
+                                        @csrf
+                                        <input type="hidden" name="school_id" value="{{ $ctx['school_id'] }}">
+                                        <input type="hidden" name="role" value="{{ $ctx['role'] }}">
+                                        <button type="submit" class="w-full text-left px-3 py-2 rounded border border-slate-200 bg-white hover:bg-slate-50 text-sm flex justify-between items-center">
+                                            <span>{{ $ctx['school_name'] }} ({{ $ctx['role'] }})</span>
+                                            @if(session('active_school_id') == $ctx['school_id'] && session('active_role') == $ctx['role'])
+                                                <span class="text-xs text-green-600">@lang('messages.current')</span>
+                                            @endif
+                                        </button>
+                                    </form>
+                                @endforeach
+                            </div>
                         </div>
-
-                        <script>
-                        function switchContext() {
-                            const selector = document.getElementById('context-switcher');
-                            const option = selector.options[selector.selectedIndex];
-
-                            if (!option || !option.dataset.school) {
-                                return;
-                            }
-
-                            document.getElementById('switch-school-id').value = option.dataset.school;
-                            document.getElementById('switch-role').value = option.dataset.role;
-
-                            document.getElementById('context-switcher-form').submit();
-                        }
-                        </script>
                         @endif
 
                         <!-- Menu Items -->

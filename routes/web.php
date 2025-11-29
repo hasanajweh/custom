@@ -34,7 +34,7 @@ use App\Http\Controllers\MainAdmin\DashboardController as MainAdminDashboardCont
 use App\Http\Controllers\MainAdmin\HierarchyController;
 use App\Http\Controllers\MainAdmin\SubjectsGradesController;
 use App\Http\Controllers\MainAdmin\UserController as MainAdminUserController;
-use App\Http\Controllers\Tenant\ContextSwitchController;
+use App\Http\Controllers\SwitchContextController;
 use App\Models\Network;
 use App\Models\School;
 use App\Models\SchoolUserRole;
@@ -55,6 +55,10 @@ use Illuminate\Support\Facades\App;
 // ===========================
 
 Route::post('/set-locale', [LanguageController::class, 'update'])->name('locale.update');
+
+Route::post('/switch-context', [SwitchContextController::class, 'switch'])
+    ->middleware(['auth'])
+    ->name('context.switch');
 
 // ===========================
 // SUPER ADMIN ROUTES
@@ -211,33 +215,28 @@ Route::prefix('{network:slug}/{branch:slug}')
                         ->with('error', __('messages.auth.unauthorized'));
                 }
 
-                $role = null;
-                $preferredRole = session('active_role');
+                $effectiveRole = session('active_role', $user->role);
+                $effectiveSchool = session('active_school_id', $user->school_id) ?? $branch->id;
 
-                if ($preferredRole && in_array($preferredRole, $availableRoles)) {
-                    $role = $preferredRole;
-                } elseif ($user->role && in_array($user->role, $availableRoles)) {
-                    $role = $user->role;
-                } else {
-                    $role = collect(['admin', 'supervisor', 'teacher'])
+                if ($effectiveSchool !== $branch->id) {
+                    $effectiveSchool = $branch->id;
+                }
+
+                if (! in_array($effectiveRole, $availableRoles)) {
+                    $effectiveRole = collect(['admin', 'supervisor', 'teacher'])
                         ->first(fn ($candidate) => in_array($candidate, $availableRoles))
                         ?? $availableRoles[0];
                 }
 
-                TenantContext::setActiveContext($branch->id, $role);
-                $user->setAttribute('role', $role);
-                $user->setAttribute('school_id', $branch->id);
+                session(['active_role' => $effectiveRole, 'active_school_id' => $effectiveSchool]);
 
-                return match($role) {
+                return match($effectiveRole) {
                     'admin' => redirect()->to(tenant_route('school.admin.dashboard', $branch)),
                     'teacher' => redirect()->to(tenant_route('teacher.dashboard', $branch)),
                     'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $branch)),
-                    default => redirect()->to(tenant_route('dashboard', $branch)),
+                    default => abort(403, 'Invalid role'),
                 };
             })->name('dashboard');
-
-            Route::post('/context-switch', [ContextSwitchController::class, 'switch'])
-                ->name('tenant.context.switch');
 
             // ===========================
             // PROFILE ROUTES (ALL USERS)

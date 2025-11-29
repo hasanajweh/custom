@@ -20,6 +20,8 @@ class VerifyTenantAccess
         $school = SchoolResolver::resolve($schoolParam);
         $network = $request->route('network');
         $user = $request->user();
+        $activeSchoolId = session('active_school_id');
+        $activeRole = session('active_role');
 
         // If no school in route, continue
         if (! $school) {
@@ -49,12 +51,8 @@ class VerifyTenantAccess
         }
 
         $userSchools = $user?->schoolUserRoles()->pluck('school_id')->toArray();
-        $availableRoles = $user?->schoolUserRoles()
-            ->where('school_id', $school->id)
-            ->pluck('role')
-            ->toArray();
 
-        if (! $user || ! in_array($school->id, $userSchools) || empty($availableRoles)) {
+        if ($school && (! $user || ! in_array($school->id, $userSchools))) {
             SecurityLogger::logTenantIsolationBreach(
                 (int) $school->id,
                 $user?->school_id ?? 0,
@@ -65,22 +63,46 @@ class VerifyTenantAccess
                 ->with('error', __('messages.auth.unauthorized'));
         }
 
-        $activeRole = null;
-        $sessionRole = session('active_role');
+        $effectiveSchoolId = null;
 
-        if ($sessionRole && in_array($sessionRole, $availableRoles)) {
-            $activeRole = $sessionRole;
-        } elseif ($user->role && in_array($user->role, $availableRoles)) {
-            $activeRole = $user->role;
+        if ($activeSchoolId && in_array($activeSchoolId, $userSchools ?? [])) {
+            $effectiveSchoolId = $activeSchoolId;
+        } elseif ($school && in_array($school->id, $userSchools ?? [])) {
+            $effectiveSchoolId = $school->id;
+        } elseif ($user?->school_id && in_array($user->school_id, $userSchools ?? [])) {
+            $effectiveSchoolId = $user->school_id;
+        } elseif (! empty($userSchools)) {
+            $effectiveSchoolId = $userSchools[0];
+        }
+
+        if (! $effectiveSchoolId) {
+            return redirect()
+                ->to(route('login'))
+                ->with('error', __('messages.auth.unauthorized'));
+        }
+
+        $availableRoles = $user?->schoolUserRoles()
+            ->where('school_id', $effectiveSchoolId)
+            ->pluck('role')
+            ->toArray();
+
+        if (empty($availableRoles)) {
+            return redirect()
+                ->to(route('login'))
+                ->with('error', __('messages.auth.unauthorized'));
+        }
+
+        if ($activeRole && in_array($activeRole, $availableRoles)) {
+            $resolvedRole = $activeRole;
+        } elseif ($user?->role && in_array($user->role, $availableRoles)) {
+            $resolvedRole = $user->role;
         } else {
-            $activeRole = collect(['admin', 'supervisor', 'teacher'])
+            $resolvedRole = collect(['admin', 'supervisor', 'teacher'])
                 ->first(fn ($role) => in_array($role, $availableRoles))
                 ?? $availableRoles[0];
         }
 
-        TenantContext::setActiveContext($school->id, $activeRole);
-        $user->setAttribute('role', $activeRole);
-        $user->setAttribute('school_id', $school->id);
+        TenantContext::setActiveContext($effectiveSchoolId, $resolvedRole);
 
         return $next($request);
     }
