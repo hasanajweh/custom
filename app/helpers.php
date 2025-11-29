@@ -60,6 +60,7 @@ if (!function_exists('tenant_route')) {
     function tenant_route(string $name, $school = null, array $parameters = [], bool $absolute = true, bool $strict = true): string
     {
         $user = auth()->user();
+        $sessionSchoolId = session('active_school_id');
 
         // When only parameters are passed, shift them correctly
         if ($school !== null && ! $school instanceof Network && ! $school instanceof School && ! $school instanceof Branch && ! is_string($school)) {
@@ -76,6 +77,10 @@ if (!function_exists('tenant_route')) {
         $route = Route::current();
         $routeNetworkParam = $route?->parameter('network');
         $routeSchoolParam = $route?->parameter('school') ?? $route?->parameter('branch');
+
+        if (! $school && $sessionSchoolId) {
+            $school = School::with('network')->find($sessionSchoolId);
+        }
 
         if (! $school) {
             if ($routeSchoolParam instanceof School || $routeSchoolParam instanceof Branch) {
@@ -106,6 +111,10 @@ if (!function_exists('tenant_route')) {
             'school_has_network' => (bool) ($school?->network),
         ];
 
+        if (! $network && $school instanceof School) {
+            $network = $school->network;
+        }
+
         if (! $network) {
             if (! $strict) {
                 return route($name, $parameters, $absolute);
@@ -116,6 +125,7 @@ if (!function_exists('tenant_route')) {
                 'route_school_param' => is_object($routeSchoolParam) ? $routeSchoolParam?->slug : $routeSchoolParam,
                 'user_id' => $user?->id,
                 'school_provided' => (bool) $school,
+                'session_school_id' => $sessionSchoolId,
             ];
 
             throw new \InvalidArgumentException(
