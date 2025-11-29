@@ -6,6 +6,10 @@
         $networkName = $networkModel?->name ?? config('app.name');
         $networkSlug = $networkModel?->slug ?? auth()->user()?->network?->slug ?? '';
         $isMainAdmin = $isMainAdmin ?? (bool) auth()->user()?->is_main_admin;
+        $currentRole = \App\Services\ActiveContext::getRole() ?? auth()->user()?->role;
+        $availableContexts = auth()->user()?->availableContexts();
+        $activeContextSchool = \App\Services\ActiveContext::getSchool();
+        $activeContextRole = $currentRole;
     @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
@@ -1162,7 +1166,7 @@
                             class="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}"
                             aria-label="{{ __('messages.navigation.open_user_menu') }}">
                         @php
-                            $role = strtolower(Auth::user()->role);
+                            $role = strtolower($currentRole ?? '');
                             $bgColors = [
                                 'teacher' => 'bg-blue-600',
                                 'supervisor' => 'bg-indigo-600',
@@ -1185,7 +1189,7 @@
 
                         <div class="hidden sm:block text-left {{ app()->getLocale() === 'ar' ? 'text-right' : '' }}">
                             <p class="text-sm font-bold text-gray-700">{{ Auth::user()->name }}</p>
-                            <p class="text-xs text-gray-500 font-medium">{{ __('messages.roles.' . Auth::user()->role) }}</p>
+                            <p class="text-xs text-gray-500 font-medium">{{ $currentRole ? __('messages.roles.' . $currentRole) : '' }}</p>
                         </div>
                         <i class="ri-arrow-down-s-line text-gray-400"></i>
                     </button>
@@ -1208,7 +1212,7 @@
 
                                 <div class="flex-1 min-w-0">
                                     <p class="font-bold text-gray-900">{{ Auth::user()->name }}</p>
-                                    <p class="text-sm text-gray-600 font-semibold">{{ __('messages.roles.' . Auth::user()->role) }}</p>
+                                    <p class="text-sm text-gray-600 font-semibold">{{ $currentRole ? __('messages.roles.' . $currentRole) : '' }}</p>
                                     <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
                                 </div>
                             </div>
@@ -1226,7 +1230,7 @@
                                         $networkCtx = $schoolCtx?->network;
                                     @endphp
                                     @if($schoolCtx && $networkCtx)
-                                        <form method="POST" action="{{ route('tenant.context.switch', ['network' => $networkCtx->slug, 'branch' => $schoolCtx->slug]) }}" class="w-full">
+                                        <form method="POST" action="{{ route('tenant.switch.context', ['network' => $networkCtx->slug, 'branch' => $schoolCtx->slug]) }}" class="w-full">
                                             @csrf
                                             <input type="hidden" name="school_id" value="{{ $schoolCtx->id }}">
                                             <input type="hidden" name="role" value="{{ $ctx->role }}">

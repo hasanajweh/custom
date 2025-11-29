@@ -32,6 +32,10 @@ class VerifyTenantAccess
 
         $networkId = $network instanceof Network ? $network->id : null;
 
+        if ($network && $school && $school->network_id !== $networkId) {
+            abort(404);
+        }
+
         if ($user && $user->role === 'main_admin') {
             if ($networkId && $user->network_id !== $networkId) {
                 abort(403, 'Unauthorized access to this network.');
@@ -44,28 +48,20 @@ class VerifyTenantAccess
             return $next($request);
         }
 
-        if ($network && $school && $school->network_id !== $networkId) {
-            abort(404);
+        if (! $user) {
+            abort(403, 'Unauthorized.');
         }
 
-        $userSchools = $user?->schoolUserRoles()->pluck('school_id')->toArray();
-
-        if ($school && (! $user || ! in_array($school->id, $userSchools))) {
-            SecurityLogger::logTenantIsolationBreach(
-                (int) $school->id,
-                $user?->school_id ?? 0,
-            );
-
-            return redirect()
-                ->to(safe_tenant_route('login', $school))
-                ->with('error', __('messages.auth.unauthorized'));
-        }
-
-        $hasContext = SchoolUserRole::where('user_id', $user?->id)
+        $hasContext = SchoolUserRole::where('user_id', $user->id)
             ->where('school_id', $school?->id)
             ->exists();
 
-        if (! $hasContext && $user?->school_id !== ($school?->id)) {
+        if (! $hasContext) {
+            SecurityLogger::logTenantIsolationBreach(
+                (int) ($school?->id ?? 0),
+                $user->school_id ?? 0,
+            );
+
             abort(403, 'Access denied to this school.');
         }
 

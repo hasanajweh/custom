@@ -22,11 +22,11 @@ class EnsureUserHasRole
 
         $activeRole = ActiveContext::getRole();
 
-        if (! $activeRole) {
-            $activeRole = $user->role;
-        }
-
         $allowedRoles = $this->normalizeRoles($roles);
+
+        if (! $activeRole) {
+            abort(403, 'You do not have an active role for this context.');
+        }
 
         if (in_array('admin', $allowedRoles, true) && $user->role === 'main_admin') {
             return $next($request);

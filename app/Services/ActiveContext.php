@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Session;
 
 class ActiveContext
 {
+    public static function setSchool(int $id): void
+    {
+        Session::put('active_school_id', $id);
+    }
+
     public static function getSchool(): ?School
     {
         $schoolId = Session::get('active_school_id');
@@ -17,30 +22,27 @@ class ActiveContext
         }
 
         $user = Auth::user();
+
         if (! $user) {
             return null;
         }
 
-        if ($user->school_id) {
-            $school = School::with('network')->find($user->school_id);
-            if ($school) {
-                self::setSchool($school->id);
-                return $school;
-            }
-        }
+        $context = $user->schoolUserRoles()
+            ->with('school.network')
+            ->first();
 
-        $context = $user->availableContexts()->first();
         if ($context && $context->school) {
             self::setSchool($context->school->id);
+
             return $context->school;
         }
 
         return null;
     }
 
-    public static function setSchool(int $schoolId): void
+    public static function setRole(string $role): void
     {
-        Session::put('active_school_id', $schoolId);
+        Session::put('active_role', $role);
     }
 
     public static function getRole(): ?string
@@ -52,27 +54,34 @@ class ActiveContext
         }
 
         $user = Auth::user();
+
         if (! $user) {
             return null;
         }
 
-        if (! empty($user->role)) {
-            self::setRole($user->role);
-            return $user->role;
+        $schoolId = Session::get('active_school_id');
+
+        if ($schoolId) {
+            $context = $user->schoolUserRoles()
+                ->where('school_id', $schoolId)
+                ->first();
+
+            if ($context) {
+                self::setRole($context->role);
+
+                return $context->role;
+            }
         }
 
-        $context = $user->availableContexts()->first();
-        if ($context && $context->role) {
+        $context = $user->schoolUserRoles()->first();
+
+        if ($context) {
             self::setRole($context->role);
+
             return $context->role;
         }
 
         return null;
-    }
-
-    public static function setRole(string $role): void
-    {
-        Session::put('active_role', $role);
     }
 
     public static function clear(): void
