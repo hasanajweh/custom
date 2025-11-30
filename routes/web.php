@@ -49,6 +49,10 @@ use Illuminate\Support\Facades\App;
 |--------------------------------------------------------------------------
 */
 
+Route::post('/switch-context', [ContextSwitchController::class, 'switch'])
+    ->name('tenant.switch-context')
+    ->middleware(['auth', 'setlocale']);
+
 // ===========================
 // LANGUAGE SWITCHING ROUTES
 // ===========================
@@ -129,10 +133,6 @@ Route::prefix('superadmin')
 Route::post('/impersonate/leave', [ImpersonationController::class, 'stop'])
     ->middleware(['auth'])
     ->name('impersonate.leave');
-
-Route::post('/switch-context', [ContextSwitchController::class, 'switch'])
-    ->name('tenant.switch-context')
-    ->middleware(['auth', 'setlocale']);
 
 // ===========================
 // MAIN ADMIN ROUTES
