@@ -1,19 +1,21 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Tenant;
 
+use App\Http\Controllers\Controller;
 use App\Models\School;
 use App\Models\SchoolUserRole;
 use App\Services\ActiveContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ContextSwitchController extends Controller
 {
     public function switch(Request $request): RedirectResponse
     {
-        if (! Auth::check()) {
+        $user = $request->user();
+
+        if (! $user) {
             abort(403, 'Not authenticated');
         }
 
@@ -22,28 +24,25 @@ class ContextSwitchController extends Controller
             'role' => 'required|string|in:admin,teacher,supervisor',
         ]);
 
-        $user = $request->user();
-        $schoolId = (int) $validated['school_id'];
-        $role = $validated['role'];
+        $school = School::with('network')->findOrFail($validated['school_id']);
 
-        $context = SchoolUserRole::where('user_id', $user->id)
-            ->where('school_id', $schoolId)
-            ->where('role', $role)
-            ->first();
+        $hasContext = SchoolUserRole::where('user_id', $user->id)
+            ->where('school_id', $school->id)
+            ->where('role', $validated['role'])
+            ->exists();
 
-        if (! $context) {
+        if (! $hasContext) {
             abort(403, 'You do not have this role in this school.');
         }
 
-        $school = School::with('network')->findOrFail($schoolId);
-
         ActiveContext::setSchool($school->id);
-        ActiveContext::setRole($role);
+        ActiveContext::setRole($validated['role']);
 
-        $target = match ($role) {
+        $target = match ($validated['role']) {
             'admin' => tenant_route('school.admin.dashboard', $school),
             'teacher' => tenant_route('teacher.dashboard', $school),
             'supervisor' => tenant_route('supervisor.dashboard', $school),
+            default => abort(403, 'Invalid role'),
         };
 
         return redirect()->to($target);
