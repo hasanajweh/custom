@@ -15,37 +15,32 @@ class ContextSwitchController extends Controller
     {
         $request->validate([
             'school_id' => ['required', 'integer', 'exists:schools,id'],
-            'role' => ['required', 'string', 'in:admin,teacher,supervisor'],
+            'role'      => ['required', 'string', 'in:admin,teacher,supervisor'],
         ]);
 
         $user = Auth::user();
+        if (!$user) abort(403);
 
-        if (! $user) {
-            abort(403);
-        }
+        $schoolId = (int) $request->school_id;
+        $role     = $request->role;
 
-        $schoolId = (int) $request->input('school_id');
-        $role = $request->input('role');
-
-        $hasContext = $user->schoolUserRoles()
+        $has = $user->schoolUserRoles()
             ->where('school_id', $schoolId)
             ->where('role', $role)
             ->exists();
 
-        if (! $hasContext) {
-            abort(403);
-        }
+        if (!$has) abort(403);
 
         $school = School::with('network')->findOrFail($schoolId);
 
         ActiveContext::setSchool($schoolId);
         ActiveContext::setRole($role);
 
-        return match ($role) {
-            'admin' => redirect()->to(tenant_route('school.admin.dashboard', $school)),
-            'teacher' => redirect()->to(tenant_route('teacher.dashboard', $school)),
+        return match($role) {
+            'admin'      => redirect()->to(tenant_route('school.admin.dashboard', $school)),
+            'teacher'    => redirect()->to(tenant_route('teacher.dashboard', $school)),
             'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $school)),
-            default => abort(403),
+            default      => abort(403),
         };
     }
 }
