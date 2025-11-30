@@ -130,6 +130,10 @@ Route::post('/impersonate/leave', [ImpersonationController::class, 'stop'])
     ->middleware(['auth'])
     ->name('impersonate.leave');
 
+Route::post('/switch-context', [ContextSwitchController::class, 'switch'])
+    ->name('tenant.switch-context')
+    ->middleware(['auth', 'setlocale']);
+
 // ===========================
 // MAIN ADMIN ROUTES
 // ===========================
@@ -230,16 +234,13 @@ Route::prefix('{network:slug}/{branch:slug}')
                     $activeRole = $derivedRole;
                 }
 
-                return match ($activeRole) {
-                    'admin' => redirect()->to(tenant_route('school.admin.dashboard', $branch)),
-                    'teacher' => redirect()->to(tenant_route('teacher.dashboard', $branch)),
-                    'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $branch)),
-                    default => abort(403, 'Invalid user role.')
-                };
-            })->name('dashboard');
-
-            Route::post('/switch-context', [ContextSwitchController::class, 'switch'])
-                ->name('tenant.switch-context');
+            return match ($activeRole) {
+                'admin' => redirect()->to(tenant_route('school.admin.dashboard', $branch)),
+                'teacher' => redirect()->to(tenant_route('teacher.dashboard', $branch)),
+                'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $branch)),
+                default => abort(403, 'Invalid user role.')
+            };
+        })->name('dashboard');
 
             // ===========================
             // PROFILE ROUTES (ALL USERS)
