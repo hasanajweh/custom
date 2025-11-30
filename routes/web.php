@@ -211,17 +211,23 @@ Route::prefix('{network:slug}/{branch:slug}')
                 }
 
                 $activeRole = ActiveContext::getRole();
-                $context = $user->schoolRoles()
+
+                $hasActiveRoleForSchool = $activeRole && $user->schoolUserRoles()
                     ->where('school_id', $branch->id)
-                    ->first();
+                    ->where('role', $activeRole)
+                    ->exists();
 
-                if (! $context) {
-                    abort(403, 'No role assigned for this school.');
-                }
+                if (! $hasActiveRoleForSchool) {
+                    $derivedRole = $user->schoolUserRoles()
+                        ->where('school_id', $branch->id)
+                        ->value('role');
 
-                if (! $activeRole || $context->role !== $activeRole) {
-                    ActiveContext::setRole($context->role);
-                    $activeRole = $context->role;
+                    if (! $derivedRole) {
+                        abort(403, 'No role assigned for this school.');
+                    }
+
+                    ActiveContext::setRole($derivedRole);
+                    $activeRole = $derivedRole;
                 }
 
                 return match ($activeRole) {

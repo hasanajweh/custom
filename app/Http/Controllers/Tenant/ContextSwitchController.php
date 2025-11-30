@@ -4,47 +4,48 @@ namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
 use App\Models\School;
-use App\Models\SchoolUserRole;
 use App\Services\ActiveContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ContextSwitchController extends Controller
 {
     public function switch(Request $request): RedirectResponse
     {
-        $user = $request->user();
-
-        if (! $user) {
-            abort(403, 'Not authenticated');
-        }
-
-        $validated = $request->validate([
-            'school_id' => 'required|integer|exists:schools,id',
-            'role' => 'required|string|in:admin,teacher,supervisor',
+        $request->validate([
+            'school_id' => ['required', 'integer', 'exists:schools,id'],
+            'role' => ['required', 'string', 'in:admin,teacher,supervisor'],
         ]);
 
-        $school = School::with('network')->findOrFail($validated['school_id']);
+        $user = Auth::user();
 
-        $hasContext = SchoolUserRole::where('user_id', $user->id)
-            ->where('school_id', $school->id)
-            ->where('role', $validated['role'])
+        if (! $user) {
+            abort(403);
+        }
+
+        $schoolId = (int) $request->input('school_id');
+        $role = $request->input('role');
+
+        $hasContext = $user->schoolUserRoles()
+            ->where('school_id', $schoolId)
+            ->where('role', $role)
             ->exists();
 
         if (! $hasContext) {
-            abort(403, 'You do not have this role in this school.');
+            abort(403);
         }
 
-        ActiveContext::setSchool($school->id);
-        ActiveContext::setRole($validated['role']);
+        $school = School::with('network')->findOrFail($schoolId);
 
-        $target = match ($validated['role']) {
-            'admin' => tenant_route('school.admin.dashboard', $school),
-            'teacher' => tenant_route('teacher.dashboard', $school),
-            'supervisor' => tenant_route('supervisor.dashboard', $school),
-            default => abort(403, 'Invalid role'),
+        ActiveContext::setSchool($schoolId);
+        ActiveContext::setRole($role);
+
+        return match ($role) {
+            'admin' => redirect()->to(tenant_route('school.admin.dashboard', $school)),
+            'teacher' => redirect()->to(tenant_route('teacher.dashboard', $school)),
+            'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $school)),
+            default => abort(403),
         };
-
-        return redirect()->to($target);
     }
 }

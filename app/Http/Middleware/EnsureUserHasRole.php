@@ -53,10 +53,6 @@ class EnsureUserHasRole
             abort(403, 'You do not have an active role for this context.');
         }
 
-        if (in_array('admin', $allowedRoles, true) && $user->role === 'main_admin') {
-            return $next($request);
-        }
-
         if (empty($allowedRoles) || ! in_array($activeRole, $allowedRoles, true)) {
             abort(403, 'You do not have the required role for this context.');
         }
