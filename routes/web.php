@@ -191,8 +191,10 @@ Route::prefix('{network:slug}/{branch:slug}')
         // AUTHENTICATED TENANT ROUTES (ALL ROLES)
         // ===========================
         Route::middleware(['setNetwork', 'setBranch', 'ensure.school.network.match', 'verify.tenant.access', 'auth'])->group(function () {
+            // 🔥 FIXED TENANT CONTEXT SWITCH ROUTE
             Route::post('/switch-context', [ContextSwitchController::class, 'switch'])
-                ->name('tenant.switch-context');
+                ->name('tenant.switch-context')
+                ->middleware('auth');
 
             // Dashboard (role-based)
             Route::get('/dashboard', function (Network $network, School $branch) {
@@ -213,24 +215,10 @@ Route::prefix('{network:slug}/{branch:slug}')
                     $activeSchool = $branch;
                 }
 
-                $activeRole = ActiveContext::getRole();
+                $activeRole = ActiveContext::ensureSchoolContext($branch);
 
-                $hasActiveRoleForSchool = $activeRole && $user->schoolUserRoles()
-                    ->where('school_id', $branch->id)
-                    ->where('role', $activeRole)
-                    ->exists();
-
-                if (! $hasActiveRoleForSchool) {
-                    $derivedRole = $user->schoolUserRoles()
-                        ->where('school_id', $branch->id)
-                        ->value('role');
-
-                    if (! $derivedRole) {
-                        abort(403, 'No role assigned for this school.');
-                    }
-
-                    ActiveContext::setRole($derivedRole);
-                    $activeRole = $derivedRole;
+                if (! $activeRole) {
+                    abort(403, 'No role assigned for this school.');
                 }
 
             return match ($activeRole) {

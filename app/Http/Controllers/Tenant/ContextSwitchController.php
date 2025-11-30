@@ -6,29 +6,43 @@ use App\Http\Controllers\Controller;
 use App\Models\School;
 use App\Services\ActiveContext;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ContextSwitchController extends Controller
 {
     public function switch(Request $request)
     {
         $request->validate([
-            'school_id' => 'required|integer',
-            'role' => 'required|string'
+            'school_id' => ['required','integer','exists:schools,id'],
+            'role' => ['required','string','in:admin,teacher,supervisor'],
         ]);
 
-        $school = School::findOrFail($request->school_id);
+        $user = Auth::user();
+        if (!$user) abort(403);
 
-        // verify user belongs to school
-        auth()->user()->schoolUserRoles()
-            ->where('school_id', $school->id)
-            ->where('role', $request->role)
-            ->firstOrFail();
+        $schoolId = (int) $request->school_id;
+        $role = $request->role;
 
-        ActiveContext::setSchool($school->id);
-        ActiveContext::setRole($request->role);
+        // Check user has that context
+        $hasContext = $user->schoolUserRoles()
+            ->where('school_id',$schoolId)
+            ->where('role',$role)
+            ->exists();
 
-        return redirect()->to(
-            tenant_route('dashboard', $school)
-        );
+        if (!$hasContext) abort(403);
+
+        $school = School::with('network')->findOrFail($schoolId);
+
+        // Save context
+        ActiveContext::setSchool($schoolId);
+        ActiveContext::setRole($role);
+
+        // Redirect to correct dashboard
+        return match($role) {
+            'admin' => redirect()->to(tenant_route('school.admin.dashboard', $school)),
+            'teacher' => redirect()->to(tenant_route('teacher.dashboard', $school)),
+            'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $school)),
+            default => abort(403),
+        };
     }
 }
