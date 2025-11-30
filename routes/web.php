@@ -235,14 +235,6 @@ Route::prefix('{network:slug}/{branch:slug}')
             Route::post('/switch-context', [ContextSwitchController::class, 'switch'])
                 ->name('tenant.switch-context');
 
-            // Failsafe redirect to ensure accidental GET access never lands on a 404 page
-            Route::get('/switch-context', function (Network $network, School $branch) {
-                return redirect()->route('dashboard', [
-                    'network' => $network->slug,
-                    'branch' => $branch->slug,
-                ]);
-            });
-
             // ===========================
             // PROFILE ROUTES (ALL USERS)
             // ===========================
