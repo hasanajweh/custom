@@ -130,6 +130,10 @@ Route::post('/impersonate/leave', [ImpersonationController::class, 'stop'])
     ->middleware(['auth'])
     ->name('impersonate.leave');
 
+Route::post('/switch-context', [ContextSwitchController::class, 'switch'])
+    ->name('tenant.switch-context')
+    ->middleware(['auth', 'setlocale']);
+
 // ===========================
 // MAIN ADMIN ROUTES
 // ===========================
@@ -237,9 +241,6 @@ Route::prefix('{network:slug}/{branch:slug}')
                     default => abort(403, 'Invalid user role.')
                 };
             })->name('dashboard');
-
-            Route::post('/switch-context', [ContextSwitchController::class, 'switch'])
-                ->name('tenant.switch-context');
 
             // ===========================
             // PROFILE ROUTES (ALL USERS)

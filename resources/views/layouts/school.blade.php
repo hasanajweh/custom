@@ -1243,37 +1243,42 @@
                             </div>
                         </div>
 
-                        @if(isset($availableContexts) && $availableContexts->count() > 1)
-                        <div class="mt-2 px-3 py-2 rounded bg-slate-100">
-                            <label class="block text-sm mb-1 text-slate-600">
-                                @lang('messages.switch_context')
-                            </label>
-                            <div class="space-y-2">
-                                @foreach($availableContexts as $ctx)
-                                    @php
-                                        $schoolCtx = $ctx->school;
-                                        $networkCtx = $schoolCtx?->network;
-                                    @endphp
-                                    @if($schoolCtx && $networkCtx)
-                                        <form method="POST" action="{{ route('tenant.switch-context', ['network' => $networkCtx->slug, 'branch' => $schoolCtx->slug]) }}" class="w-full">
-                                            @csrf
-                                            <input type="hidden" name="school_id" value="{{ $schoolCtx->id }}">
-                                            <input type="hidden" name="role" value="{{ $ctx->role }}">
-                                            <button type="submit" class="w-full text-left px-3 py-2 rounded border border-slate-200 bg-white hover:bg-slate-50 text-sm flex justify-between items-center">
-                                                <span>
-                                                    <div class="font-medium">{{ $schoolCtx->name }}</div>
-                                                    <div class="text-xs text-gray-500">@lang('messages.role_' . $ctx->role) ({{ $networkCtx->name }})</div>
-                                                </span>
-                                                @if(($activeContextSchool?->id ?? null) === $schoolCtx->id && ($activeContextRole ?? null) === $ctx->role)
-                                                    <span class="text-xs text-green-600">@lang('messages.current')</span>
-                                                @endif
-                                            </button>
-                                        </form>
-                                    @endif
-                                @endforeach
-                            </div>
-                        </div>
-                        @endif
+@if(isset($availableContexts) && $availableContexts->count() > 1)
+    <div class="mt-2 px-3 py-2 rounded bg-slate-100">
+        <label class="block text-sm mb-1 text-slate-600">
+            @lang('messages.switch_context')
+        </label>
+        <div class="space-y-2">
+            @foreach($availableContexts as $ctx)
+                @php
+                    $schoolCtx  = $ctx->school;
+                    $networkCtx = $schoolCtx?->network;
+                @endphp
+                @if($schoolCtx && $networkCtx)
+                    <form method="POST" action="{{ route('tenant.switch-context') }}" class="w-full">
+                        @csrf
+                        <input type="hidden" name="school_id" value="{{ $schoolCtx->id }}">
+                        <input type="hidden" name="role" value="{{ $ctx->role }}">
+
+                        <button type="submit"
+                                class="w-full text-left px-3 py-2 rounded border border-slate-200 bg-white hover:bg-slate-50 text-sm flex justify-between items-center">
+                            <span>
+                                <div class="font-medium">{{ $schoolCtx->name }}</div>
+                                <div class="text-xs text-gray-500">
+                                    @lang('messages.role_' . $ctx->role) ({{ $networkCtx->name }})
+                                </div>
+                            </span>
+
+                            @if(($activeContextSchool?->id ?? null) === $schoolCtx->id && ($activeContextRole ?? null) === $ctx->role)
+                                <span class="text-xs text-green-600">@lang('messages.current')</span>
+                            @endif
+                        </button>
+                    </form>
+                @endif
+            @endforeach
+        </div>
+    </div>
+@endif
 
                         <!-- Menu Items -->
                         <div class="py-1">
