@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Services\ActiveContext;
+use App\Support\SchoolResolver;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +22,30 @@ class EnsureUserHasRole
         }
 
         $activeRole = ActiveContext::getRole();
+
+        if (! $activeRole) {
+            $activeSchool = ActiveContext::getSchool();
+
+            if (! $activeSchool) {
+                $schoolFromRoute = $request->route('school') ?? $request->route('branch');
+                $activeSchool = SchoolResolver::resolve($schoolFromRoute);
+
+                if ($activeSchool) {
+                    ActiveContext::setSchool($activeSchool->id);
+                }
+            }
+
+            if ($activeSchool) {
+                $derivedRole = $user->schoolUserRoles()
+                    ->where('school_id', $activeSchool->id)
+                    ->value('role');
+
+                if ($derivedRole) {
+                    ActiveContext::setRole($derivedRole);
+                    $activeRole = $derivedRole;
+                }
+            }
+        }
 
         $allowedRoles = $this->normalizeRoles($roles);
 

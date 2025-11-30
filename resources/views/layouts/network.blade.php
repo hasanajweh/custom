@@ -1230,7 +1230,7 @@
                                         $networkCtx = $schoolCtx?->network;
                                     @endphp
                                     @if($schoolCtx && $networkCtx)
-                                        <form method="POST" action="{{ route('tenant.switch.context', ['network' => $networkCtx->slug, 'branch' => $schoolCtx->slug]) }}" class="w-full">
+                                        <form method="POST" action="{{ route('tenant.switch-context', ['network' => $networkCtx->slug, 'branch' => $schoolCtx->slug]) }}" class="w-full">
                                             @csrf
                                             <input type="hidden" name="school_id" value="{{ $schoolCtx->id }}">
                                             <input type="hidden" name="role" value="{{ $ctx->role }}">
