@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Network;
+use App\Services\ActiveContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -51,6 +52,8 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
+            ActiveContext::clear();
+
             // Update last login timestamp
             Auth::user()->update(['last_login_at' => now()]);
 
@@ -80,6 +83,8 @@ class LoginController extends Controller
     public function logout(Request $request, Network $network)
     {
         Auth::logout();
+
+        ActiveContext::clear();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

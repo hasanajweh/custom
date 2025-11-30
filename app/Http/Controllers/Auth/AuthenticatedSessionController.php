@@ -39,6 +39,8 @@ class AuthenticatedSessionController extends Controller
             abort(404);
         }
 
+        ActiveContext::clear();
+
         // Attempt authentication
         try {
             $request->authenticate();

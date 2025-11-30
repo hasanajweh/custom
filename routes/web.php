@@ -49,10 +49,6 @@ use Illuminate\Support\Facades\App;
 |--------------------------------------------------------------------------
 */
 
-Route::post('/switch-context', [ContextSwitchController::class, 'switch'])
-    ->name('tenant.switch-context')
-    ->middleware(['auth', 'setlocale']);
-
 // ===========================
 // LANGUAGE SWITCHING ROUTES
 // ===========================
@@ -195,6 +191,9 @@ Route::prefix('{network:slug}/{branch:slug}')
         // AUTHENTICATED TENANT ROUTES (ALL ROLES)
         // ===========================
         Route::middleware(['setNetwork', 'setBranch', 'ensure.school.network.match', 'verify.tenant.access', 'auth'])->group(function () {
+            Route::post('/switch-context', [ContextSwitchController::class, 'switch'])
+                ->name('tenant.switch-context');
+
             // Dashboard (role-based)
             Route::get('/dashboard', function (Network $network, School $branch) {
                 if ($branch->network_id !== $network->id) {
