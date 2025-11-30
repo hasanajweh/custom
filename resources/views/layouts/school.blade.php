@@ -1250,23 +1250,25 @@
                             </label>
                             <div class="space-y-2">
                                 @foreach($availableContexts as $ctx)
-                                    @php
-                                        $schoolCtx = $ctx->school;
-                                        $networkCtx = $schoolCtx?->network;
-                                    @endphp
-                                    @if($schoolCtx && $networkCtx)
-                                        <form method="POST" action="{{ tenant_route('tenant.switch-context', $school) }}">
-                                            @csrf
-                                            <input type="hidden" name="school_id" value="{{ $schoolCtx->id }}">
-                                            <input type="hidden" name="role" value="{{ $ctx->role }}">
-                                            <button type="submit" class="w-full text-left px-3 py-2 hover:bg-slate-100">
-                                                <div class="font-medium">{{ $schoolCtx->name }}</div>
-                                                <div class="text-xs text-gray-500">@lang('messages.role_' . $ctx->role)</div>
-                                                @if(($activeContextSchool?->id ?? null) === $schoolCtx->id && ($activeContextRole ?? null) === $ctx->role)
-                                                    <span class="text-xs text-green-600">@lang('messages.current')</span>
-                                                @endif
-                                            </button>
-                                        </form>
+                                    @php $schoolCtx = $ctx->school; @endphp
+
+                                    @if($schoolCtx)
+                                    <form method="POST" action="{{ tenant_route('tenant.switch-context', $schoolCtx) }}">
+                                        @csrf
+                                        <input type="hidden" name="school_id" value="{{ $schoolCtx->id }}">
+                                        <input type="hidden" name="role" value="{{ $ctx->role }}">
+
+                                        <button type="submit" class="w-full text-left px-3 py-2 hover:bg-slate-100">
+                                            <div class="font-medium">{{ $schoolCtx->name }}</div>
+                                            <div class="text-xs text-gray-500">
+                                                @lang('messages.role_' . $ctx->role)
+                                            </div>
+
+                                            @if(session('active_school_id') == $schoolCtx->id && session('active_role') == $ctx->role)
+                                                <span class="text-xs text-green-600">@lang('messages.current')</span>
+                                            @endif
+                                        </button>
+                                    </form>
                                     @endif
                                 @endforeach
                             </div>

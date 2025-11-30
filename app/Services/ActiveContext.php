@@ -17,11 +17,18 @@ class ActiveContext
     {
         $schoolId = Session::get('active_school_id');
 
-        if ($schoolId) {
-            return School::with('network')->find($schoolId);
-        }
-
         $user = Auth::user();
+
+        if ($schoolId) {
+            $school = School::with('network')->find($schoolId);
+
+            // Ensure the active school still belongs to the authenticated user
+            if ($school && $user && $user->schoolUserRoles()
+                ->where('school_id', $schoolId)
+                ->exists()) {
+                return $school;
+            }
+        }
 
         if (! $user) {
             return null;
@@ -47,12 +54,6 @@ class ActiveContext
 
     public static function getRole(): ?string
     {
-        $role = Session::get('active_role');
-
-        if ($role) {
-            return $role;
-        }
-
         $user = Auth::user();
 
         if (! $user) {
@@ -60,6 +61,17 @@ class ActiveContext
         }
 
         $schoolId = Session::get('active_school_id');
+        $role = Session::get('active_role');
+
+        $roleQuery = $user->schoolUserRoles();
+
+        if ($schoolId) {
+            $roleQuery->where('school_id', $schoolId);
+        }
+
+        if ($role && (clone $roleQuery)->where('role', $role)->exists()) {
+            return $role;
+        }
 
         if ($schoolId) {
             $context = $user->schoolUserRoles()
@@ -78,10 +90,54 @@ class ActiveContext
         if ($context) {
             self::setRole($context->role);
 
+            if ($context->school) {
+                self::setSchool($context->school->id);
+            }
+
             return $context->role;
         }
 
         return null;
+    }
+
+    public static function resolveRoleForSchool(School $school): ?string
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return null;
+        }
+
+        $currentRole = Session::get('active_role');
+
+        $hasRoleForSchool = $currentRole && $user->schoolUserRoles()
+            ->where('school_id', $school->id)
+            ->where('role', $currentRole)
+            ->exists();
+
+        if ($hasRoleForSchool) {
+            return $currentRole;
+        }
+
+        $derivedRole = $user->schoolUserRoles()
+            ->where('school_id', $school->id)
+            ->value('role');
+
+        if ($derivedRole) {
+            self::setRole($derivedRole);
+            self::setSchool($school->id);
+
+            return $derivedRole;
+        }
+
+        return null;
+    }
+
+    public static function ensureSchoolContext(School $school): ?string
+    {
+        self::setSchool($school->id);
+
+        return self::resolveRoleForSchool($school);
     }
 
     public static function clear(): void
