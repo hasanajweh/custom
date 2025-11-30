@@ -34,7 +34,7 @@ use App\Http\Controllers\MainAdmin\DashboardController as MainAdminDashboardCont
 use App\Http\Controllers\MainAdmin\HierarchyController;
 use App\Http\Controllers\MainAdmin\SubjectsGradesController;
 use App\Http\Controllers\MainAdmin\UserController as MainAdminUserController;
-use App\Http\Controllers\ContextSwitchController;
+use App\Http\Controllers\Tenant\ContextSwitchController;
 use App\Models\Network;
 use App\Models\School;
 use App\Services\ActiveContext;
@@ -233,7 +233,7 @@ Route::prefix('{network:slug}/{branch:slug}')
             })->name('dashboard');
 
             Route::post('/switch-context', [ContextSwitchController::class, 'switch'])
-                ->name('tenant.switch.context');
+                ->name('tenant.switch-context');
 
             // ===========================
             // PROFILE ROUTES (ALL USERS)
