@@ -23,6 +23,12 @@ class EnsureUserHasRole
 
         $allowedRoles = $this->normalizeRoles($roles);
 
+        $route = $request->route();
+        $routeName = $route?->getName();
+        $routeParameters = $route?->parameters() ?? [];
+        $routeSchoolParam = $route?->parameter('branch') ?? $route?->parameter('school');
+        $slugFromRoute = optional($routeSchoolParam)?->slug ?? $routeSchoolParam;
+
         $activeSchool = ActiveContext::getSchool();
         $activeRole = ActiveContext::getRole();
 
@@ -33,6 +39,16 @@ class EnsureUserHasRole
                 ->exists();
 
             if ($hasRole) {
+                if ($slugFromRoute && $activeSchool->slug !== $slugFromRoute && $routeName) {
+                    $params = collect($routeParameters)->except(['branch', 'school', 'network'])->all();
+
+                    return redirect()->to(tenant_route(
+                        $routeName,
+                        $activeSchool,
+                        $params,
+                    ));
+                }
+
                 if (empty($allowedRoles) || in_array($activeRole, $allowedRoles, true)) {
                     return $next($request);
                 }
@@ -57,6 +73,18 @@ class EnsureUserHasRole
 
         if (! $activeSchool) {
             abort(403, 'No active school context available.');
+        }
+
+        if ($activeRole) {
+            $hasRole = $user->schoolUserRoles()
+                ->where('school_id', $activeSchool->id)
+                ->where('role', $activeRole)
+                ->exists();
+
+            if (! $hasRole) {
+                ActiveContext::clearRole();
+                $activeRole = null;
+            }
         }
 
         if (! $activeRole) {
@@ -85,6 +113,16 @@ class EnsureUserHasRole
 
         if (! empty($allowedRoles) && ! in_array($activeRole, $allowedRoles, true)) {
             abort(403, 'You do not have the required role for this context.');
+        }
+
+        if ($slugFromRoute && $activeSchool->slug !== $slugFromRoute && $routeName) {
+            $params = collect($routeParameters)->except(['branch', 'school', 'network'])->all();
+
+            return redirect()->to(tenant_route(
+                $routeName,
+                $activeSchool,
+                $params,
+            ));
         }
 
         return $next($request);

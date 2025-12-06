@@ -1,7 +1,10 @@
 @auth
 <div class="flex h-16 shrink-0 items-center">
     @php
-        $school = $school
+        $activeContextSchool = \App\Services\ActiveContext::getSchool();
+        $activeContextRole = \App\Services\ActiveContext::getRole();
+        $school = $activeContextSchool
+            ?? $school
             ?? request()->attributes->get('branch')
             ?? request()->attributes->get('school')
             ?? Auth::user()?->school;

@@ -62,25 +62,28 @@ if (!function_exists('tenant_route')) {
         $user = auth()->user();
         $sessionSchoolId = session('active_school_id');
 
-        // When only parameters are passed, shift them correctly
-        if ($school !== null && ! $school instanceof Network && ! $school instanceof School && ! $school instanceof Branch && !is_string($school)) {
+        if ($school !== null && ! $school instanceof Network && ! $school instanceof School && ! $school instanceof Branch && ! is_string($school)) {
             if (is_array($school) && empty($parameters)) {
                 $parameters = $school;
                 $school = null;
             }
         }
 
-        // Normalize provided school
+        $providedSchool = null;
+
         if (is_string($school)) {
             $school = School::with('network')->where('slug', $school)->first();
         }
 
-        // Prefer explicitly provided school, then session, then ActiveContext
-        if (! $school && $sessionSchoolId) {
+        if ($school instanceof School || $school instanceof Branch) {
+            $providedSchool = $school;
+        }
+
+        if ($school === null && $sessionSchoolId) {
             $school = School::with('network')->find($sessionSchoolId);
         }
 
-        if (! $school) {
+        if ($school === null) {
             $school = \App\Services\ActiveContext::getSchool();
         }
 
@@ -88,7 +91,6 @@ if (!function_exists('tenant_route')) {
         $routeNetworkParam = $route?->parameter('network');
         $routeSchoolParam = $route?->parameter('school') ?? $route?->parameter('branch');
 
-        // Resolve network strictly from the school when provided
         $network = match (true) {
             $school instanceof School => $school->network,
             $school instanceof Branch => $school->network,
@@ -96,7 +98,6 @@ if (!function_exists('tenant_route')) {
             default => null,
         };
 
-        // If no school was found yet, fall back to route parameters or user
         if (! $school) {
             if ($routeSchoolParam instanceof School || $routeSchoolParam instanceof Branch) {
                 $school = $routeSchoolParam;
@@ -105,8 +106,12 @@ if (!function_exists('tenant_route')) {
             } elseif ($user?->school) {
                 $school = $user->school;
             }
+        }
 
-            if (! $network) {
+        if (! $network) {
+            if ($school instanceof School || $school instanceof Branch) {
+                $network = $school->network;
+            } else {
                 $network = match (true) {
                     $routeNetworkParam instanceof Network => $routeNetworkParam,
                     is_string($routeNetworkParam) => Network::where('slug', $routeNetworkParam)->first(),
@@ -116,18 +121,12 @@ if (!function_exists('tenant_route')) {
             }
         }
 
-        if (! $network && $school instanceof School) {
-            $network = $school->network;
-        }
-
         if (! $network) {
             if (! $strict) {
                 return route($name, $parameters, $absolute);
             }
 
-            throw new \InvalidArgumentException(
-                'Network is required to generate tenant routes.',
-            );
+            throw new \InvalidArgumentException('Network is required to generate tenant routes.');
         }
 
         if ($school === null || $school instanceof Network) {
@@ -139,10 +138,6 @@ if (!function_exists('tenant_route')) {
             $school instanceof School => $school,
             default => null,
         };
-
-        if (! $branch && $routeSchoolParam) {
-            $branch = School::with('network')->where('slug', $routeSchoolParam)->first();
-        }
 
         if (! $branch) {
             if (! $strict) {
@@ -160,12 +155,14 @@ if (!function_exists('tenant_route')) {
             throw new \InvalidArgumentException('Network is required to generate tenant routes for the provided school.');
         }
 
+        $resolvedBranch = $providedSchool ?: $branch;
+
         return route(
             $name,
             array_merge([
-                'network' => $branch->network->slug,
-                'branch' => $branch->slug,
-                'school' => $branch->slug,
+                'network' => $resolvedBranch->network->slug,
+                'branch' => $resolvedBranch->slug,
+                'school' => $resolvedBranch->slug,
             ], $parameters),
             $absolute,
         );
