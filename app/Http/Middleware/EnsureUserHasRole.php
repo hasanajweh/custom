@@ -21,39 +21,72 @@ class EnsureUserHasRole
             abort(403);
         }
 
+        $allowedRoles = $this->normalizeRoles($roles);
+
+        $activeSchool = ActiveContext::getSchool();
         $activeRole = ActiveContext::getRole();
 
-        if (! $activeRole) {
-            $activeSchool = ActiveContext::getSchool();
+        $routeSchool = SchoolResolver::resolve($request->route('school') ?? $request->route('branch'));
 
-            if (! $activeSchool) {
-                $schoolFromRoute = $request->route('school') ?? $request->route('branch');
-                $activeSchool = SchoolResolver::resolve($schoolFromRoute);
+        if ($activeSchool && $routeSchool && $activeSchool->id !== $routeSchool->id) {
+            return redirect()->to(tenant_route('dashboard', $activeSchool));
+        }
 
-                if ($activeSchool) {
-                    ActiveContext::setSchool($activeSchool->id);
+        if ($activeSchool && $activeRole) {
+            $hasRole = $user->schoolUserRoles()
+                ->where('school_id', $activeSchool->id)
+                ->where('role', $activeRole)
+                ->exists();
+
+            if ($hasRole) {
+                if (empty($allowedRoles) || in_array($activeRole, $allowedRoles, true)) {
+                    return $next($request);
                 }
+
+                abort(403, 'You do not have the required role for this context.');
             }
 
-            if ($activeSchool) {
-                $derivedRole = $user->schoolUserRoles()
-                    ->where('school_id', $activeSchool->id)
-                    ->value('role');
+            ActiveContext::clear();
+            $activeSchool = null;
+            $activeRole = null;
+        }
 
-                if ($derivedRole) {
-                    ActiveContext::setRole($derivedRole);
-                    $activeRole = $derivedRole;
-                }
+        if (! $activeSchool) {
+            if ($routeSchool && $user->schoolUserRoles()->where('school_id', $routeSchool->id)->exists()) {
+                ActiveContext::setSchool($routeSchool->id);
+                $activeSchool = $routeSchool;
             }
         }
 
-        $allowedRoles = $this->normalizeRoles($roles);
+        if (! $activeSchool) {
+            abort(403, 'No active school context available.');
+        }
+
+        if (! $activeRole) {
+            $roleQuery = $user->schoolUserRoles()->where('school_id', $activeSchool->id);
+
+            if (! empty($allowedRoles)) {
+                $roleQuery->whereIn('role', $allowedRoles);
+            }
+
+            $derivedRole = $roleQuery->value('role');
+
+            if ($derivedRole) {
+                try {
+                    ActiveContext::setRole($derivedRole);
+                } catch (\Throwable $e) {
+                    // Ignore and fall through to abort if setting fails
+                }
+
+                $activeRole = $derivedRole;
+            }
+        }
 
         if (! $activeRole) {
             abort(403, 'You do not have an active role for this context.');
         }
 
-        if (empty($allowedRoles) || ! in_array($activeRole, $allowedRoles, true)) {
+        if (! empty($allowedRoles) && ! in_array($activeRole, $allowedRoles, true)) {
             abort(403, 'You do not have the required role for this context.');
         }
 

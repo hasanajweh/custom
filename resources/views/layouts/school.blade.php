@@ -2,36 +2,22 @@
 <html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" class="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     @php
+        $activeContextSchool = \App\Services\ActiveContext::getSchool();
+        $activeContextRole = \App\Services\ActiveContext::getRole();
+
         $school = $school
             ?? request()->attributes->get('branch')
             ?? request()->attributes->get('school')
+            ?? $activeContextSchool
             ?? Auth::user()->school;
 
-        $branch = $branch ?? request()->route('branch');
+        $branch = $branch ?? request()->route('branch') ?? $school;
         $network = $network ?? request()->route('network') ?? $school?->network ?? auth()->user()?->network;
 
-        $currentSchool = \App\Services\ActiveContext::getSchool();
-        $currentRole = \App\Services\ActiveContext::getRole();
-
-        if (! $currentSchool && $school) {
-            \App\Services\ActiveContext::setSchool($school->id);
-            $currentSchool = $school;
-        }
-
-        if (! $currentRole && auth()->user()) {
-            $context = auth()->user()->schoolUserRoles()
-                ->where('school_id', $school?->id)
-                ->first();
-
-            if ($context) {
-                \App\Services\ActiveContext::setRole($context->role);
-                $currentRole = $context->role;
-            }
-        }
+        $currentSchool = $activeContextSchool ?? $school;
+        $currentRole = $activeContextRole;
 
         $availableContexts = auth()->user()?->availableContexts();
-        $activeContextSchool = $currentSchool;
-        $activeContextRole = $currentRole;
 
         $schoolName = $school?->name ?? config('app.name');
         $schoolSlug = $school?->slug ?? '';
