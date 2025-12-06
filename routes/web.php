@@ -210,24 +210,36 @@ Route::prefix('{network:slug}/{branch:slug}')
 
                 $activeSchool = ActiveContext::getSchool();
 
-                if (! $activeSchool || $activeSchool->id !== $branch->id) {
-                    ActiveContext::setSchool($branch->id);
-                    $activeSchool = $branch;
+                if (! $activeSchool) {
+                    if ($user->schoolUserRoles()->where('school_id', $branch->id)->exists()) {
+                        ActiveContext::setSchool($branch->id);
+                        $activeSchool = $branch;
+                    } else {
+                        $activeSchool = ActiveContext::getSchool();
+                    }
                 }
 
-                $activeRole = ActiveContext::ensureSchoolContext($branch);
+                if ($activeSchool && $activeSchool->id !== $branch->id) {
+                    return redirect()->to(tenant_route('dashboard', $activeSchool));
+                }
+
+                if (! $activeSchool) {
+                    abort(403, 'No active school context available.');
+                }
+
+                $activeRole = ActiveContext::getRole();
 
                 if (! $activeRole) {
                     abort(403, 'No role assigned for this school.');
                 }
 
-            return match ($activeRole) {
-                'admin' => redirect()->to(tenant_route('school.admin.dashboard', $branch)),
-                'teacher' => redirect()->to(tenant_route('teacher.dashboard', $branch)),
-                'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $branch)),
-                default => abort(403, 'Invalid user role.')
-            };
-        })->name('dashboard');
+                return match ($activeRole) {
+                    'admin' => redirect()->to(tenant_route('school.admin.dashboard', $activeSchool)),
+                    'teacher' => redirect()->to(tenant_route('teacher.dashboard', $activeSchool)),
+                    'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $activeSchool)),
+                    default => abort(403, 'Invalid user role.')
+                };
+            })->name('dashboard');
 
             // ===========================
             // PROFILE ROUTES (ALL USERS)

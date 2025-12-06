@@ -1,7 +1,8 @@
 @php
     $school = $school
         ?? request()->attributes->get('branch')
-        ?? request()->attributes->get('school');
+        ?? request()->attributes->get('school')
+        ?? \App\Services\ActiveContext::getSchool();
 @endphp
 
 <nav class="space-y-1">
