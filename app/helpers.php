@@ -63,25 +63,40 @@ if (!function_exists('tenant_route')) {
         $sessionSchoolId = session('active_school_id');
 
         // When only parameters are passed, shift them correctly
-        if ($school !== null && ! $school instanceof Network && ! $school instanceof School && ! $school instanceof Branch && ! is_string($school)) {
+        if ($school !== null && ! $school instanceof Network && ! $school instanceof School && ! $school instanceof Branch && !is_string($school)) {
             if (is_array($school) && empty($parameters)) {
                 $parameters = $school;
                 $school = null;
             }
         }
 
+        // Normalize provided school
         if (is_string($school)) {
             $school = School::with('network')->where('slug', $school)->first();
+        }
+
+        // Prefer explicitly provided school, then session, then ActiveContext
+        if (! $school && $sessionSchoolId) {
+            $school = School::with('network')->find($sessionSchoolId);
+        }
+
+        if (! $school) {
+            $school = \App\Services\ActiveContext::getSchool();
         }
 
         $route = Route::current();
         $routeNetworkParam = $route?->parameter('network');
         $routeSchoolParam = $route?->parameter('school') ?? $route?->parameter('branch');
 
-        if (! $school && $sessionSchoolId) {
-            $school = School::with('network')->find($sessionSchoolId);
-        }
+        // Resolve network strictly from the school when provided
+        $network = match (true) {
+            $school instanceof School => $school->network,
+            $school instanceof Branch => $school->network,
+            $school instanceof Network => $school,
+            default => null,
+        };
 
+        // If no school was found yet, fall back to route parameters or user
         if (! $school) {
             if ($routeSchoolParam instanceof School || $routeSchoolParam instanceof Branch) {
                 $school = $routeSchoolParam;
@@ -90,26 +105,16 @@ if (!function_exists('tenant_route')) {
             } elseif ($user?->school) {
                 $school = $user->school;
             }
+
+            if (! $network) {
+                $network = match (true) {
+                    $routeNetworkParam instanceof Network => $routeNetworkParam,
+                    is_string($routeNetworkParam) => Network::where('slug', $routeNetworkParam)->first(),
+                    $user && $user->network => $user->network,
+                    default => null,
+                };
+            }
         }
-
-        $network = match (true) {
-            $school instanceof School => $school->network,
-            $school instanceof Branch => $school->network,
-            $school instanceof Network => $school,
-            $routeNetworkParam instanceof Network => $routeNetworkParam,
-            is_string($routeNetworkParam) => Network::where('slug', $routeNetworkParam)->first(),
-            $user && $user->network => $user->network,
-            default => null,
-        };
-
-        $context = [
-            'route_network_param' => is_object($routeNetworkParam) ? $routeNetworkParam?->slug : $routeNetworkParam,
-            'route_school_param' => is_object($routeSchoolParam) ? $routeSchoolParam?->slug : $routeSchoolParam,
-            'user_id' => $user?->id,
-            'user_role' => $user?->role,
-            'school_id' => $school?->id,
-            'school_has_network' => (bool) ($school?->network),
-        ];
 
         if (! $network && $school instanceof School) {
             $network = $school->network;
@@ -120,16 +125,8 @@ if (!function_exists('tenant_route')) {
                 return route($name, $parameters, $absolute);
             }
 
-            $context = [
-                'route_network_param' => is_object($routeNetworkParam) ? $routeNetworkParam?->slug : $routeNetworkParam,
-                'route_school_param' => is_object($routeSchoolParam) ? $routeSchoolParam?->slug : $routeSchoolParam,
-                'user_id' => $user?->id,
-                'school_provided' => (bool) $school,
-                'session_school_id' => $sessionSchoolId,
-            ];
-
             throw new \InvalidArgumentException(
-                'Network is required to generate tenant routes. Context: ' . json_encode($context),
+                'Network is required to generate tenant routes.',
             );
         }
 
@@ -140,11 +137,12 @@ if (!function_exists('tenant_route')) {
         $branch = match (true) {
             $school instanceof Branch => $school,
             $school instanceof School => $school,
-            $routeSchoolParam instanceof Branch => $routeSchoolParam,
-            $routeSchoolParam instanceof School => $routeSchoolParam,
-            is_string($routeSchoolParam) => School::with('network')->where('slug', $routeSchoolParam)->first(),
             default => null,
         };
+
+        if (! $branch && $routeSchoolParam) {
+            $branch = School::with('network')->where('slug', $routeSchoolParam)->first();
+        }
 
         if (! $branch) {
             if (! $strict) {
@@ -165,7 +163,7 @@ if (!function_exists('tenant_route')) {
         return route(
             $name,
             array_merge([
-                'network' => $network->slug,
+                'network' => $branch->network->slug,
                 'branch' => $branch->slug,
                 'school' => $branch->slug,
             ], $parameters),
