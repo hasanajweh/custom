@@ -26,12 +26,6 @@ class EnsureUserHasRole
         $activeSchool = ActiveContext::getSchool();
         $activeRole = ActiveContext::getRole();
 
-        $routeSchool = SchoolResolver::resolve($request->route('school') ?? $request->route('branch'));
-
-        if ($activeSchool && $routeSchool && $activeSchool->id !== $routeSchool->id) {
-            return redirect()->to(tenant_route('dashboard', $activeSchool));
-        }
-
         if ($activeSchool && $activeRole) {
             $hasRole = $user->schoolUserRoles()
                 ->where('school_id', $activeSchool->id)
@@ -52,9 +46,12 @@ class EnsureUserHasRole
         }
 
         if (! $activeSchool) {
-            if ($routeSchool && $user->schoolUserRoles()->where('school_id', $routeSchool->id)->exists()) {
-                ActiveContext::setSchool($routeSchool->id);
-                $activeSchool = $routeSchool;
+            $schoolFromRoute = $request->route('school') ?? $request->route('branch');
+            $resolvedSchool = SchoolResolver::resolve($schoolFromRoute);
+
+            if ($resolvedSchool && $user->schoolUserRoles()->where('school_id', $resolvedSchool->id)->exists()) {
+                ActiveContext::setSchool($resolvedSchool->id);
+                $activeSchool = $resolvedSchool;
             }
         }
 

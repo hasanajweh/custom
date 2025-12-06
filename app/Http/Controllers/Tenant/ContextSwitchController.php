@@ -29,16 +29,8 @@ class ContextSwitchController extends Controller
         $school = School::with('network')->findOrFail($schoolId);
         $routeNetwork = $request->route('network');
 
-        if ($routeNetwork) {
-            $networkId = is_object($routeNetwork) ? $routeNetwork->id : null;
-
-            if ($networkId && $school->network_id !== $networkId) {
-                abort(404);
-            }
-
-            if (is_string($routeNetwork) && $school->network && $school->network->slug !== $routeNetwork) {
-                abort(404);
-            }
+        if ($routeNetwork && $school->network_id !== $routeNetwork->id) {
+            abort(404);
         }
 
         $hasContext = $user->schoolUserRoles()
