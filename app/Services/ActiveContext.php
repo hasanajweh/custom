@@ -5,33 +5,34 @@ namespace App\Services;
 use App\Models\School;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use InvalidArgumentException;
 
 class ActiveContext
 {
     public static function setSchool(int $id): void
     {
         Session::put('active_school_id', $id);
+        Session::forget('active_role');
     }
 
     public static function getSchool(): ?School
     {
-        $schoolId = Session::get('active_school_id');
-
         $user = Auth::user();
+
+        if (! $user) {
+            return null;
+        }
+
+        $schoolId = Session::get('active_school_id');
 
         if ($schoolId) {
             $school = School::with('network')->find($schoolId);
 
-            // Ensure the active school still belongs to the authenticated user
-            if ($school && $user && $user->schoolUserRoles()
-                ->where('school_id', $schoolId)
-                ->exists()) {
+            if ($school && $user->schoolUserRoles()->where('school_id', $schoolId)->exists()) {
                 return $school;
             }
-        }
 
-        if (! $user) {
-            return null;
+            Session::forget('active_school_id');
         }
 
         $context = $user->schoolUserRoles()
@@ -49,6 +50,22 @@ class ActiveContext
 
     public static function setRole(string $role): void
     {
+        $user = Auth::user();
+        $school = self::getSchool();
+
+        if (! $user || ! $school) {
+            throw new InvalidArgumentException('Cannot set role without an active school or user.');
+        }
+
+        $hasRole = $user->schoolUserRoles()
+            ->where('school_id', $school->id)
+            ->where('role', $role)
+            ->exists();
+
+        if (! $hasRole) {
+            throw new InvalidArgumentException('User does not have the requested role for the active school.');
+        }
+
         Session::put('active_role', $role);
     }
 
@@ -60,39 +77,31 @@ class ActiveContext
             return null;
         }
 
-        $schoolId = Session::get('active_school_id');
-        $role = Session::get('active_role');
+        $activeSchool = self::getSchool();
 
-        $roleQuery = $user->schoolUserRoles();
+        if (! $activeSchool) {
+            Session::forget('active_role');
 
-        if ($schoolId) {
-            $roleQuery->where('school_id', $schoolId);
+            return null;
         }
 
-        if ($role && (clone $roleQuery)->where('role', $role)->exists()) {
+        $role = Session::get('active_role');
+
+        if ($role && $user->schoolUserRoles()
+            ->where('school_id', $activeSchool->id)
+            ->where('role', $role)
+            ->exists()) {
             return $role;
         }
 
-        if ($schoolId) {
-            $context = $user->schoolUserRoles()
-                ->where('school_id', $schoolId)
-                ->first();
+        Session::forget('active_role');
 
-            if ($context) {
-                self::setRole($context->role);
-
-                return $context->role;
-            }
-        }
-
-        $context = $user->schoolUserRoles()->first();
+        $context = $user->schoolUserRoles()
+            ->where('school_id', $activeSchool->id)
+            ->first();
 
         if ($context) {
-            self::setRole($context->role);
-
-            if ($context->school) {
-                self::setSchool($context->school->id);
-            }
+            Session::put('active_role', $context->role);
 
             return $context->role;
         }
@@ -110,12 +119,10 @@ class ActiveContext
 
         $currentRole = Session::get('active_role');
 
-        $hasRoleForSchool = $currentRole && $user->schoolUserRoles()
+        if ($currentRole && $user->schoolUserRoles()
             ->where('school_id', $school->id)
             ->where('role', $currentRole)
-            ->exists();
-
-        if ($hasRoleForSchool) {
+            ->exists()) {
             return $currentRole;
         }
 
@@ -124,8 +131,7 @@ class ActiveContext
             ->value('role');
 
         if ($derivedRole) {
-            self::setRole($derivedRole);
-            self::setSchool($school->id);
+            Session::put('active_role', $derivedRole);
 
             return $derivedRole;
         }
@@ -135,7 +141,11 @@ class ActiveContext
 
     public static function ensureSchoolContext(School $school): ?string
     {
-        self::setSchool($school->id);
+        $activeSchool = self::getSchool();
+
+        if (! $activeSchool || $activeSchool->id !== $school->id) {
+            self::setSchool($school->id);
+        }
 
         return self::resolveRoleForSchool($school);
     }
