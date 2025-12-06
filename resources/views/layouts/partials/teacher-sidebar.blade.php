@@ -1,8 +1,10 @@
 @php
-    $school = $school
+    $activeSchool = \App\Services\ActiveContext::getSchool();
+    $school = $activeSchool
+        ?? $school
         ?? request()->attributes->get('branch')
         ?? request()->attributes->get('school')
-        ?? \App\Services\ActiveContext::getSchool();
+        ?? auth()->user()?->school;
 @endphp
 
 <nav class="space-y-1">

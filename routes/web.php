@@ -209,36 +209,59 @@ Route::prefix('{network:slug}/{branch:slug}')
                 }
 
                 $activeSchool = ActiveContext::getSchool();
-
-                if (! $activeSchool) {
-                    if ($user->schoolUserRoles()->where('school_id', $branch->id)->exists()) {
-                        ActiveContext::setSchool($branch->id);
-                        $activeSchool = $branch;
-                    } else {
-                        $activeSchool = ActiveContext::getSchool();
-                    }
-                }
+                $activeRole = ActiveContext::getRole();
 
                 if ($activeSchool && $activeSchool->id !== $branch->id) {
                     return redirect()->to(tenant_route('dashboard', $activeSchool));
+                }
+
+                if (! $activeSchool && $user->schoolUserRoles()->where('school_id', $branch->id)->exists()) {
+                    ActiveContext::setSchool($branch->id);
+                    $activeSchool = $branch;
                 }
 
                 if (! $activeSchool) {
                     abort(403, 'No active school context available.');
                 }
 
-                $activeRole = ActiveContext::getRole();
+                if ($activeRole) {
+                    $hasRole = $user->schoolUserRoles()
+                        ->where('school_id', $activeSchool->id)
+                        ->where('role', $activeRole)
+                        ->exists();
+
+                    if (! $hasRole) {
+                        ActiveContext::clearRole();
+                        $activeRole = null;
+                    }
+                }
+
+                if (! $activeRole) {
+                    $derivedRole = $user->schoolUserRoles()
+                        ->where('school_id', $activeSchool->id)
+                        ->value('role');
+
+                    if ($derivedRole) {
+                        ActiveContext::setRole($derivedRole);
+                        $activeRole = $derivedRole;
+                    }
+                }
 
                 if (! $activeRole) {
                     abort(403, 'No role assigned for this school.');
                 }
 
-                return match ($activeRole) {
-                    'admin' => redirect()->to(tenant_route('school.admin.dashboard', $activeSchool)),
-                    'teacher' => redirect()->to(tenant_route('teacher.dashboard', $activeSchool)),
-                    'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $activeSchool)),
-                    default => abort(403, 'Invalid user role.')
-                };
+                return redirect()->to(
+                    tenant_route(
+                        match ($activeRole) {
+                            'admin' => 'school.admin.dashboard',
+                            'teacher' => 'teacher.dashboard',
+                            'supervisor' => 'supervisor.dashboard',
+                            default => abort(403, 'Invalid user role.'),
+                        },
+                        $activeSchool,
+                    )
+                );
             })->name('dashboard');
 
             // ===========================

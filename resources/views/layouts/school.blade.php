@@ -1235,27 +1235,23 @@
                                 @lang('messages.switch_context')
                             </label>
                             <div class="space-y-2">
-                                @foreach($availableContexts as $ctx)
-                                    @php $schoolCtx = $ctx->school; @endphp
+                                @foreach($availableContexts as $schoolCtx)
+                                <form method="POST"
+                                      action="{{ tenant_route('tenant.switch-context', $schoolCtx->school) }}"
+                                      class="w-full">
+                                    @csrf
+                                    <input type="hidden" name="school_id" value="{{ $schoolCtx->school->id }}">
+                                    <input type="hidden" name="role" value="{{ $schoolCtx->role }}">
 
-                                    @if($schoolCtx)
-                                    <form method="POST" action="{{ tenant_route('tenant.switch-context', $schoolCtx) }}">
-                                        @csrf
-                                        <input type="hidden" name="school_id" value="{{ $schoolCtx->id }}">
-                                        <input type="hidden" name="role" value="{{ $ctx->role }}">
+                                    <button type="submit"
+                                            class="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                                        {{ $schoolCtx->school->name }} ({{ $schoolCtx->role }})
 
-                                        <button type="submit" class="w-full text-left px-3 py-2 hover:bg-slate-100">
-                                            <div class="font-medium">{{ $schoolCtx->name }}</div>
-                                            <div class="text-xs text-gray-500">
-                                                @lang('messages.role_' . $ctx->role)
-                                            </div>
-
-                                            @if(session('active_school_id') == $schoolCtx->id && session('active_role') == $ctx->role)
-                                                <span class="text-xs text-green-600">@lang('messages.current')</span>
-                                            @endif
-                                        </button>
-                                    </form>
-                                    @endif
+                                        @if(session('active_school_id') == $schoolCtx->school->id && session('active_role') == $schoolCtx->role)
+                                            <span class="block text-xs text-green-600">@lang('messages.current')</span>
+                                        @endif
+                                    </button>
+                                </form>
                                 @endforeach
                             </div>
                         </div>

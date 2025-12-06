@@ -45,11 +45,15 @@ class ContextSwitchController extends Controller
         ActiveContext::setSchool($school->id);
         ActiveContext::setRole($role);
 
-        return match ($role) {
-            'admin' => redirect()->to(tenant_route('school.admin.dashboard', $school)),
-            'teacher' => redirect()->to(tenant_route('teacher.dashboard', $school)),
-            'supervisor' => redirect()->to(tenant_route('supervisor.dashboard', $school)),
-            default => abort(403),
-        };
+        return redirect()->to(
+            tenant_route(
+                match ($role) {
+                    'admin' => 'school.admin.dashboard',
+                    'supervisor' => 'supervisor.dashboard',
+                    'teacher' => 'teacher.dashboard',
+                },
+                $school,
+            )
+        );
     }
 }
