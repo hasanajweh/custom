@@ -15,21 +15,32 @@ class ContextSwitchController extends Controller
 {
     /**
      * Handle GET requests to switch-context (redirect to dashboard with error).
-     * 
-     * This handles cases where:
-     * - User navigates directly to the URL
-     * - JavaScript is disabled and form doesn't submit properly
-     * - Browser follows a cached redirect
+     * Used when someone accidentally navigates to the switch URL via GET.
      */
     public function show(Request $request): RedirectResponse
+    {
+        return $this->redirectToDashboard();
+    }
+
+    /**
+     * Handle GET requests to global switch route.
+     */
+    public function showGlobal(Request $request): RedirectResponse
+    {
+        return $this->redirectToDashboard();
+    }
+
+    /**
+     * Redirect user to their appropriate dashboard.
+     */
+    private function redirectToDashboard(): RedirectResponse
     {
         $user = Auth::user();
         
         if (! $user) {
-            return redirect()->route('login');
+            return redirect('/');
         }
 
-        // Try to redirect to the user's current dashboard
         $activeSchool = ActiveContext::getSchool();
         $activeRole = ActiveContext::getRole();
 
@@ -41,35 +52,48 @@ class ContextSwitchController extends Controller
                 default => 'dashboard',
             };
 
-            return redirect()
-                ->to(tenant_route($dashboardRoute, $activeSchool))
-                ->with('info', __('messages.switch_context_post_required'));
+            return redirect()->to(tenant_route($dashboardRoute, $activeSchool));
         }
 
-        // Fallback: try to get school from route
-        $branch = $request->route('branch');
-        if ($branch instanceof School) {
-            return redirect()
-                ->to(tenant_route('dashboard', $branch))
-                ->with('info', __('messages.switch_context_post_required'));
+        // Try to get first available context
+        $firstContext = $user->schoolUserRoles()->with('school.network')->first();
+        
+        if ($firstContext && $firstContext->school) {
+            ActiveContext::setContext($firstContext->school->id, $firstContext->role);
+            return redirect()->to(tenant_route('dashboard', $firstContext->school));
         }
 
-        return redirect('/')->with('error', __('messages.auth.unauthorized'));
+        return redirect('/');
     }
 
     /**
-     * Switch the active school/role context for the authenticated user.
-     * 
-     * This method validates the user has the requested role in the requested school,
-     * sets the ActiveContext, and redirects to the correct dashboard using the
-     * school's network and school slugs.
+     * Switch context via tenant-prefixed route.
      */
     public function switch(Request $request): RedirectResponse
+    {
+        return $this->performSwitch($request);
+    }
+
+    /**
+     * Switch context via global route (more reliable, no route binding issues).
+     */
+    public function switchGlobal(Request $request): RedirectResponse
+    {
+        return $this->performSwitch($request);
+    }
+
+    /**
+     * Perform the actual context switch.
+     * 
+     * This method validates the user has the requested role in the requested school,
+     * sets the ActiveContext, and redirects to the correct dashboard.
+     */
+    private function performSwitch(Request $request): RedirectResponse
     {
         $user = Auth::user();
 
         if (! $user) {
-            abort(403, 'Not authenticated.');
+            return redirect('/')->with('error', __('messages.auth.unauthorized'));
         }
 
         $validated = $request->validate([

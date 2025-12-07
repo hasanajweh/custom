@@ -131,6 +131,18 @@ Route::post('/impersonate/leave', [ImpersonationController::class, 'stop'])
     ->name('impersonate.leave');
 
 // ===========================
+// GLOBAL CONTEXT SWITCH ROUTE (outside tenant prefix for reliability)
+// ===========================
+Route::middleware(['web', 'auth'])
+    ->prefix('context')
+    ->group(function () {
+        Route::get('/switch', [ContextSwitchController::class, 'showGlobal'])
+            ->name('context.switch.show');
+        Route::post('/switch', [ContextSwitchController::class, 'switchGlobal'])
+            ->name('context.switch');
+    });
+
+// ===========================
 // MAIN ADMIN ROUTES
 // ===========================
 Route::prefix('{network:slug}/main-admin')
