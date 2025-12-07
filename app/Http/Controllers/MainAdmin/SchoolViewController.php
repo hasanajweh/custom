@@ -19,14 +19,23 @@ class SchoolViewController extends Controller
             abort(403);
         }
         
-        $school = School::where('slug', $schoolSlug)
+        $school = School::with('network')
+            ->where('slug', $schoolSlug)
             ->where('network_id', $network->id)
             ->firstOrFail();
         
         // Set context to view as admin - this allows main admin to access school routes
-        ActiveContext::setContext($school->id, 'admin');
+        // Set school first, then role
+        ActiveContext::setSchool($school->id);
+        ActiveContext::setRole('admin');
+        
+        // Ensure session is saved before redirect
+        session()->save();
+        
+        // Use tenant_route helper to generate the correct URL
+        $dashboardUrl = tenant_route('school.admin.dashboard', $school);
         
         // Redirect to the actual school admin dashboard (full admin experience)
-        return redirect()->to(tenant_route('school.admin.dashboard', $school));
+        return redirect($dashboardUrl);
     }
 }

@@ -16,7 +16,10 @@ class ActiveContext
         // Main admin exception: verify school belongs to their network
         if ($user && $user->isMainAdmin()) {
             $school = School::find($id);
-            if ($school && $school->network_id !== $user->network_id) {
+            if (!$school) {
+                throw new InvalidArgumentException('School not found.');
+            }
+            if ($school->network_id !== $user->network_id) {
                 throw new InvalidArgumentException('School does not belong to your network.');
             }
         }

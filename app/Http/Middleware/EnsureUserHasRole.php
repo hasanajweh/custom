@@ -21,19 +21,45 @@ class EnsureUserHasRole
             abort(403);
         }
 
-        // Main admin exception: if they have active context set, allow access
+        // Main admin exception: can access any school in their network
         if ($user->isMainAdmin()) {
             $activeSchool = ActiveContext::getSchool();
             $activeRole = ActiveContext::getRole();
             
-            if ($activeSchool && $activeRole) {
-                // Verify school belongs to main admin's network
-                if ($activeSchool->network_id === $user->network_id) {
-                    // Check if the active role matches the required role for this route
-                    $allowedRoles = $this->normalizeRoles($roles);
-                    if (empty($allowedRoles) || in_array($activeRole, $allowedRoles, true)) {
-                        return $next($request);
+            // Try to get school from route if active context not set yet
+            if (!$activeSchool) {
+                $schoolFromRoute = $request->route('school') ?? $request->route('branch');
+                if ($schoolFromRoute) {
+                    $resolvedSchool = SchoolResolver::resolve($schoolFromRoute);
+                    if ($resolvedSchool && $resolvedSchool->network_id === $user->network_id) {
+                        try {
+                            ActiveContext::setSchool($resolvedSchool->id);
+                            ActiveContext::setRole('admin');
+                            $activeSchool = $resolvedSchool;
+                            $activeRole = 'admin';
+                        } catch (\Exception $e) {
+                            // If setting context fails, continue to check below
+                        }
                     }
+                }
+            }
+            
+            // If we have a school (from context or route), allow access
+            if ($activeSchool && $activeSchool->network_id === $user->network_id) {
+                // If no role set, default to admin for main admin
+                if (!$activeRole) {
+                    try {
+                        ActiveContext::setRole('admin');
+                        $activeRole = 'admin';
+                    } catch (\Exception $e) {
+                        // Continue anyway
+                    }
+                }
+                
+                // Check if the active role matches the required role for this route
+                $allowedRoles = $this->normalizeRoles($roles);
+                if (empty($allowedRoles) || ($activeRole && in_array($activeRole, $allowedRoles, true))) {
+                    return $next($request);
                 }
             }
         }
