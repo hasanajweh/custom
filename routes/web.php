@@ -169,8 +169,8 @@ Route::prefix('{network:slug}/main-admin')
             Route::put('profile', [MainAdminProfileController::class, 'update'])->name('profile.update');
             Route::put('profile/password', [MainAdminProfileController::class, 'updatePassword'])->name('profile.password.update');
             
-            // School view (view as admin) - redirects to full admin dashboard
-            Route::get('school/{schoolSlug}/view', [SchoolViewController::class, 'view'])->name('school.view');
+            // School impersonation (simple query parameter approach)
+            Route::get('hierarchy/impersonate', [SchoolViewController::class, 'impersonate'])->name('hierarchy.impersonate');
             
             Route::post('logout', [LoginController::class, 'logout'])->name('logout');
         });

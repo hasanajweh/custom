@@ -1429,13 +1429,13 @@
                         <i class="ri-eye-line text-2xl"></i>
                         <div>
                             <p class="font-semibold">{{ __('messages.main_admin.viewing_as_admin') }}</p>
-                            <p class="text-sm text-yellow-100">{{ $activeContextSchool->name }} • {{ __('messages.network') }}: {{ $network->name ?? $activeContextSchool->network->name }}</p>
+                            <p class="text-sm text-yellow-100">{{ $activeContextSchool->name }}</p>
                         </div>
                     </div>
-                    <a href="{{ route('main-admin.dashboard', ['network' => ($network->slug ?? $activeContextSchool->network->slug)]) }}" 
+                    <a href="{{ route('main-admin.hierarchy', ['network' => ($network->slug ?? $activeContextSchool->network->slug)]) }}" 
                        class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg font-medium transition-all duration-200 whitespace-nowrap">
                         <i class="ri-arrow-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}-line"></i>
-                        {{ __('messages.main_admin.back_to_main_dashboard') }}
+                        {{ __('messages.main_admin.back_to_dashboard') }}
                     </a>
                 </div>
             </div>

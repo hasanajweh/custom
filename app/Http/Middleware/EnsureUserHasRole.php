@@ -21,7 +21,7 @@ class EnsureUserHasRole
             abort(403);
         }
 
-        // Main admin exception: can access any school in their network
+        // Main admin exception: can access any school in their network - no checks needed
         if ($user->isMainAdmin()) {
             $activeSchool = ActiveContext::getSchool();
             $activeRole = ActiveContext::getRole();
@@ -44,7 +44,7 @@ class EnsureUserHasRole
                 }
             }
             
-            // If we have a school (from context or route), allow access
+            // If we have a school from context or route, allow access
             if ($activeSchool && $activeSchool->network_id === $user->network_id) {
                 // If no role set, default to admin for main admin
                 if (!$activeRole) {
@@ -56,9 +56,19 @@ class EnsureUserHasRole
                     }
                 }
                 
-                // Check if the active role matches the required role for this route
+                // Main admin can access any role route - just check if role matches
                 $allowedRoles = $this->normalizeRoles($roles);
                 if (empty($allowedRoles) || ($activeRole && in_array($activeRole, $allowedRoles, true))) {
+                    return $next($request);
+                }
+            }
+            
+            // If no active school but main admin, try to get from route and allow
+            $schoolFromRoute = $request->route('school') ?? $request->route('branch');
+            if ($schoolFromRoute) {
+                $resolvedSchool = SchoolResolver::resolve($schoolFromRoute);
+                if ($resolvedSchool && $resolvedSchool->network_id === $user->network_id) {
+                    // Allow main admin through - they can view/edit anything
                     return $next($request);
                 }
             }

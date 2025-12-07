@@ -100,7 +100,7 @@
 
                     <!-- View School Button -->
                     <div class="mt-6 pt-4 border-t border-gray-200">
-                        <a href="{{ route('main-admin.school.view', ['network' => $network->slug, 'schoolSlug' => $branch->slug]) }}" 
+                        <a href="{{ route('main-admin.hierarchy.impersonate', ['network' => $network->slug, 'school' => $branch->slug]) }}" 
                            class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
                             <i class="ri-eye-line"></i>
                             {{ __('messages.main_admin.view_as_admin') }}

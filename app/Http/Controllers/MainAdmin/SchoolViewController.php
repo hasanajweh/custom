@@ -11,31 +11,40 @@ use Illuminate\Support\Facades\Auth;
 
 class SchoolViewController extends Controller
 {
-    public function view(Network $network, string $schoolSlug)
+    public function impersonate(Request $request, Network $network)
     {
         $user = Auth::user();
         
+        // Simple check: must be main admin of this network
         if (!$user->isMainAdmin() || $user->network_id !== $network->id) {
             abort(403);
+        }
+        
+        $schoolSlug = $request->query('school');
+        
+        if (!$schoolSlug) {
+            return redirect()->route('main-admin.hierarchy', ['network' => $network->slug])
+                ->with('error', 'School parameter is required.');
         }
         
         $school = School::with('network')
             ->where('slug', $schoolSlug)
             ->where('network_id', $network->id)
-            ->firstOrFail();
+            ->first();
         
-        // Set context to view as admin - this allows main admin to access school routes
-        // Set school first, then role
+        if (!$school) {
+            return redirect()->route('main-admin.hierarchy', ['network' => $network->slug])
+                ->with('error', 'School not found.');
+        }
+        
+        // Set context silently (no logging)
         ActiveContext::setSchool($school->id);
         ActiveContext::setRole('admin');
         
-        // Ensure session is saved before redirect
+        // Save session
         session()->save();
         
-        // Use tenant_route helper to generate the correct URL
-        $dashboardUrl = tenant_route('school.admin.dashboard', $school);
-        
-        // Redirect to the actual school admin dashboard (full admin experience)
-        return redirect($dashboardUrl);
+        // Redirect to school admin dashboard
+        return redirect()->to(tenant_route('school.admin.dashboard', $school));
     }
 }

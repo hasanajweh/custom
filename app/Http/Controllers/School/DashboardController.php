@@ -26,7 +26,13 @@ class DashboardController extends Controller
 
         $user = Auth::user();
 
-        if ($user && $user->school_id !== $branch->id) {
+        // Main admin exception: can access any school in their network
+        if ($user && $user->isMainAdmin()) {
+            if ($branch->network_id !== $user->network_id) {
+                abort(403, 'School does not belong to your network.');
+            }
+            // Main admin can proceed - no school_id check needed
+        } elseif ($user && $user->school_id !== $branch->id) {
             abort(403);
         }
 

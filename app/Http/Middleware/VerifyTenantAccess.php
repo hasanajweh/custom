@@ -36,22 +36,24 @@ class VerifyTenantAccess
             abort(404);
         }
 
-        // Main admin exception: can access any school in their network
+        // Main admin exception: can access any school in their network - no restrictions
         if ($user && $user->isMainAdmin()) {
             // If no school in route, allow (might be a route without school parameter)
             if (!$school) {
                 return $next($request);
             }
             
+            // Verify network match if network is in route
             if ($networkId && $user->network_id !== $networkId) {
                 abort(403, 'Unauthorized access to this network.');
             }
 
+            // Verify school belongs to main admin's network
             if ($school && $school->network_id !== $user->network_id) {
                 abort(403, 'Unauthorized access to this school.');
             }
 
-            // Main admin can access - allow through
+            // Main admin can access everything - allow through immediately
             return $next($request);
         }
 

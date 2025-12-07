@@ -1314,6 +1314,7 @@ return [
         'view_as_admin' => 'View as Admin',
         'viewing_as_admin' => 'Viewing as Admin',
         'back_to_main_dashboard' => 'Back to Main Dashboard',
+        'back_to_dashboard' => 'Back to Dashboard',
         'no_branches' => 'No branches found',
         'no_branches_description' => 'There are no branches in this network yet.',
         'subjects_grades' => [

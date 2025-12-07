@@ -1314,6 +1314,7 @@ return [
         'view_as_admin' => 'عرض كمدير',
         'viewing_as_admin' => 'عرض كمدير',
         'back_to_main_dashboard' => 'العودة إلى لوحة التحكم الرئيسية',
+        'back_to_dashboard' => 'العودة إلى لوحة التحكم',
         'no_branches' => 'لا توجد فروع',
         'no_branches_description' => 'لا توجد فروع في هذه الشبكة بعد.',
         'subjects_grades' => [
