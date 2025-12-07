@@ -169,9 +169,8 @@ Route::prefix('{network:slug}/main-admin')
             Route::put('profile', [MainAdminProfileController::class, 'update'])->name('profile.update');
             Route::put('profile/password', [MainAdminProfileController::class, 'updatePassword'])->name('profile.password.update');
             
-            // School view (view as admin)
+            // School view (view as admin) - redirects to full admin dashboard
             Route::get('school/{schoolSlug}/view', [SchoolViewController::class, 'view'])->name('school.view');
-            Route::get('school/{schoolSlug}/dashboard', [SchoolViewController::class, 'dashboard'])->name('school.dashboard');
             
             Route::post('logout', [LoginController::class, 'logout'])->name('logout');
         });

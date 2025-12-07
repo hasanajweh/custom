@@ -1421,6 +1421,25 @@
 <!-- Enhanced Main Content -->
 <main class="main-content {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
     <div class="p-6 md:p-8 max-w-7xl mx-auto">
+        @if(Auth::check() && Auth::user()->isMainAdmin() && $currentRole === 'admin' && $activeContextSchool)
+            <!-- Main Admin Viewing Banner -->
+            <div class="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl p-4 text-white shadow-lg mb-6">
+                <div class="flex items-center justify-between flex-wrap gap-3">
+                    <div class="flex items-center gap-3">
+                        <i class="ri-eye-line text-2xl"></i>
+                        <div>
+                            <p class="font-semibold">{{ __('messages.main_admin.viewing_as_admin') }}</p>
+                            <p class="text-sm text-yellow-100">{{ $activeContextSchool->name }} • {{ __('messages.network') }}: {{ $network->name ?? $activeContextSchool->network->name }}</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('main-admin.dashboard', ['network' => ($network->slug ?? $activeContextSchool->network->slug)]) }}" 
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg font-medium transition-all duration-200 whitespace-nowrap">
+                        <i class="ri-arrow-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}-line"></i>
+                        {{ __('messages.main_admin.back_to_main_dashboard') }}
+                    </a>
+                </div>
+            </div>
+        @endif
         @yield('content')
     </div>
 </main>

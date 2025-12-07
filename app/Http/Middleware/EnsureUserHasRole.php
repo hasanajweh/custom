@@ -21,6 +21,23 @@ class EnsureUserHasRole
             abort(403);
         }
 
+        // Main admin exception: if they have active context set, allow access
+        if ($user->isMainAdmin()) {
+            $activeSchool = ActiveContext::getSchool();
+            $activeRole = ActiveContext::getRole();
+            
+            if ($activeSchool && $activeRole) {
+                // Verify school belongs to main admin's network
+                if ($activeSchool->network_id === $user->network_id) {
+                    // Check if the active role matches the required role for this route
+                    $allowedRoles = $this->normalizeRoles($roles);
+                    if (empty($allowedRoles) || in_array($activeRole, $allowedRoles, true)) {
+                        return $next($request);
+                    }
+                }
+            }
+        }
+
         $allowedRoles = $this->normalizeRoles($roles);
 
         $route = $request->route();
