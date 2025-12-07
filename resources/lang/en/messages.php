@@ -217,6 +217,8 @@ return [
             'supervisor_title' => 'No supervisor uploads',
             'supervisor_subtitle' => 'No supervisor materials in the last 72 hours',
         ],
+        'no_subjects_assigned' => 'No subjects assigned',
+        'no_files_to_review' => 'No files to review',
     ],
 
     // Navigation
@@ -236,6 +238,7 @@ return [
         'terms' => 'Terms',
         'manage_users' => 'Manage Users',
         'file_browser' => 'File Browser',
+        'files' => 'Files',
         'my_files' => 'My Files',
         'upload_file' => 'Upload File',
         'review_files' => 'Review Files',

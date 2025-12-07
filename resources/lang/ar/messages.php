@@ -217,6 +217,8 @@ return [
             'supervisor_title' => 'لا توجد ملفات للمشرفين',
             'supervisor_subtitle' => 'لا توجد مواد للمشرفين في آخر 72 ساعة',
         ],
+        'no_subjects_assigned' => 'لم يتم تعيين مواد لك',
+        'no_files_to_review' => 'لا توجد ملفات للمراجعة',
     ],
 
 
@@ -274,6 +276,7 @@ return [
         'terms' => 'الشروط',
         'manage_users' => 'إدارة المستخدمين',
         'file_browser' => 'متصفح الملفات',
+        'files' => 'الملفات',
         'my_files' => 'ملفاتي',
         'upload_file' => 'رفع ملف',
         'review_files' => 'مراجعة الملفات',

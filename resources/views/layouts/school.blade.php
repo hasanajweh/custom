@@ -1163,13 +1163,54 @@
 
             <!-- Right Navigation -->
             <div class="flex items-center space-x-4 {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}">
-                <button 
-                    type="button"
-                    onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')"
-                    class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-                >
-                    {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
-                </button>
+                <!-- Beautiful Language Switcher -->
+                <div class="relative" x-data="{ open: false }">
+                    <button 
+                        @click="open = !open"
+                        @click.away="open = false"
+                        type="button"
+                        class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 border border-indigo-100 transition-all duration-200 group"
+                    >
+                        <span class="text-lg">{{ app()->getLocale() === 'ar' ? '🇸🇦' : '🇬🇧' }}</span>
+                        <span class="text-sm font-medium text-gray-700 group-hover:text-indigo-700">
+                            {{ app()->getLocale() === 'ar' ? 'العربية' : 'English' }}
+                        </span>
+                        <i class="ri-arrow-down-s-line text-gray-400 group-hover:text-indigo-500 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
+                    </button>
+                    
+                    <div 
+                        x-show="open"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        class="absolute {{ app()->getLocale() === 'ar' ? 'left-0' : 'right-0' }} mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50"
+                        style="display: none;"
+                    >
+                        <button
+                            onclick="switchLocale('ar')"
+                            class="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-colors {{ app()->getLocale() === 'ar' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700' }}"
+                        >
+                            <span class="text-xl">🇸🇦</span>
+                            <span>العربية</span>
+                            @if(app()->getLocale() === 'ar')
+                                <i class="ri-check-line {{ app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto' }} text-indigo-600"></i>
+                            @endif
+                        </button>
+                        <button
+                            onclick="switchLocale('en')"
+                            class="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-colors {{ app()->getLocale() === 'en' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700' }}"
+                        >
+                            <span class="text-xl">🇬🇧</span>
+                            <span>English</span>
+                            @if(app()->getLocale() === 'en')
+                                <i class="ri-check-line {{ app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto' }} text-indigo-600"></i>
+                            @endif
+                        </button>
+                    </div>
+                </div>
 
                 <!-- Enhanced User Dropdown -->
                 <div class="relative">
@@ -1349,15 +1390,24 @@
             @include('layouts.partials.supervisor-sidebar')
         @endif
 
-        <!-- Mobile Language Switcher (Moved here) -->
-        <div class="mobile-language-switcher">
-            <button 
-                type="button"
-                onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')"
-                class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-            >
-                {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
-            </button>
+        <!-- Mobile Language Switcher -->
+        <div class="mobile-language-switcher p-4">
+            <div class="flex gap-2">
+                <button
+                    onclick="switchLocale('ar')"
+                    class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-200 {{ app()->getLocale() === 'ar' ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
+                >
+                    <span class="text-lg">🇸🇦</span>
+                    <span class="font-medium">العربية</span>
+                </button>
+                <button
+                    onclick="switchLocale('en')"
+                    class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-200 {{ app()->getLocale() === 'en' ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
+                >
+                    <span class="text-lg">🇬🇧</span>
+                    <span class="font-medium">English</span>
+                </button>
+            </div>
         </div>
 
         <div class="sidebar-footer">
