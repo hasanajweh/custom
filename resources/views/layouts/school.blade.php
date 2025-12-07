@@ -1248,7 +1248,7 @@
                                         $roleColor = $roleColors[$schoolCtx->role] ?? 'bg-gray-100 text-gray-700';
                                     @endphp
                                     <form method="POST"
-                                          action="{{ route('context.switch') }}"
+                                          action="{{ tenant_route('tenant.switch-context', $school) }}"
                                           class="w-full">
                                         @csrf
                                         <input type="hidden" name="school_id" value="{{ $schoolCtx->school->id }}">

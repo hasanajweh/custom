@@ -5,7 +5,6 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
-    // ...
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
@@ -17,8 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 \App\Http\Middleware\SetLocale::class,
             ],
             append: [
+                // IdentifyTenant is safe - it only sets context if school param exists
                 \App\Http\Middleware\IdentifyTenant::class,
-                \App\Http\Middleware\SetNetwork::class,
+                // NOTE: SetNetwork removed from global - it was causing 404 on routes without {network}
+                // Use 'setNetwork' middleware alias on specific route groups instead
             ]
         );
 

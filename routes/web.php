@@ -131,18 +131,6 @@ Route::post('/impersonate/leave', [ImpersonationController::class, 'stop'])
     ->name('impersonate.leave');
 
 // ===========================
-// GLOBAL CONTEXT SWITCH ROUTE (outside tenant prefix for reliability)
-// ===========================
-Route::middleware(['web', 'auth'])
-    ->prefix('context')
-    ->group(function () {
-        Route::get('/switch', [ContextSwitchController::class, 'showGlobal'])
-            ->name('context.switch.show');
-        Route::post('/switch', [ContextSwitchController::class, 'switchGlobal'])
-            ->name('context.switch');
-    });
-
-// ===========================
 // MAIN ADMIN ROUTES
 // ===========================
 Route::prefix('{network:slug}/main-admin')
@@ -202,7 +190,7 @@ Route::prefix('{network:slug}/{branch:slug}')
         // ===========================
         // AUTHENTICATED TENANT ROUTES (ALL ROLES)
         // ===========================
-        Route::middleware(['ensure.school.network.match', 'verify.tenant.access', 'auth'])->group(function () {
+        Route::middleware(['auth', 'verify.tenant.access'])->group(function () {
             // Context Switch Routes - handles switching between schools/roles for multi-role users
             Route::get('/switch-context', [ContextSwitchController::class, 'show'])
                 ->name('tenant.switch-context.show');
