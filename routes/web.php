@@ -131,6 +131,14 @@ Route::post('/impersonate/leave', [ImpersonationController::class, 'stop'])
     ->name('impersonate.leave');
 
 // ===========================
+// CONTEXT SWITCH (Simple route - no tenant binding needed)
+// ===========================
+Route::middleware(['auth'])->group(function () {
+    Route::post('/switch-context', [ContextSwitchController::class, 'switch'])
+        ->name('switch-context');
+});
+
+// ===========================
 // MAIN ADMIN ROUTES
 // ===========================
 Route::prefix('{network:slug}/main-admin')
