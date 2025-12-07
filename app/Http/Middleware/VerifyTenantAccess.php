@@ -36,7 +36,8 @@ class VerifyTenantAccess
             abort(404);
         }
 
-        if ($user && $user->role === 'main_admin') {
+        // Main admin exception: can access any school in their network
+        if ($user && $user->isMainAdmin()) {
             if ($networkId && $user->network_id !== $networkId) {
                 abort(403, 'Unauthorized access to this network.');
             }

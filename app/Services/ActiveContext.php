@@ -11,6 +11,16 @@ class ActiveContext
 {
     public static function setSchool(int $id): void
     {
+        $user = Auth::user();
+        
+        // Main admin exception: verify school belongs to their network
+        if ($user && $user->isMainAdmin()) {
+            $school = School::find($id);
+            if ($school && $school->network_id !== $user->network_id) {
+                throw new InvalidArgumentException('School does not belong to your network.');
+            }
+        }
+        
         Session::put('active_school_id', $id);
         Session::forget('active_role');
     }
@@ -23,18 +33,40 @@ class ActiveContext
             return null;
         }
 
+        // Main admin exception: can access any school in their network
+        $isMainAdmin = $user->isMainAdmin();
+
         $schoolId = Session::get('active_school_id');
 
         if ($schoolId) {
             $school = School::with('network')->find($schoolId);
 
-            if ($school && $user->schoolUserRoles()->where('school_id', $schoolId)->exists()) {
-                return $school;
+            if ($school) {
+                // Main admin: check if school belongs to their network
+                if ($isMainAdmin) {
+                    if ($school->network_id === $user->network_id) {
+                        return $school;
+                    }
+                } 
+                // Regular user: check if they have a role in this school
+                elseif ($user->schoolUserRoles()->where('school_id', $schoolId)->exists()) {
+                    return $school;
+                }
             }
 
             Session::forget('active_school_id');
         }
 
+        // Main admin: return first school in their network if no active school set
+        if ($isMainAdmin && $user->network_id) {
+            $school = School::where('network_id', $user->network_id)->first();
+            if ($school) {
+                self::setSchool($school->id);
+                return $school;
+            }
+        }
+
+        // Regular user: get from schoolUserRoles
         $context = $user->schoolUserRoles()
             ->with('school.network')
             ->first();
@@ -57,6 +89,20 @@ class ActiveContext
             throw new InvalidArgumentException('Cannot set role without an active school or user.');
         }
 
+        // Main admin exception: can set any role for any school in their network
+        $isMainAdmin = $user->isMainAdmin();
+        
+        if ($isMainAdmin) {
+            // Verify school belongs to main admin's network
+            if ($school->network_id !== $user->network_id) {
+                throw new InvalidArgumentException('School does not belong to your network.');
+            }
+            // Main admin can set any role (admin, teacher, supervisor) for viewing purposes
+            Session::put('active_role', $role);
+            return;
+        }
+
+        // Regular user: must have the role in this school
         $hasRole = $user->schoolUserRoles()
             ->where('school_id', $school->id)
             ->where('role', $role)
@@ -96,6 +142,20 @@ class ActiveContext
             return null;
         }
 
+        // Main admin exception: return session role if set, or default to 'admin'
+        $isMainAdmin = $user->isMainAdmin();
+        
+        if ($isMainAdmin) {
+            $role = Session::get('active_role');
+            if ($role) {
+                return $role;
+            }
+            // Default to 'admin' for main admin viewing schools
+            Session::put('active_role', 'admin');
+            return 'admin';
+        }
+
+        // Regular user: check if they have the role
         $role = Session::get('active_role');
 
         if ($role && $user->schoolUserRoles()
@@ -125,6 +185,17 @@ class ActiveContext
         $user = Auth::user();
 
         if (! $user) {
+            return null;
+        }
+
+        // Main admin exception: can use any role for schools in their network
+        $isMainAdmin = $user->isMainAdmin();
+        
+        if ($isMainAdmin) {
+            if ($school->network_id === $user->network_id) {
+                $currentRole = Session::get('active_role');
+                return $currentRole ?: 'admin'; // Default to admin for main admin
+            }
             return null;
         }
 
