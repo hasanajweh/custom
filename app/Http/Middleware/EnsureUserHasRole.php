@@ -29,9 +29,11 @@ class EnsureUserHasRole
         $routeSchoolParam = $route?->parameter('branch') ?? $route?->parameter('school');
         $slugFromRoute = optional($routeSchoolParam)?->slug ?? $routeSchoolParam;
 
+        // Get active context from session (user's selected school/role)
         $activeSchool = ActiveContext::getSchool();
         $activeRole = ActiveContext::getRole();
 
+        // If we have both active school and role from session, validate and use them
         if ($activeSchool && $activeRole) {
             $hasRole = $user->schoolUserRoles()
                 ->where('school_id', $activeSchool->id)
@@ -39,6 +41,7 @@ class EnsureUserHasRole
                 ->exists();
 
             if ($hasRole) {
+                // Check if URL slugs match ActiveContext - if not, redirect to correct URL
                 if ($slugFromRoute && $activeSchool->slug !== $slugFromRoute && $routeName) {
                     $params = collect($routeParameters)->except(['branch', 'school', 'network'])->all();
 
@@ -49,18 +52,23 @@ class EnsureUserHasRole
                     ));
                 }
 
+                // Check if the active role is allowed for this route
                 if (empty($allowedRoles) || in_array($activeRole, $allowedRoles, true)) {
                     return $next($request);
                 }
 
-                abort(403, 'You do not have the required role for this context.');
+                // Active role doesn't match route requirements - clear it and derive new one
+                ActiveContext::clearRole();
+                $activeRole = null;
+            } else {
+                // User doesn't have this role in this school - clear context
+                ActiveContext::clear();
+                $activeSchool = null;
+                $activeRole = null;
             }
-
-            ActiveContext::clear();
-            $activeSchool = null;
-            $activeRole = null;
         }
 
+        // If no active school, try to get from route
         if (! $activeSchool) {
             $schoolFromRoute = $request->route('school') ?? $request->route('branch');
             $resolvedSchool = SchoolResolver::resolve($schoolFromRoute);
@@ -75,6 +83,7 @@ class EnsureUserHasRole
             abort(403, 'No active school context available.');
         }
 
+        // If we have an active role, validate it's still valid
         if ($activeRole) {
             $hasRole = $user->schoolUserRoles()
                 ->where('school_id', $activeSchool->id)
@@ -87,6 +96,7 @@ class EnsureUserHasRole
             }
         }
 
+        // Only derive a role if we don't have one (don't override user's selection)
         if (! $activeRole) {
             $roleQuery = $user->schoolUserRoles()->where('school_id', $activeSchool->id);
 
@@ -115,6 +125,7 @@ class EnsureUserHasRole
             abort(403, 'You do not have the required role for this context.');
         }
 
+        // Final check: ensure URL slugs match ActiveContext
         if ($slugFromRoute && $activeSchool->slug !== $slugFromRoute && $routeName) {
             $params = collect($routeParameters)->except(['branch', 'school', 'network'])->all();
 

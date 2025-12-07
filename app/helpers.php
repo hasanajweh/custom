@@ -54,14 +54,15 @@ if (!function_exists('tenant_route')) {
     /**
      * Generate tenant aware routes.
      *
+     * This function ALWAYS uses the provided school's network and school slugs,
+     * ignoring route parameters to ensure correct URL generation.
+     *
      * Controllers/services should use this helper with the default strict mode to
      * guarantee context is present. Views should use safe_tenant_route() instead.
      */
     function tenant_route(string $name, $school = null, array $parameters = [], bool $absolute = true, bool $strict = true): string
     {
-        $user = auth()->user();
-        $sessionSchoolId = session('active_school_id');
-
+        // Handle array parameters passed as second argument
         if ($school !== null && ! $school instanceof Network && ! $school instanceof School && ! $school instanceof Branch && ! is_string($school)) {
             if (is_array($school) && empty($parameters)) {
                 $parameters = $school;
@@ -71,26 +72,35 @@ if (!function_exists('tenant_route')) {
 
         $providedSchool = null;
 
+        // Resolve school from string slug if needed
         if (is_string($school)) {
             $school = School::with('network')->where('slug', $school)->first();
         }
 
+        // Store the provided school to ensure we use its slugs
         if ($school instanceof School || $school instanceof Branch) {
             $providedSchool = $school;
         }
 
-        if ($school === null && $sessionSchoolId) {
-            $school = School::with('network')->find($sessionSchoolId);
-        }
-
+        // If no school provided, try to get from ActiveContext
         if ($school === null) {
             $school = \App\Services\ActiveContext::getSchool();
         }
 
-        $route = Route::current();
-        $routeNetworkParam = $route?->parameter('network');
-        $routeSchoolParam = $route?->parameter('school') ?? $route?->parameter('branch');
+        // If still no school and we have session, try that
+        if ($school === null) {
+            $sessionSchoolId = session('active_school_id');
+            if ($sessionSchoolId) {
+                $school = School::with('network')->find($sessionSchoolId);
+            }
+        }
 
+        // If we have a provided school, ALWAYS use it (don't fall back to route params)
+        if ($providedSchool) {
+            $school = $providedSchool;
+        }
+
+        // Get network from school
         $network = match (true) {
             $school instanceof School => $school->network,
             $school instanceof Branch => $school->network,
@@ -98,41 +108,24 @@ if (!function_exists('tenant_route')) {
             default => null,
         };
 
-        if (! $school) {
-            if ($routeSchoolParam instanceof School || $routeSchoolParam instanceof Branch) {
-                $school = $routeSchoolParam;
-            } elseif (is_string($routeSchoolParam)) {
-                $school = School::with('network')->where('slug', $routeSchoolParam)->first();
-            } elseif ($user?->school) {
-                $school = $user->school;
-            }
+        // If no network and we have a school, try to load it
+        if (! $network && $school instanceof School) {
+            $school->load('network');
+            $network = $school->network;
         }
 
-        if (! $network) {
-            if ($school instanceof School || $school instanceof Branch) {
-                $network = $school->network;
-            } else {
-                $network = match (true) {
-                    $routeNetworkParam instanceof Network => $routeNetworkParam,
-                    is_string($routeNetworkParam) => Network::where('slug', $routeNetworkParam)->first(),
-                    $user && $user->network => $user->network,
-                    default => null,
-                };
-            }
-        }
-
-        if (! $network) {
-            if (! $strict) {
-                return route($name, $parameters, $absolute);
-            }
-
-            throw new \InvalidArgumentException('Network is required to generate tenant routes.');
-        }
-
+        // For routes that don't need a school (network-level only)
         if ($school === null || $school instanceof Network) {
+            if (! $network) {
+                if (! $strict) {
+                    return route($name, $parameters, $absolute);
+                }
+                throw new \InvalidArgumentException('Network is required to generate tenant routes.');
+            }
             return route($name, array_merge(['network' => $network->slug], $parameters), $absolute);
         }
 
+        // For school-level routes, we need both network and school
         $branch = match (true) {
             $school instanceof Branch => $school,
             $school instanceof School => $school,
@@ -143,26 +136,28 @@ if (!function_exists('tenant_route')) {
             if (! $strict) {
                 return route($name, $parameters, $absolute);
             }
-
             throw new \InvalidArgumentException('Branch is required to generate tenant routes for branch-level pages.');
+        }
+
+        // Ensure network is loaded
+        if (! $branch->network) {
+            $branch->load('network');
         }
 
         if (! $branch->network) {
             if (! $strict) {
                 return route($name, $parameters, $absolute);
             }
-
             throw new \InvalidArgumentException('Network is required to generate tenant routes for the provided school.');
         }
 
-        $resolvedBranch = $providedSchool ?: $branch;
-
+        // ALWAYS use the provided school's slugs, never route parameters
         return route(
             $name,
             array_merge([
-                'network' => $resolvedBranch->network->slug,
-                'branch' => $resolvedBranch->slug,
-                'school' => $resolvedBranch->slug,
+                'network' => $branch->network->slug,
+                'branch' => $branch->slug,
+                'school' => $branch->slug,
             ], $parameters),
             $absolute,
         );

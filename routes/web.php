@@ -208,22 +208,28 @@ Route::prefix('{network:slug}/{branch:slug}')
                     abort(403, 'Not authenticated.');
                 }
 
+                // Get active context from session (user's selected school/role)
                 $activeSchool = ActiveContext::getSchool();
                 $activeRole = ActiveContext::getRole();
 
+                // If ActiveContext has a different school than URL, redirect to correct URL
                 if ($activeSchool && $activeSchool->id !== $branch->id) {
                     return redirect()->to(tenant_route('dashboard', $activeSchool));
                 }
 
-                if (! $activeSchool && $user->schoolUserRoles()->where('school_id', $branch->id)->exists()) {
-                    ActiveContext::setSchool($branch->id);
-                    $activeSchool = $branch;
+                // If no active school, try to set from route
+                if (! $activeSchool) {
+                    if ($user->schoolUserRoles()->where('school_id', $branch->id)->exists()) {
+                        ActiveContext::setSchool($branch->id);
+                        $activeSchool = $branch;
+                    }
                 }
 
                 if (! $activeSchool) {
                     abort(403, 'No active school context available.');
                 }
 
+                // Validate active role is still valid for this school
                 if ($activeRole) {
                     $hasRole = $user->schoolUserRoles()
                         ->where('school_id', $activeSchool->id)
@@ -236,6 +242,7 @@ Route::prefix('{network:slug}/{branch:slug}')
                     }
                 }
 
+                // Only derive role if we don't have one (don't override user's selection)
                 if (! $activeRole) {
                     $derivedRole = $user->schoolUserRoles()
                         ->where('school_id', $activeSchool->id)
@@ -251,6 +258,12 @@ Route::prefix('{network:slug}/{branch:slug}')
                     abort(403, 'No role assigned for this school.');
                 }
 
+                // Ensure URL slugs match ActiveContext before redirecting
+                if ($activeSchool->slug !== $branch->slug || $activeSchool->network->slug !== $network->slug) {
+                    return redirect()->to(tenant_route('dashboard', $activeSchool));
+                }
+
+                // Redirect to role-specific dashboard using ActiveContext school
                 return redirect()->to(
                     tenant_route(
                         match ($activeRole) {
