@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class SchoolViewController extends Controller
 {
-    public function view(Network $network, School $school)
+    public function view(Network $network, string $schoolSlug)
     {
         $user = Auth::user();
         
@@ -19,9 +19,9 @@ class SchoolViewController extends Controller
             abort(403);
         }
         
-        if ($school->network_id !== $network->id) {
-            abort(404);
-        }
+        $school = School::where('slug', $schoolSlug)
+            ->where('network_id', $network->id)
+            ->firstOrFail();
         
         // Set context to view as admin
         ActiveContext::setContext($school->id, 'admin');
@@ -29,11 +29,11 @@ class SchoolViewController extends Controller
         // Redirect to school admin dashboard
         return redirect()->route('main-admin.school.dashboard', [
             'network' => $network->slug,
-            'school' => $school->slug
+            'schoolSlug' => $school->slug
         ]);
     }
     
-    public function dashboard(Network $network, School $school)
+    public function dashboard(Network $network, string $schoolSlug)
     {
         $user = Auth::user();
         
@@ -41,9 +41,9 @@ class SchoolViewController extends Controller
             abort(403);
         }
         
-        if ($school->network_id !== $network->id) {
-            abort(404);
-        }
+        $school = School::where('slug', $schoolSlug)
+            ->where('network_id', $network->id)
+            ->firstOrFail();
         
         // Load school admin dashboard data
         $school->loadCount([
