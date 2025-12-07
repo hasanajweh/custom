@@ -1336,6 +1336,10 @@ return [
 
     'branches' => 'Branches',
     'network' => 'Network',
+
+    // Context Switching
+    'switch_context' => 'Switch Context',
+    'current' => 'Current',
 ];
 
 

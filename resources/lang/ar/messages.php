@@ -1336,4 +1336,8 @@ return [
 
     'branches' => 'الفروع',
     'network' => 'الشبكة',
+
+    // Context Switching
+    'switch_context' => 'تبديل السياق',
+    'current' => 'الحالي',
 ];

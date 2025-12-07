@@ -1216,28 +1216,47 @@
                         </div>
 
                         @if(isset($availableContexts) && $availableContexts->count() > 1)
-                        <div class="mt-2 px-3 py-2 rounded bg-slate-100">
-                            <label class="block text-sm mb-1 text-slate-600">
+                        <div class="border-t border-gray-100 my-2"></div>
+                        <div class="px-3 py-2">
+                            <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                                <i class="ri-swap-line"></i>
                                 @lang('messages.switch_context')
                             </label>
-                            <div class="space-y-2">
+                            <div class="space-y-1">
                                 @foreach($availableContexts as $schoolCtx)
-                                <form method="POST"
-                                      action="{{ tenant_route('tenant.switch-context', $schoolCtx->school) }}"
-                                      class="w-full">
-                                    @csrf
-                                    <input type="hidden" name="school_id" value="{{ $schoolCtx->school->id }}">
-                                    <input type="hidden" name="role" value="{{ $schoolCtx->role }}">
+                                    @php
+                                        $isCurrent = session('active_school_id') == $schoolCtx->school->id && session('active_role') == $schoolCtx->role;
+                                        $roleColors = [
+                                            'admin' => 'bg-purple-100 text-purple-700',
+                                            'teacher' => 'bg-blue-100 text-blue-700',
+                                            'supervisor' => 'bg-green-100 text-green-700',
+                                        ];
+                                        $roleColor = $roleColors[$schoolCtx->role] ?? 'bg-gray-100 text-gray-700';
+                                    @endphp
+                                    <form method="POST"
+                                          action="{{ tenant_route('tenant.switch-context', $schoolCtx->school) }}"
+                                          class="w-full">
+                                        @csrf
+                                        <input type="hidden" name="school_id" value="{{ $schoolCtx->school->id }}">
+                                        <input type="hidden" name="role" value="{{ $schoolCtx->role }}">
 
-                                    <button type="submit"
-                                            class="block w-full text-left px-4 py-2 hover:bg-gray-100">
-                                        {{ $schoolCtx->school->name }} ({{ $schoolCtx->role }})
-
-                                        @if(session('active_school_id') == $schoolCtx->school->id && session('active_role') == $schoolCtx->role)
-                                            <span class="block text-xs text-green-600">@lang('messages.current')</span>
-                                        @endif
-                                    </button>
-                                </form>
+                                        <button type="submit"
+                                                class="flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm transition-all duration-150 {{ $isCurrent ? 'bg-primary/10 border border-primary/30' : 'hover:bg-gray-50' }}">
+                                            <div class="flex items-center gap-2 min-w-0">
+                                                @if($isCurrent)
+                                                    <i class="ri-checkbox-circle-fill text-green-500 flex-shrink-0"></i>
+                                                @else
+                                                    <i class="ri-circle-line text-gray-300 flex-shrink-0"></i>
+                                                @endif
+                                                <span class="truncate font-medium {{ $isCurrent ? 'text-primary' : 'text-gray-700' }}">
+                                                    {{ $schoolCtx->school->name }}
+                                                </span>
+                                            </div>
+                                            <span class="flex-shrink-0 px-2 py-0.5 text-xs font-medium rounded-full {{ $roleColor }}">
+                                                {{ __('messages.roles.' . $schoolCtx->role) }}
+                                            </span>
+                                        </button>
+                                    </form>
                                 @endforeach
                             </div>
                         </div>
