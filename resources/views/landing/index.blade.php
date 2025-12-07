@@ -535,7 +535,7 @@
             padding: 0;
             border: 1px solid var(--border);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             overflow: hidden;
         }
@@ -567,46 +567,38 @@
         }
         
         .mockup-content {
-            padding: 32px;
-            min-height: 400px;
+            padding: 0;
+            min-height: 600px;
             background: white;
+            position: relative;
         }
         
-        .mockup-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
+        .preview-tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
         }
         
-        .mockup-card {
-            height: 100px;
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
+        .preview-tab-content.active {
+            display: block;
         }
         
-        .mockup-list {
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
-        .mockup-list-item {
-            height: 12px;
-            background: white;
-            border-radius: 4px;
-            margin-bottom: 8px;
-        }
-        
-        .mockup-bar {
-            height: 40px;
-            background: var(--teal);
-            border-radius: 8px;
+        .mockup-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            border-radius: 0 0 16px 16px;
         }
         
         .preview-description {
@@ -1162,8 +1154,7 @@
                     العربية
                 </button>
             </div>
-            <a href="{{ route('login') }}" class="btn-login">{{ app()->getLocale() === 'ar' ? 'تسجيل الدخول' : 'Login' }}</a>
-            <a href="{{ route('register') }}" class="btn-primary">{{ app()->getLocale() === 'ar' ? 'ابدأ الآن' : 'Get Started' }}</a>
+            <a href="#cta" class="btn-primary">{{ app()->getLocale() === 'ar' ? 'ابدأ الآن' : 'Get Started' }}</a>
         </div>
     </nav>
 </header>
@@ -1186,7 +1177,7 @@
                 : 'A cloud platform for networks, schools, teachers, supervisors, and administrators. Empower your educational institutions with modern workflow tools.' }}
         </p>
         <div class="hero-cta">
-            <a href="{{ route('register') }}" class="btn-cta-primary">
+            <a href="#cta" class="btn-cta-primary">
                 {{ app()->getLocale() === 'ar' ? 'ابدأ مجاناً' : 'Get Started Free' }}
                 <i class="ri-arrow-right-line"></i>
             </a>
@@ -1552,33 +1543,30 @@
             </p>
         </div>
         <div class="preview-tabs">
-            <a href="#" class="preview-tab active">{{ app()->getLocale() === 'ar' ? 'لوحة تحكم المعلم' : 'Teacher Dashboard' }}</a>
-            <a href="#" class="preview-tab">{{ app()->getLocale() === 'ar' ? 'لوحة تحكم المشرف' : 'Supervisor Dashboard' }}</a>
-            <a href="#" class="preview-tab">{{ app()->getLocale() === 'ar' ? 'أدوات المدير' : 'Admin Tools' }}</a>
+            <a href="#" class="preview-tab active" data-tab="teacher">{{ app()->getLocale() === 'ar' ? 'لوحة تحكم المعلم' : 'Teacher Dashboard' }}</a>
+            <a href="#" class="preview-tab" data-tab="supervisor">{{ app()->getLocale() === 'ar' ? 'لوحة تحكم المشرف' : 'Supervisor Dashboard' }}</a>
+            <a href="#" class="preview-tab" data-tab="admin">{{ app()->getLocale() === 'ar' ? 'لوحة تحكم المدير' : 'Admin Dashboard' }}</a>
         </div>
         <div class="preview-mockup">
             <div class="mockup-header">
                 <div class="mockup-dot red"></div>
                 <div class="mockup-dot yellow"></div>
                 <div class="mockup-dot green"></div>
-                <div class="mockup-url">app.scholder.io/teacher</div>
+                <div class="mockup-url" id="mockup-url">app.scholder.io/teacher</div>
             </div>
             <div class="mockup-content">
-                <div class="mockup-grid">
-                    <div class="mockup-card"></div>
-                    <div class="mockup-card"></div>
-                    <div class="mockup-card"></div>
+                <div class="preview-tab-content active" id="teacher-preview">
+                    <img src="https://i.ibb.co/LXpMz4pJ/teacherdashboard.jpg" alt="{{ app()->getLocale() === 'ar' ? 'لوحة تحكم المعلم' : 'Teacher Dashboard' }}" class="mockup-image">
                 </div>
-                <div class="mockup-list">
-                    <div class="mockup-list-item"></div>
-                    <div class="mockup-list-item"></div>
-                    <div class="mockup-list-item"></div>
-                    <div class="mockup-list-item"></div>
+                <div class="preview-tab-content" id="supervisor-preview">
+                    <img src="https://i.ibb.co/PvN7fBFc/supervisordashboard.jpg" alt="{{ app()->getLocale() === 'ar' ? 'لوحة تحكم المشرف' : 'Supervisor Dashboard' }}" class="mockup-image">
                 </div>
-                <div class="mockup-bar"></div>
+                <div class="preview-tab-content" id="admin-preview">
+                    <img src="https://i.ibb.co/V06dBrH0/admindashboard.jpg" alt="{{ app()->getLocale() === 'ar' ? 'لوحة تحكم المدير' : 'Admin Dashboard' }}" class="mockup-image">
+                </div>
             </div>
         </div>
-        <p class="preview-description">
+        <p class="preview-description" id="preview-description">
             {{ app()->getLocale() === 'ar' 
                 ? 'ارفع الملفات، وتتبع الطلبات، واستقبل الملاحظات.'
                 : 'Upload files, track submissions, and receive feedback.' }}
@@ -1745,7 +1733,7 @@
 </section>
 
 <!-- CTA Section -->
-<section class="cta-section">
+<section id="cta" class="cta-section">
     <div class="container">
         <h2>{{ app()->getLocale() === 'ar' ? 'انضم إلى سكولدر اليوم' : 'Join Scholder Today' }}</h2>
         <p>
@@ -1754,11 +1742,11 @@
                 : 'Empower your schools with modern educational tools. Transform how your institution manages workflows, reviews, and collaboration.' }}
         </p>
         <div class="cta-buttons">
-            <a href="{{ route('register') }}" class="cta-btn cta-btn-primary">
+            <a href="#contact" class="cta-btn cta-btn-primary">
                 {{ app()->getLocale() === 'ar' ? 'ابدأ مجاناً' : 'Get Started Free' }}
                 <i class="ri-arrow-right-line"></i>
             </a>
-            <a href="#contact" class="cta-btn cta-btn-secondary">
+            <a href="mailto:sales@scholder.io" class="cta-btn cta-btn-secondary">
                 <i class="ri-mail-line"></i>
                 {{ app()->getLocale() === 'ar' ? 'اتصل بالمبيعات' : 'Contact Sales' }}
             </a>
@@ -1798,7 +1786,7 @@
                     <li><a href="#features">{{ app()->getLocale() === 'ar' ? 'المميزات' : 'Features' }}</a></li>
                     <li><a href="#pricing">{{ app()->getLocale() === 'ar' ? 'الأسعار' : 'Pricing' }}</a></li>
                     <li><a href="#security">{{ app()->getLocale() === 'ar' ? 'الأمان' : 'Security' }}</a></li>
-                    <li><a href="#">{{ app()->getLocale() === 'ar' ? 'خارطة الطريق' : 'Roadmap' }}</a></li>
+                    <li><a href="#product-preview">{{ app()->getLocale() === 'ar' ? 'معاينة المنتج' : 'Product Preview' }}</a></li>
                 </ul>
             </div>
             <div class="footer-column">
@@ -1865,11 +1853,48 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // Product Preview Tabs
+const tabDescriptions = {
+    teacher: {
+        en: 'Upload files, track submissions, and receive feedback.',
+        ar: 'ارفع الملفات، وتتبع الطلبات، واستقبل الملاحظات.'
+    },
+    supervisor: {
+        en: 'Review files, monitor teacher performance, and provide structured feedback.',
+        ar: 'راجع الملفات، راقب أداء المعلمين، وقدم ملاحظات منظمة.'
+    },
+    admin: {
+        en: 'Manage schools, view analytics, control subscriptions, and oversee operations.',
+        ar: 'أدر المدارس، اعرض التحليلات، تحكم في الاشتراكات، وأشرف على العمليات.'
+    }
+};
+
+const urlMap = {
+    teacher: 'app.scholder.io/teacher',
+    supervisor: 'app.scholder.io/supervisor',
+    admin: 'app.scholder.io/admin'
+};
+
 document.querySelectorAll('.preview-tab').forEach(tab => {
     tab.addEventListener('click', function(e) {
         e.preventDefault();
+        const tabType = this.getAttribute('data-tab');
+        
+        // Update active tab
         document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
         this.classList.add('active');
+        
+        // Update preview content
+        document.querySelectorAll('.preview-tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById(tabType + '-preview').classList.add('active');
+        
+        // Update URL
+        document.getElementById('mockup-url').textContent = urlMap[tabType];
+        
+        // Update description
+        const locale = '{{ app()->getLocale() }}';
+        document.getElementById('preview-description').textContent = tabDescriptions[tabType][locale];
     });
 });
 </script>
