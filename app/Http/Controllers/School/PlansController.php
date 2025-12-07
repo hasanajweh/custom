@@ -22,7 +22,14 @@ class PlansController extends Controller
             abort(404);
         }
 
-        if (Auth::user()->school_id !== $branch->id) {
+        $user = Auth::user();
+        
+        // Main admin exception: can access any school in their network
+        if ($user->isMainAdmin()) {
+            if ($branch->network_id !== $user->network_id) {
+                abort(403, 'School does not belong to your network.');
+            }
+        } elseif ($user->school_id !== $branch->id) {
             abort(403);
         }
 
@@ -122,7 +129,14 @@ class PlansController extends Controller
             abort(404);
         }
 
-        if (Auth::user()->school_id !== $branch->id) {
+        $user = Auth::user();
+        
+        // Main admin exception: can access any school in their network
+        if ($user->isMainAdmin()) {
+            if ($branch->network_id !== $user->network_id) {
+                abort(403, 'School does not belong to your network.');
+            }
+        } elseif ($user->school_id !== $branch->id) {
             abort(403);
         }
 
@@ -141,7 +155,14 @@ class PlansController extends Controller
             abort(404);
         }
 
-        if (Auth::user()->school_id !== $branch->id) {
+        $user = Auth::user();
+        
+        // Main admin exception: can access any school in their network
+        if ($user->isMainAdmin()) {
+            if ($branch->network_id !== $user->network_id) {
+                abort(403, 'School does not belong to your network.');
+            }
+        } elseif ($user->school_id !== $branch->id) {
             abort(403);
         }
 

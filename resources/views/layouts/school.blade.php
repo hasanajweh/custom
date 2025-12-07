@@ -1453,7 +1453,19 @@ function switchLocale(locale) {
             "X-CSRF-TOKEN": "{{ csrf_token() }}"
         },
         body: JSON.stringify({ locale })
-    }).then(r => r.json()).then(() => {
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error('Network response was not ok');
+    })
+    .then(() => {
+        window.location.reload();
+    })
+    .catch(error => {
+        console.error('Language switch error:', error);
+        // Fallback: reload anyway
         window.location.reload();
     });
 }

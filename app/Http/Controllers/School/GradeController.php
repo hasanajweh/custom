@@ -17,7 +17,18 @@ class GradeController extends Controller
             abort(404);
         }
 
-        if (Auth::user()->school_id !== $branch->id) {
+        $user = Auth::user();
+        
+        // Main admin exception: can access any school in their network
+        if ($user->isMainAdmin()) {
+            if ($branch->network_id !== $user->network_id) {
+                abort(403, 'School does not belong to your network.');
+            }
+            return $branch;
+        }
+
+        // Regular admin: must belong to this school
+        if ($user->school_id !== $branch->id) {
             abort(403);
         }
 
@@ -69,7 +80,9 @@ class GradeController extends Controller
     {
         $school = $this->validateContext($network, $branch);
 
-        if ($grade->created_in !== $school->id) {
+        // Main admin exception: can archive any grade in their network
+        $user = Auth::user();
+        if (!$user->isMainAdmin() && $grade->created_in !== $school->id) {
             abort(403);
         }
 
@@ -82,9 +95,17 @@ class GradeController extends Controller
     {
         $school = $this->validateContext($network, $branch);
 
-        $grade = Grade::withTrashed()
-            ->where('created_in', $school->id)
-            ->findOrFail($gradeId);
+        // Main admin exception: can restore any grade in their network
+        $user = Auth::user();
+        $query = Grade::withTrashed();
+        
+        if ($user->isMainAdmin()) {
+            $query->where('network_id', $user->network_id);
+        } else {
+            $query->where('created_in', $school->id);
+        }
+        
+        $grade = $query->findOrFail($gradeId);
 
         $grade->restore();
 

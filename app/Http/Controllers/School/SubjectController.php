@@ -17,7 +17,18 @@ class SubjectController extends Controller
             abort(404);
         }
 
-        if (Auth::user()->school_id !== $branch->id) {
+        $user = Auth::user();
+        
+        // Main admin exception: can access any school in their network
+        if ($user->isMainAdmin()) {
+            if ($branch->network_id !== $user->network_id) {
+                abort(403, 'School does not belong to your network.');
+            }
+            return $branch;
+        }
+
+        // Regular admin: must belong to this school
+        if ($user->school_id !== $branch->id) {
             abort(403);
         }
 
@@ -69,7 +80,9 @@ class SubjectController extends Controller
     {
         $school = $this->validateContext($network, $branch);
 
-        if ($subject->created_in !== $school->id) {
+        // Main admin exception: can archive any subject in their network
+        $user = Auth::user();
+        if (!$user->isMainAdmin() && $subject->created_in !== $school->id) {
             abort(403);
         }
 
@@ -82,9 +95,17 @@ class SubjectController extends Controller
     {
         $school = $this->validateContext($network, $branch);
 
-        $subject = Subject::withTrashed()
-            ->where('created_in', $school->id)
-            ->findOrFail($subjectId);
+        // Main admin exception: can restore any subject in their network
+        $user = Auth::user();
+        $query = Subject::withTrashed();
+        
+        if ($user->isMainAdmin()) {
+            $query->where('network_id', $user->network_id);
+        } else {
+            $query->where('created_in', $school->id);
+        }
+        
+        $subject = $query->findOrFail($subjectId);
 
         $subject->restore();
 

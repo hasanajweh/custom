@@ -24,7 +24,21 @@ abstract class BaseSchoolController extends Controller
     {
         $user = auth()->user();
 
-        if (!$user->is_super_admin && $user->school_id !== $school->id) {
+        // SuperAdmin and MainAdmin can access
+        if ($user->is_super_admin) {
+            return;
+        }
+        
+        // Main admin exception: can access any school in their network
+        if ($user->isMainAdmin()) {
+            if ($school->network_id !== $user->network_id) {
+                abort(403, 'School does not belong to your network.');
+            }
+            return;
+        }
+
+        // Regular users: must belong to this school
+        if ($user->school_id !== $school->id) {
             abort(403, 'Unauthorized access to this school.');
         }
     }

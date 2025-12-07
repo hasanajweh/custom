@@ -18,6 +18,12 @@ class LanguageController extends Controller
 
         Session::put('locale', $data['locale']);
         App::setLocale($data['locale']);
+        Session::save();
+
+        // If AJAX request, return JSON
+        if ($request->expectsJson() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'locale' => $data['locale']]);
+        }
 
         // Preserve tenant context when switching language
         // Get the current URL to preserve tenant slugs

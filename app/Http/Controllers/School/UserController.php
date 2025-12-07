@@ -25,7 +25,18 @@ class UserController extends Controller
             abort(404);
         }
 
-        if (Auth::user()->school_id !== $branch->id) {
+        $user = Auth::user();
+        
+        // Main admin exception: can access any school in their network
+        if ($user->isMainAdmin()) {
+            if ($branch->network_id !== $user->network_id) {
+                abort(403, 'School does not belong to your network.');
+            }
+            return $branch;
+        }
+
+        // Regular admin: must belong to this school
+        if ($user->school_id !== $branch->id) {
             abort(403);
         }
 
@@ -221,7 +232,10 @@ class UserController extends Controller
     public function edit(Network $network, School $branch, User $user)
     {
         $school = $this->validateContext($network, $branch);
-        if ($user->school_id !== $school->id) {
+        
+        // Main admin exception: can update any user in their network
+        $currentUser = Auth::user();
+        if (!$currentUser->isMainAdmin() && $user->school_id !== $school->id) {
             abort(404);
         }
 
@@ -256,7 +270,10 @@ class UserController extends Controller
     public function update(Request $request, Network $network, School $branch, User $user)
     {
         $school = $this->validateContext($network, $branch);
-        if ($user->school_id !== $school->id) {
+        
+        // Main admin exception: can update any user in their network
+        $currentUser = Auth::user();
+        if (!$currentUser->isMainAdmin() && $user->school_id !== $school->id) {
             abort(404);
         }
 
@@ -366,7 +383,10 @@ class UserController extends Controller
     public function toggleStatus(Network $network, School $branch, User $user)
     {
         $school = $this->validateContext($network, $branch);
-        if ($user->school_id !== $school->id) {
+        
+        // Main admin exception: can update any user in their network
+        $currentUser = Auth::user();
+        if (!$currentUser->isMainAdmin() && $user->school_id !== $school->id) {
             abort(404);
         }
 
@@ -392,7 +412,10 @@ class UserController extends Controller
     public function destroy(Network $network, School $branch, User $user)
     {
         $school = $this->validateContext($network, $branch);
-        if ($user->school_id !== $school->id) {
+        
+        // Main admin exception: can update any user in their network
+        $currentUser = Auth::user();
+        if (!$currentUser->isMainAdmin() && $user->school_id !== $school->id) {
             abort(404);
         }
 
@@ -413,9 +436,20 @@ class UserController extends Controller
     public function restore(Network $network, School $branch, $userId)
     {
         $school = $this->validateContext($network, $branch);
-        $user = User::onlyTrashed()
-            ->where('school_id', $school->id)
-            ->findOrFail($userId);
+        
+        // Main admin exception: can restore any user in their network
+        $currentUser = Auth::user();
+        $query = User::onlyTrashed();
+        
+        if ($currentUser->isMainAdmin()) {
+            $query->whereHas('school', function($q) use ($currentUser) {
+                $q->where('network_id', $currentUser->network_id);
+            });
+        } else {
+            $query->where('school_id', $school->id);
+        }
+        
+        $user = $query->findOrFail($userId);
 
         $user->restore();
 
@@ -429,9 +463,20 @@ class UserController extends Controller
     public function forceDelete(Network $network, School $branch, $userId)
     {
         $school = $this->validateContext($network, $branch);
-        $user = User::onlyTrashed()
-            ->where('school_id', $school->id)
-            ->findOrFail($userId);
+        
+        // Main admin exception: can delete any user in their network
+        $currentUser = Auth::user();
+        $query = User::onlyTrashed();
+        
+        if ($currentUser->isMainAdmin()) {
+            $query->whereHas('school', function($q) use ($currentUser) {
+                $q->where('network_id', $currentUser->network_id);
+            });
+        } else {
+            $query->where('school_id', $school->id);
+        }
+        
+        $user = $query->findOrFail($userId);
 
         DB::beginTransaction();
 
