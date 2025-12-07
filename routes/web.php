@@ -190,11 +190,12 @@ Route::prefix('{network:slug}/{branch:slug}')
         // ===========================
         // AUTHENTICATED TENANT ROUTES (ALL ROLES)
         // ===========================
-        Route::middleware(['setNetwork', 'setBranch', 'ensure.school.network.match', 'verify.tenant.access', 'auth'])->group(function () {
-            // 🔥 FIXED TENANT CONTEXT SWITCH ROUTE
+        Route::middleware(['ensure.school.network.match', 'verify.tenant.access', 'auth'])->group(function () {
+            // Context Switch Routes - handles switching between schools/roles for multi-role users
+            Route::get('/switch-context', [ContextSwitchController::class, 'show'])
+                ->name('tenant.switch-context.show');
             Route::post('/switch-context', [ContextSwitchController::class, 'switch'])
-                ->name('tenant.switch-context')
-                ->middleware('auth');
+                ->name('tenant.switch-context');
 
             // Dashboard (role-based)
             Route::get('/dashboard', function (Network $network, School $branch) {

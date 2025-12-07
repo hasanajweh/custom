@@ -69,6 +69,17 @@ class ActiveContext
         Session::put('active_role', $role);
     }
 
+    public static function setContext(int $schoolId, string $role): void
+    {
+        self::setSchool($schoolId);
+        self::setRole($role);
+    }
+
+    public static function clearRole(): void
+    {
+        Session::forget('active_role');
+    }
+
     public static function getRole(): ?string
     {
         $user = Auth::user();

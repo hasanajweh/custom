@@ -54,11 +54,10 @@ if (!function_exists('tenant_route')) {
     /**
      * Generate tenant aware routes.
      *
-     * This function ALWAYS uses the provided school's network and school slugs,
-     * ignoring route parameters to ensure correct URL generation.
-     *
-     * Controllers/services should use this helper with the default strict mode to
-     * guarantee context is present. Views should use safe_tenant_route() instead.
+     * This helper always emits URLs that include both {network} and {branch}
+     * slugs. It never falls back to global (non-tenant) routes; if the context
+     * cannot be resolved an InvalidArgumentException is thrown (caught by
+     * safe_tenant_route where appropriate).
      */
     function tenant_route(string $name, $school = null, array $parameters = [], bool $absolute = true, bool $strict = true): string
     {
@@ -100,64 +99,41 @@ if (!function_exists('tenant_route')) {
             $school = $providedSchool;
         }
 
-        // Get network from school
-        $network = match (true) {
-            $school instanceof School => $school->network,
-            $school instanceof Branch => $school->network,
-            $school instanceof Network => $school,
-            default => null,
-        };
-
-        // If no network and we have a school, try to load it
-        if (! $network && $school instanceof School) {
-            $school->load('network');
-            $network = $school->network;
+        if ($school === null) {
+            throw new \InvalidArgumentException('Branch (school) context is required to generate tenant routes.');
         }
 
-        // For routes that don't need a school (network-level only)
-        if ($school === null || $school instanceof Network) {
-            if (! $network) {
-                if (! $strict) {
-                    return route($name, $parameters, $absolute);
-                }
-                throw new \InvalidArgumentException('Network is required to generate tenant routes.');
-            }
-            return route($name, array_merge(['network' => $network->slug], $parameters), $absolute);
+        // Network-level routes (if someone passed a Network model directly)
+        if ($school instanceof Network) {
+            return route($name, array_merge(['network' => $school->slug], $parameters), $absolute);
+        }
+
+        if (! ($school instanceof School) && ! ($school instanceof Branch)) {
+            throw new \InvalidArgumentException('Invalid tenant context provided.');
         }
 
         // For school-level routes, we need both network and school
-        $branch = match (true) {
-            $school instanceof Branch => $school,
-            $school instanceof School => $school,
-            default => null,
-        };
+        $branch = $school;
 
-        if (! $branch) {
-            if (! $strict) {
-                return route($name, $parameters, $absolute);
-            }
-            throw new \InvalidArgumentException('Branch is required to generate tenant routes for branch-level pages.');
-        }
+        $network = $branch->network;
 
-        // Ensure network is loaded
-        if (! $branch->network) {
+        if (! $network) {
             $branch->load('network');
+            $network = $branch->network;
         }
 
-        if (! $branch->network) {
-            if (! $strict) {
-                return route($name, $parameters, $absolute);
-            }
+        if (! $network) {
             throw new \InvalidArgumentException('Network is required to generate tenant routes for the provided school.');
         }
 
-        // ALWAYS use the provided school's slugs, never route parameters
+        // ALWAYS use the provided school's slugs, never route parameters or globals
+        // Note: We use 'branch' as the primary parameter since routes use {branch:slug}
+        // The 'school' alias is only added for routes that specifically use {school} parameter
         return route(
             $name,
             array_merge([
-                'network' => $branch->network->slug,
+                'network' => $network->slug,
                 'branch' => $branch->slug,
-                'school' => $branch->slug,
             ], $parameters),
             $absolute,
         );

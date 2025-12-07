@@ -1339,5 +1339,7 @@ return [
 
     // Context Switching
     'switch_context' => 'تبديل السياق',
+    'switch_context_post_required' => 'يرجى استخدام قائمة تبديل السياق لتغيير دورك.',
+    'context_switched' => 'تم تبديل السياق بنجاح.',
     'current' => 'الحالي',
 ];

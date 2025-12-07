@@ -1339,6 +1339,8 @@ return [
 
     // Context Switching
     'switch_context' => 'Switch Context',
+    'switch_context_post_required' => 'Please use the context switcher menu to change your role.',
+    'context_switched' => 'Context switched successfully.',
     'current' => 'Current',
 ];
 
