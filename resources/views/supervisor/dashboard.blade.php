@@ -20,37 +20,84 @@
             </div>
         </div>
 
-        <!-- Statistics Grid -->
+        <!-- Enhanced Statistics Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Files to Review -->
-            <div class="bg-white rounded-xl p-6 border border-gray-100 hover:shadow-lg transition-shadow">
+            <!-- Total Files Reviewed -->
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100 hover:shadow-lg transition-shadow">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">{{ __('messages.dashboard.files_reviewed') }}</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ $totalReviewed }}</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ number_format($totalReviewed) }}</p>
                         <p class="text-xs text-gray-500 mt-2">{{ __('messages.dashboard.total_reviewed') }}</p>
+                        @if($lastWeekReviews > 0)
+                            <p class="text-xs mt-1 {{ $thisWeekReviews >= $lastWeekReviews ? 'text-green-600' : 'text-red-600' }}">
+                                <i class="ri-arrow-{{ $thisWeekReviews >= $lastWeekReviews ? 'up' : 'down' }}-line"></i>
+                                {{ abs($thisWeekReviews - $lastWeekReviews) }} {{ __('messages.dashboard.this_week') }}
+                            </p>
+                        @endif
                     </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                        <i class="ri-checkbox-circle-line text-green-600 text-xl"></i>
+                    <div class="w-14 h-14 bg-green-200 rounded-full flex items-center justify-center">
+                        <i class="ri-checkbox-circle-line text-green-700 text-2xl"></i>
                     </div>
                 </div>
             </div>
 
             <!-- This Week Reviews -->
-            <div class="bg-white rounded-xl p-6 border border-gray-100 hover:shadow-lg transition-shadow">
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100 hover:shadow-lg transition-shadow">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">{{ __('messages.dashboard.this_week') }}</p>
                         <p class="text-3xl font-bold text-gray-900">{{ $thisWeekReviews }}</p>
                         <p class="text-xs text-gray-500 mt-2">{{ __('messages.dashboard.files_reviewed') }}</p>
+                        @if($lastWeekReviews > 0)
+                            @php
+                                $change = $thisWeekReviews - $lastWeekReviews;
+                                $percentChange = $lastWeekReviews > 0 ? round(($change / $lastWeekReviews) * 100, 1) : 0;
+                            @endphp
+                            <p class="text-xs mt-1 {{ $change >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                <i class="ri-arrow-{{ $change >= 0 ? 'up' : 'down' }}-line"></i>
+                                {{ abs($percentChange) }}% {{ $change >= 0 ? __('messages.stats.increase') : __('messages.stats.decrease') }}
+                            </p>
+                        @endif
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <i class="ri-calendar-check-line text-blue-600 text-xl"></i>
+                    <div class="w-14 h-14 bg-blue-200 rounded-full flex items-center justify-center">
+                        <i class="ri-calendar-check-line text-blue-700 text-2xl"></i>
                     </div>
                 </div>
             </div>
 
-            <!-- Total Teachers -->
+            <!-- This Month Reviews -->
+            <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100 hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">{{ __('messages.dashboard.this_month') }}</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ $thisMonthReviews }}</p>
+                        <p class="text-xs text-gray-500 mt-2">{{ __('messages.dashboard.files_reviewed') }}</p>
+                    </div>
+                    <div class="w-14 h-14 bg-purple-200 rounded-full flex items-center justify-center">
+                        <i class="ri-calendar-line text-purple-700 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Downloads -->
+            <div class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-6 border border-orange-100 hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">{{ __('messages.dashboard.total_downloads') }}</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ number_format($totalDownloads ?? 0) }}</p>
+                        <p class="text-xs text-gray-500 mt-2">{{ __('messages.dashboard.times_downloaded') }}</p>
+                    </div>
+                    <div class="w-14 h-14 bg-orange-200 rounded-full flex items-center justify-center">
+                        <i class="ri-download-line text-orange-700 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Analytics Row -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Active Teachers -->
             <div class="bg-white rounded-xl p-6 border border-gray-100 hover:shadow-lg transition-shadow">
                 <div class="flex items-center justify-between">
                     <div>
@@ -77,7 +124,73 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Files by Type Summary -->
+            <div class="bg-white rounded-xl p-6 border border-gray-100 hover:shadow-lg transition-shadow">
+                <div>
+                    <p class="text-sm text-gray-600 mb-3">{{ __('messages.files.content_type') }}</p>
+                    <div class="space-y-2">
+                        @php
+                            $typeLabels = [
+                                'exam' => __('messages.files.exam'),
+                                'worksheet' => __('messages.files.worksheet'),
+                                'summary' => __('messages.files.summary'),
+                            ];
+                        @endphp
+                        @foreach($filesByType as $type => $count)
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-700">{{ $typeLabels[$type] ?? ucfirst($type) }}</span>
+                                <span class="text-sm font-semibold text-gray-900">{{ $count }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <!-- Weekly Trend Chart -->
+        @if(isset($weeklyTrend) && count($weeklyTrend) > 0)
+        <div class="bg-white rounded-xl border border-gray-100 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('messages.dashboard.recent_activity') }} - {{ __('messages.dashboard.this_week') }}</h3>
+            <div class="flex items-end justify-between h-48 space-x-2">
+                @foreach($weeklyTrend as $week)
+                    <div class="flex-1 flex flex-col items-center">
+                        <div class="w-full bg-gray-100 rounded-t-lg flex items-end justify-center" style="height: {{ $weeklyTrend->max('count') > 0 ? ($week['count'] / $weeklyTrend->max('count')) * 100 : 0 }}%">
+                            <div class="w-full bg-gradient-to-t from-green-500 to-emerald-400 rounded-t-lg"></div>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-2">{{ $week['week'] }}</p>
+                        <p class="text-sm font-semibold text-gray-900 mt-1">{{ $week['count'] }}</p>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        <!-- Top Contributing Teachers -->
+        @if(isset($topTeachers) && $topTeachers->count() > 0)
+        <div class="bg-white rounded-xl border border-gray-100 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('messages.dashboard.top_contributor') }} - {{ __('messages.users.teachers') }}</h3>
+            <div class="space-y-3">
+                @foreach($topTeachers as $index => $teacher)
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                {{ $index + 1 }}
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">{{ $teacher->name }}</p>
+                                <p class="text-xs text-gray-500">{{ $teacher->email }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-lg font-bold text-indigo-600">{{ $teacher->file_submissions_count }}</p>
+                            <p class="text-xs text-gray-500">{{ __('messages.files.files_found', ['count' => $teacher->file_submissions_count]) }}</p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
 
         <!-- Recent Reviews & Subject Overview -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">

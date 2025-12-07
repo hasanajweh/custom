@@ -404,6 +404,11 @@ return [
 
     ],
 
+    'archived' => [
+        'total' => '{0} No archived items|{1} :count archived item|[2,*] :count archived items',
+        'none' => 'No archived items available',
+    ],
+
     // Files Management
     'files' => [
         'title' => 'File Management',
@@ -764,7 +769,6 @@ return [
         'review' => 'Review',
         'review_file' => 'Review File',
         'back_to_files' => 'Back to Files',
-
     ],
 
     // Dark Mode & UI
@@ -1198,6 +1202,12 @@ return [
         'files' => 'files',
         'started' => 'Started',
         'auto_renew' => 'Auto Renew',
+        'sort_by' => 'Sort By',
+        'sort_order' => 'Sort Order',
+        'ascending' => 'Ascending',
+        'descending' => 'Descending',
+        'minimum' => 'Minimum',
+        'maximum' => 'Maximum',
     ],
 
     'filters' => [

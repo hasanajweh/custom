@@ -442,6 +442,11 @@ return [
 
     ],
 
+    'archived' => [
+        'total' => '{0} لا توجد عناصر مؤرشفة|{1} عنصر مؤرشف واحد|[2,*] :count عناصر مؤرشفة',
+        'none' => 'لا توجد عناصر مؤرشفة متاحة',
+    ],
+
     // Files Management
     'files' => [
         'title' => 'إدارة الملفات',
@@ -811,7 +816,6 @@ return [
         'review' => 'مراجعة',
         'review_file' => 'مراجعة الملف',
         'back_to_files' => 'العودة إلى ملفات :subject',
-
     ],
 
     // Dark Mode & UI
@@ -1202,7 +1206,12 @@ return [
         'not_specified' => 'غير محدد',
         'by' => 'بواسطة',
         'files' => 'ملفات',
-
+        'sort_by' => 'ترتيب حسب',
+        'sort_order' => 'اتجاه الترتيب',
+        'ascending' => 'تصاعدي',
+        'descending' => 'تنازلي',
+        'minimum' => 'الحد الأدنى',
+        'maximum' => 'الحد الأقصى',
     ],
     'pwa' => [
         'install_title' => 'تثبيت :name',

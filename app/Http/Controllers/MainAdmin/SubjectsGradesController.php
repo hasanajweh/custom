@@ -24,11 +24,111 @@ class SubjectsGradesController extends Controller
             ->with('schools')
             ->get();
 
+        // Enhanced Analytics for Subjects
+        $subjectsAnalytics = $subjects->map(function($subject) use ($network) {
+            $schoolIds = $subject->schools->pluck('id');
+            
+            // Get file submissions for this subject across all assigned schools
+            $filesCount = \App\Models\FileSubmission::whereIn('school_id', $schoolIds)
+                ->where('subject_id', $subject->id)
+                ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload'])
+                ->count();
+            
+            // Get teachers using this subject
+            $teachersCount = \App\Models\User::whereIn('school_id', $schoolIds)
+                ->where('role', 'teacher')
+                ->whereHas('fileSubmissions', function($q) use ($subject) {
+                    $q->where('subject_id', $subject->id)
+                      ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload']);
+                })
+                ->distinct()
+                ->count();
+            
+            // Get total downloads
+            $downloadsCount = \App\Models\FileSubmission::whereIn('school_id', $schoolIds)
+                ->where('subject_id', $subject->id)
+                ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload'])
+                ->sum('download_count');
+            
+            // This week files
+            $thisWeekFiles = \App\Models\FileSubmission::whereIn('school_id', $schoolIds)
+                ->where('subject_id', $subject->id)
+                ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload'])
+                ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
+                ->count();
+            
+            return [
+                'subject' => $subject,
+                'files_count' => $filesCount,
+                'teachers_count' => $teachersCount,
+                'downloads_count' => $downloadsCount,
+                'this_week_files' => $thisWeekFiles,
+                'assigned_schools_count' => $subject->schools->count(),
+            ];
+        });
+
+        // Enhanced Analytics for Grades
+        $gradesAnalytics = $grades->map(function($grade) use ($network) {
+            $schoolIds = $grade->schools->pluck('id');
+            
+            // Get file submissions for this grade across all assigned schools
+            $filesCount = \App\Models\FileSubmission::whereIn('school_id', $schoolIds)
+                ->where('grade_id', $grade->id)
+                ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload'])
+                ->count();
+            
+            // Get teachers using this grade
+            $teachersCount = \App\Models\User::whereIn('school_id', $schoolIds)
+                ->where('role', 'teacher')
+                ->whereHas('fileSubmissions', function($q) use ($grade) {
+                    $q->where('grade_id', $grade->id)
+                      ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload']);
+                })
+                ->distinct()
+                ->count();
+            
+            // Get total downloads
+            $downloadsCount = \App\Models\FileSubmission::whereIn('school_id', $schoolIds)
+                ->where('grade_id', $grade->id)
+                ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload'])
+                ->sum('download_count');
+            
+            // This week files
+            $thisWeekFiles = \App\Models\FileSubmission::whereIn('school_id', $schoolIds)
+                ->where('grade_id', $grade->id)
+                ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload'])
+                ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
+                ->count();
+            
+            return [
+                'grade' => $grade,
+                'files_count' => $filesCount,
+                'teachers_count' => $teachersCount,
+                'downloads_count' => $downloadsCount,
+                'this_week_files' => $thisWeekFiles,
+                'assigned_schools_count' => $grade->schools->count(),
+            ];
+        });
+
+        // Overall Network Statistics
+        $networkStats = [
+            'total_subjects' => $subjects->count(),
+            'total_grades' => $grades->count(),
+            'total_branches' => $branches->count(),
+            'subjects_with_files' => $subjectsAnalytics->where('files_count', '>', 0)->count(),
+            'grades_with_files' => $gradesAnalytics->where('files_count', '>', 0)->count(),
+            'total_files_network' => $subjectsAnalytics->sum('files_count'),
+            'total_downloads_network' => $subjectsAnalytics->sum('downloads_count'),
+        ];
+
         return view('main-admin.subjects_grades.index', [
             'network' => $network,
             'branches' => $branches,
             'subjects' => $subjects,
             'grades' => $grades,
+            'subjectsAnalytics' => $subjectsAnalytics,
+            'gradesAnalytics' => $gradesAnalytics,
+            'networkStats' => $networkStats,
         ]);
     }
 

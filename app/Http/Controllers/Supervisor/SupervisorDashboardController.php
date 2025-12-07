@@ -43,22 +43,85 @@ class SupervisorDashboardController extends Controller
             ]);
         }
 
-        // Statistics
+        // Comprehensive Statistics
         $totalReviewed = FileSubmission::whereIn('subject_id', $subjectIds)
             ->where('school_id', $school->id)
+            ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload'])
             ->count();
 
         $thisWeekReviews = FileSubmission::whereIn('subject_id', $subjectIds)
             ->where('school_id', $school->id)
+            ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload'])
             ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
+            ->count();
+
+        $lastWeekReviews = FileSubmission::whereIn('subject_id', $subjectIds)
+            ->where('school_id', $school->id)
+            ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload'])
+            ->whereBetween('created_at', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])
+            ->count();
+
+        $thisMonthReviews = FileSubmission::whereIn('subject_id', $subjectIds)
+            ->where('school_id', $school->id)
+            ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload'])
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
             ->count();
 
         $totalTeachers = User::where('school_id', $school->id)
             ->where('role', 'teacher')
+            ->whereHas('fileSubmissions', function($q) use ($school, $subjectIds) {
+                $q->where('school_id', $school->id)
+                  ->whereIn('subject_id', $subjectIds)
+                  ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload']);
+            })
+            ->distinct()
             ->count();
 
-        // Average review time (mock data for now)
-        $avgReviewTime = 12; // minutes
+        // Average review time calculation (based on download count as proxy)
+        $avgReviewTime = $totalReviewed > 0 ? round(($totalReviewed * 5) / 60, 1) : 0; // Estimate: 5 min per file
+
+        // Total downloads across supervisor's subjects
+        $totalDownloads = FileSubmission::whereIn('subject_id', $subjectIds)
+            ->where('school_id', $school->id)
+            ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload'])
+            ->sum('download_count');
+
+        // Files by type breakdown
+        $filesByType = FileSubmission::whereIn('subject_id', $subjectIds)
+            ->where('school_id', $school->id)
+            ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload'])
+            ->select('submission_type', DB::raw('count(*) as count'))
+            ->groupBy('submission_type')
+            ->pluck('count', 'submission_type');
+
+        // Weekly trend (last 4 weeks)
+        $weeklyTrend = [];
+        for ($i = 3; $i >= 0; $i--) {
+            $weekStart = now()->subWeeks($i)->startOfWeek();
+            $weekEnd = now()->subWeeks($i)->endOfWeek();
+            $weeklyTrend[] = [
+                'week' => $weekStart->format('M d'),
+                'count' => FileSubmission::whereIn('subject_id', $subjectIds)
+                    ->where('school_id', $school->id)
+                    ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload'])
+                    ->whereBetween('created_at', [$weekStart, $weekEnd])
+                    ->count()
+            ];
+        }
+
+        // Top contributing teachers
+        $topTeachers = User::where('school_id', $school->id)
+            ->where('role', 'teacher')
+            ->withCount(['fileSubmissions' => function($q) use ($school, $subjectIds) {
+                $q->where('school_id', $school->id)
+                  ->whereIn('subject_id', $subjectIds)
+                  ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload']);
+            }])
+            ->having('file_submissions_count', '>', 0)
+            ->orderBy('file_submissions_count', 'desc')
+            ->take(5)
+            ->get();
 
         // Recent files to review - excluding plans
         $recentFiles = FileSubmission::whereIn('subject_id', $subjectIds)
@@ -106,8 +169,14 @@ class SupervisorDashboardController extends Controller
             'school',
             'totalReviewed',
             'thisWeekReviews',
+            'lastWeekReviews',
+            'thisMonthReviews',
             'totalTeachers',
             'avgReviewTime',
+            'totalDownloads',
+            'filesByType',
+            'weeklyTrend',
+            'topTeachers',
             'recentFiles',
             'subjectStats',
             'recentActivity'

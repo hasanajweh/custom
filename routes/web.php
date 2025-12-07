@@ -457,7 +457,7 @@ Route::prefix('{network:slug}/{branch:slug}/admin')
             ->name('supervisors.')
             ->group(function () {
                 Route::get('/', 'index')->name('index');
-                Route::get('/{supervisor}/files', 'files')->name('files');
+                Route::get('/{supervisor}/files', 'files')->name('files')->scopeBindings();
             });
     });
 

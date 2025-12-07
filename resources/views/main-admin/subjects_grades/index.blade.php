@@ -39,6 +39,41 @@
         </div>
     @endif
 
+    <!-- Enhanced Network Statistics Dashboard -->
+    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 text-white shadow-xl mb-6">
+        <h2 class="text-xl font-bold mb-4">{{ __('messages.dashboard.statistics') }}</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+            <div class="bg-white/10 backdrop-blur rounded-xl p-4">
+                <p class="text-xs text-indigo-100 mb-1">{{ __('messages.main_admin.users.subjects_label') }}</p>
+                <p class="text-2xl font-bold">{{ $networkStats['total_subjects'] }}</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur rounded-xl p-4">
+                <p class="text-xs text-indigo-100 mb-1">{{ __('messages.main_admin.users.grades_label') }}</p>
+                <p class="text-2xl font-bold">{{ $networkStats['total_grades'] }}</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur rounded-xl p-4">
+                <p class="text-xs text-indigo-100 mb-1">{{ __('messages.branches') }}</p>
+                <p class="text-2xl font-bold">{{ $networkStats['total_branches'] }}</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur rounded-xl p-4">
+                <p class="text-xs text-indigo-100 mb-1">{{ __('messages.files.total_files') }}</p>
+                <p class="text-2xl font-bold">{{ number_format($networkStats['total_files_network']) }}</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur rounded-xl p-4">
+                <p class="text-xs text-indigo-100 mb-1">{{ __('messages.dashboard.total_downloads') }}</p>
+                <p class="text-2xl font-bold">{{ number_format($networkStats['total_downloads_network']) }}</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur rounded-xl p-4">
+                <p class="text-xs text-indigo-100 mb-1">{{ __('messages.main_admin.users.subjects_label') }} {{ __('messages.status.active') }}</p>
+                <p class="text-2xl font-bold">{{ $networkStats['subjects_with_files'] }}</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur rounded-xl p-4">
+                <p class="text-xs text-indigo-100 mb-1">{{ __('messages.main_admin.users.grades_label') }} {{ __('messages.status.active') }}</p>
+                <p class="text-2xl font-bold">{{ $networkStats['grades_with_files'] }}</p>
+            </div>
+        </div>
+    </div>
+
     <div class="grid lg:grid-cols-3 gap-6">
         <div class="lg:col-span-1 bg-white rounded-2xl shadow-lg p-6 space-y-5 border border-indigo-50">
             <div class="flex items-start justify-between">
@@ -99,8 +134,29 @@
                     <span class="text-xs text-gray-500">{{ $subjects->count() }} {{ __('messages.main_admin.users.subjects_label') }}</span>
                 </div>
                 <div class="space-y-3">
-                    @forelse($subjects as $subject)
-                        <div class="border rounded-2xl p-4 space-y-3 bg-gradient-to-br from-white to-indigo-50/30 shadow-sm">
+                    @forelse($subjectsAnalytics as $analytics)
+                        @php($subject = $analytics['subject'])
+                        <div class="border rounded-2xl p-4 space-y-3 bg-gradient-to-br from-white to-indigo-50/30 shadow-sm hover:shadow-md transition-shadow">
+                            <!-- Analytics Header -->
+                            <div class="grid grid-cols-4 gap-2 mb-3">
+                                <div class="bg-blue-50 rounded-lg p-2 text-center">
+                                    <p class="text-xs text-gray-600">{{ __('messages.files.total_files') }}</p>
+                                    <p class="text-lg font-bold text-blue-700">{{ number_format($analytics['files_count']) }}</p>
+                                </div>
+                                <div class="bg-purple-50 rounded-lg p-2 text-center">
+                                    <p class="text-xs text-gray-600">{{ __('messages.users.teachers') }}</p>
+                                    <p class="text-lg font-bold text-purple-700">{{ $analytics['teachers_count'] }}</p>
+                                </div>
+                                <div class="bg-green-50 rounded-lg p-2 text-center">
+                                    <p class="text-xs text-gray-600">{{ __('messages.dashboard.total_downloads') }}</p>
+                                    <p class="text-lg font-bold text-green-700">{{ number_format($analytics['downloads_count']) }}</p>
+                                </div>
+                                <div class="bg-orange-50 rounded-lg p-2 text-center">
+                                    <p class="text-xs text-gray-600">{{ __('messages.dashboard.this_week') }}</p>
+                                    <p class="text-lg font-bold text-orange-700">{{ $analytics['this_week_files'] }}</p>
+                                </div>
+                            </div>
+                            
                             <div class="flex items-center justify-between">
                                 <div class="space-y-1 w-full">
                                     <p class="text-sm text-gray-500">{{ __('messages.labels.name') }}</p>
@@ -135,6 +191,9 @@
                                 </form>
                             </div>
                             <div class="flex flex-wrap gap-2 text-xs text-gray-600">
+                                <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full font-medium">
+                                    {{ $analytics['assigned_schools_count'] }} {{ __('messages.branches') }}
+                                </span>
                                 @forelse($subject->schools as $school)
                                     <span class="px-2 py-1 bg-indigo-50 text-indigo-700 rounded-full">{{ $school->name }}</span>
                                 @empty
@@ -154,8 +213,29 @@
                     <span class="text-xs text-gray-500">{{ $grades->count() }} {{ __('messages.main_admin.users.grades_label') }}</span>
                 </div>
                 <div class="space-y-3">
-                    @forelse($grades as $grade)
-                        <div class="border rounded-2xl p-4 space-y-3 bg-gradient-to-br from-white to-indigo-50/30 shadow-sm">
+                    @forelse($gradesAnalytics as $analytics)
+                        @php($grade = $analytics['grade'])
+                        <div class="border rounded-2xl p-4 space-y-3 bg-gradient-to-br from-white to-emerald-50/30 shadow-sm hover:shadow-md transition-shadow">
+                            <!-- Analytics Header -->
+                            <div class="grid grid-cols-4 gap-2 mb-3">
+                                <div class="bg-blue-50 rounded-lg p-2 text-center">
+                                    <p class="text-xs text-gray-600">{{ __('messages.files.total_files') }}</p>
+                                    <p class="text-lg font-bold text-blue-700">{{ number_format($analytics['files_count']) }}</p>
+                                </div>
+                                <div class="bg-purple-50 rounded-lg p-2 text-center">
+                                    <p class="text-xs text-gray-600">{{ __('messages.users.teachers') }}</p>
+                                    <p class="text-lg font-bold text-purple-700">{{ $analytics['teachers_count'] }}</p>
+                                </div>
+                                <div class="bg-green-50 rounded-lg p-2 text-center">
+                                    <p class="text-xs text-gray-600">{{ __('messages.dashboard.total_downloads') }}</p>
+                                    <p class="text-lg font-bold text-green-700">{{ number_format($analytics['downloads_count']) }}</p>
+                                </div>
+                                <div class="bg-orange-50 rounded-lg p-2 text-center">
+                                    <p class="text-xs text-gray-600">{{ __('messages.dashboard.this_week') }}</p>
+                                    <p class="text-lg font-bold text-orange-700">{{ $analytics['this_week_files'] }}</p>
+                                </div>
+                            </div>
+                            
                             <div class="flex items-center justify-between">
                                 <div class="space-y-1 w-full">
                                     <p class="text-sm text-gray-500">{{ __('messages.labels.name') }}</p>
@@ -190,8 +270,11 @@
                                 </form>
                             </div>
                             <div class="flex flex-wrap gap-2 text-xs text-gray-600">
+                                <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full font-medium">
+                                    {{ $analytics['assigned_schools_count'] }} {{ __('messages.branches') }}
+                                </span>
                                 @forelse($grade->schools as $school)
-                                    <span class="px-2 py-1 bg-indigo-50 text-indigo-700 rounded-full">{{ $school->name }}</span>
+                                    <span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-full">{{ $school->name }}</span>
                                 @empty
                                     <span class="text-gray-500 text-xs">{{ __('messages.main_admin.subjects_grades.unassigned') }}</span>
                                 @endforelse

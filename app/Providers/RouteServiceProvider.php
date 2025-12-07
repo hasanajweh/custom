@@ -76,5 +76,12 @@ class RouteServiceProvider extends ServiceProvider
 
             return $query->firstOrFail();
         });
+
+        // Bind supervisor parameter to User model
+        Route::bind('supervisor', function ($value) {
+            return \App\Models\User::where('id', $value)
+                ->where('role', 'supervisor')
+                ->firstOrFail();
+        });
     }
 }

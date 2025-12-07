@@ -41,6 +41,19 @@ class ReviewController extends Controller
         // Get grades for filters
         $grades = Grade::where('school_id', $school->id)->get();
 
+        // Get teachers for filters (only those who uploaded files in supervisor's subjects)
+        $teachers = \App\Models\User::where('school_id', $school->id)
+            ->where('role', 'teacher')
+            ->whereHas('fileSubmissions', function($q) use ($school, $subjectIds) {
+                $q->where('school_id', $school->id)
+                  ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload']);
+                if (!empty($subjectIds)) {
+                    $q->whereIn('subject_id', $subjectIds);
+                }
+            })
+            ->distinct()
+            ->get();
+
         // Build query - only get academic files (not plans, not supervisor uploads)
         $query = FileSubmission::where('school_id', $school->id)
             ->whereNotIn('submission_type', ['daily_plan', 'weekly_plan', 'monthly_plan', 'supervisor_upload'])
@@ -51,21 +64,43 @@ class ReviewController extends Controller
             $query->whereIn('subject_id', $subjectIds);
         }
 
-        // Apply filters
+        // Apply comprehensive filters
         if (request()->filled('search')) {
-            $query->where('title', 'like', '%' . request('search') . '%');
+            $query->where(function($q) {
+                $q->where('title', 'like', '%' . request('search') . '%')
+                  ->orWhereHas('user', function($userQuery) {
+                      $userQuery->where('name', 'like', '%' . request('search') . '%');
+                  });
+            });
         }
 
         if (request()->filled('subject_id')) {
             $query->where('subject_id', request('subject_id'));
         }
 
+        if (request()->filled('grade_id')) {
+            $query->where('grade_id', request('grade_id'));
+        }
+
         if (request()->filled('type')) {
             $query->where('submission_type', request('type'));
         }
 
-        // Date filter
-        if (request()->filled('date')) {
+        if (request()->filled('teacher_id')) {
+            $query->where('user_id', request('teacher_id'));
+        }
+
+        // Date range filters
+        if (request()->filled('date_from')) {
+            $query->whereDate('created_at', '>=', request('date_from'));
+        }
+
+        if (request()->filled('date_to')) {
+            $query->whereDate('created_at', '<=', request('date_to'));
+        }
+
+        // Single date filter (backward compatibility)
+        if (request()->filled('date') && !request()->filled('date_from') && !request()->filled('date_to')) {
             $query->whereDate('created_at', request('date'));
         }
 
@@ -79,10 +114,29 @@ class ReviewController extends Controller
             });
         }
 
-        // Always paginate
-        $files = $query->latest()->paginate(20);
+        // File size filter
+        if (request()->filled('size_min')) {
+            $query->where('file_size', '>=', request('size_min') * 1024 * 1024); // Convert MB to bytes
+        }
 
-        return view('supervisor.reviews.index', compact('school', 'files', 'subjects', 'grades'));
+        if (request()->filled('size_max')) {
+            $query->where('file_size', '<=', request('size_max') * 1024 * 1024);
+        }
+
+        // Sort options
+        $sortBy = request('sort_by', 'created_at');
+        $sortOrder = request('sort_order', 'desc');
+        
+        if (in_array($sortBy, ['created_at', 'title', 'file_size', 'download_count'])) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->latest();
+        }
+
+        // Always paginate
+        $files = $query->paginate(20);
+
+        return view('supervisor.reviews.index', compact('school', 'files', 'subjects', 'grades', 'teachers'));
     }
 
     public function show(Network $network, School $branch, FileSubmission $fileSubmission)
