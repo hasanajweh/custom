@@ -274,6 +274,7 @@ return [
         'contact' => 'اتصل بنا',
         'privacy' => 'الخصوصية',
         'terms' => 'الشروط',
+        'manage' => 'إدارة',
         'manage_users' => 'إدارة المستخدمين',
         'file_browser' => 'متصفح الملفات',
         'files' => 'الملفات',

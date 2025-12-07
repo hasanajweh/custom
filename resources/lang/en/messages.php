@@ -236,6 +236,7 @@ return [
         'privacy' => 'Privacy',
         'activity_logs' => 'Activity Logs',
         'terms' => 'Terms',
+        'manage' => 'Manage',
         'manage_users' => 'Manage Users',
         'file_browser' => 'File Browser',
         'files' => 'Files',
