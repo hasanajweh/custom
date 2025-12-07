@@ -1311,6 +1311,11 @@ return [
             'heading' => 'الهيكل',
             'subtitle' => 'نظرة شاملة على هيكلة الفروع والفرق والتغطية.',
         ],
+        'view_as_admin' => 'عرض كمدير',
+        'viewing_as_admin' => 'عرض كمدير',
+        'back_to_main_dashboard' => 'العودة إلى لوحة التحكم الرئيسية',
+        'no_branches' => 'لا توجد فروع',
+        'no_branches_description' => 'لا توجد فروع في هذه الشبكة بعد.',
         'subjects_grades' => [
             'title' => 'المواد والمراحل',
             'heading' => 'المواد والمراحل',

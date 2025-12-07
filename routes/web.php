@@ -32,6 +32,8 @@ use App\Http\Controllers\Teacher\TeacherDashboardController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\MainAdmin\DashboardController as MainAdminDashboardController;
 use App\Http\Controllers\MainAdmin\HierarchyController;
+use App\Http\Controllers\MainAdmin\ProfileController as MainAdminProfileController;
+use App\Http\Controllers\MainAdmin\SchoolViewController;
 use App\Http\Controllers\MainAdmin\SubjectsGradesController;
 use App\Http\Controllers\MainAdmin\UserController as MainAdminUserController;
 use App\Http\Controllers\Tenant\ContextSwitchController;
@@ -161,6 +163,16 @@ Route::prefix('{network:slug}/main-admin')
 
             Route::resource('users', MainAdminUserController::class)->except(['show']);
             Route::post('users/{user}/restore', [MainAdminUserController::class, 'restore'])->name('users.restore');
+            
+            // Profile routes
+            Route::get('profile', [MainAdminProfileController::class, 'edit'])->name('profile.edit');
+            Route::put('profile', [MainAdminProfileController::class, 'update'])->name('profile.update');
+            Route::put('profile/password', [MainAdminProfileController::class, 'updatePassword'])->name('profile.password.update');
+            
+            // School view (view as admin)
+            Route::get('school/{school}/view', [SchoolViewController::class, 'view'])->name('school.view');
+            Route::get('school/{school}/dashboard', [SchoolViewController::class, 'dashboard'])->name('school.dashboard');
+            
             Route::post('logout', [LoginController::class, 'logout'])->name('logout');
         });
     });

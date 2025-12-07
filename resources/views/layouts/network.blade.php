@@ -116,6 +116,8 @@
 
 
     <style>
+        [x-cloak] { display: none !important; }
+        
         :root {
             --primary: #2563EB;
             --primary-dark: #1E40AF;
@@ -1150,10 +1152,9 @@
             <!-- Right Navigation -->
             <div class="flex items-center space-x-4 {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}">
                 <!-- Beautiful Language Switcher -->
-                <div class="relative" x-data="{ open: false }">
+                <div class="relative" x-data="{ open: false }" @click.away="open = false">
                     <button 
                         @click="open = !open"
-                        @click.away="open = false"
                         type="button"
                         class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 border border-indigo-100 transition-all duration-200 group"
                     >
@@ -1166,6 +1167,7 @@
                     
                     <div 
                         x-show="open"
+                        x-cloak
                         x-transition:enter="transition ease-out duration-200"
                         x-transition:enter-start="opacity-0 scale-95"
                         x-transition:enter-end="opacity-100 scale-100"
@@ -1173,10 +1175,9 @@
                         x-transition:leave-start="opacity-100 scale-100"
                         x-transition:leave-end="opacity-0 scale-95"
                         class="absolute {{ app()->getLocale() === 'ar' ? 'left-0' : 'right-0' }} mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50"
-                        style="display: none;"
                     >
                         <button
-                            onclick="switchLocale('ar')"
+                            onclick="switchLocale('ar'); open = false;"
                             class="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-colors {{ app()->getLocale() === 'ar' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700' }}"
                         >
                             <span class="text-xl">🇸🇦</span>
@@ -1186,7 +1187,7 @@
                             @endif
                         </button>
                         <button
-                            onclick="switchLocale('en')"
+                            onclick="switchLocale('en'); open = false;"
                             class="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-colors {{ app()->getLocale() === 'en' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700' }}"
                         >
                             <span class="text-xl">🇬🇧</span>
@@ -1308,7 +1309,7 @@
                         <div class="py-1">
                             @php
                                 $networkSlug = $networkSlug ?? auth()->user()?->network?->slug;
-                                $profileUrl = $networkSlug ? route('main-admin.dashboard', ['network' => $networkSlug]) : '#';
+                                $profileUrl = $networkSlug ? route('main-admin.profile.edit', ['network' => $networkSlug]) : '#';
                                 $logoutUrl = $networkSlug ? route('main-admin.logout', ['network' => $networkSlug]) : '#';
                             @endphp
                             <a href="{{ $profileUrl }}"

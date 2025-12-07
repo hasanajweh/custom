@@ -11,9 +11,9 @@ class HierarchyController extends Controller
     public function index(Network $network): View
     {
         $branches = $network->branches()->withCount([
-            'users as admins_count' => fn($q) => $q->where('role', 'admin'),
-            'users as supervisors_count' => fn($q) => $q->where('role', 'supervisor'),
-            'users as teachers_count' => fn($q) => $q->where('role', 'teacher'),
+            'schoolUserRoles as admins_count' => fn($q) => $q->where('role', 'admin'),
+            'schoolUserRoles as supervisors_count' => fn($q) => $q->where('role', 'supervisor'),
+            'schoolUserRoles as teachers_count' => fn($q) => $q->where('role', 'teacher'),
             'subjects',
             'grades',
         ])->get();
