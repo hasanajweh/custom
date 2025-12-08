@@ -63,8 +63,8 @@ class StoreFileSubmissionRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                // More permissive regex - allows all Unicode letters, numbers, spaces, and common punctuation
-                'regex:/^[\p{L}\p{N}\p{M}\s\-_.,;:!?()\[\]{}'"\/]+$/u'
+                // Unicode letters, numbers, punctuation, brackets, quotes, slashes
+                "regex:/^[\p{L}\p{N}\p{M}\s\-_.,;:!?()\[\]{}'\"\/]+$/u"
             ],
             'description' => [
                 'nullable',
@@ -74,8 +74,7 @@ class StoreFileSubmissionRequest extends FormRequest
             'file' => [
                 'required',
                 'file',
-                // No size limit - unlimited file size
-                // Don't validate mimes here - we do deeper validation in the service
+                // No size limit here - validated later
             ],
             'submission_type' => [
                 'required',
@@ -84,11 +83,11 @@ class StoreFileSubmissionRequest extends FormRequest
             ],
         ];
 
-        // For plans, subject and grade are not required
+        // For plans, subject & grade are optional
         if ($isPlan) {
-            // Plans don't need subject or grade - make them nullable and allow empty strings
             $rules['subject_id'] = ['nullable', 'sometimes'];
             $rules['grade_id'] = ['nullable', 'sometimes'];
+
         } else {
             // For general resources, subject and grade are required
             $subjectRules = [];
