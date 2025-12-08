@@ -24,24 +24,24 @@
                 <div class="relative flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                     <div class="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-xl transform hover:scale-110 transition-transform duration-300">
                         <svg class="w-10 h-10 sm:w-12 sm:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    </div>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
                     <div class="flex-1 text-center sm:text-left">
                         <div class="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4">
-                            <div class="flex-1">
+                <div class="flex-1">
                                 <p class="text-xl sm:text-2xl font-bold text-emerald-900 mb-1">{{ $successTitleEn }}</p>
                                 <p class="text-xl sm:text-2xl font-bold text-emerald-900 mb-3">{{ $successTitleAr }}</p>
                                 <p class="text-base sm:text-lg text-emerald-800 mb-1">{{ $successMessageEn }}</p>
                                 <p class="text-base sm:text-lg text-emerald-800">{{ $successMessageAr }}</p>
                             </div>
                         </div>
-                    </div>
+                </div>
                     <button onclick="this.parentElement.parentElement.remove()" class="flex-shrink-0 p-2 text-emerald-700 hover:text-emerald-900 hover:bg-emerald-100 rounded-lg transition-all duration-200">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
                 </div>
             </div>
         @endif

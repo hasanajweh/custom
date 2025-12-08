@@ -13,16 +13,28 @@ class StoreFileSubmissionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $school = SchoolResolver::resolve($this->route('school'));
+        // Try to resolve school from either 'school' or 'branch' route parameter
+        $schoolParam = $this->route('school') ?? $this->route('branch');
+        $school = SchoolResolver::resolve($schoolParam);
         $user = $this->user();
 
+        // If no user, deny access
+        if (!$user) {
+            return false;
+        }
+
         // Super admins can upload to any school
-        if ($user && $user->is_super_admin) {
+        if ($user->is_super_admin) {
             return true;
         }
 
+        // If no school resolved, deny access
+        if (!$school) {
+            return false;
+        }
+
         // Regular users must belong to the school
-        return $school && $user && $user->school_id === $school->id;
+        return $user->school_id === $school->id;
     }
 
     /**
@@ -55,7 +67,9 @@ class StoreFileSubmissionRequest extends FormRequest
         $planTypes = ['daily_plan', 'weekly_plan', 'monthly_plan'];
         $submissionType = $this->input('submission_type');
         $isPlan = in_array($submissionType, $planTypes);
-        $school = SchoolResolver::resolve($this->route('school'));
+        // Try to resolve school from either 'school' or 'branch' route parameter
+        $schoolParam = $this->route('school') ?? $this->route('branch');
+        $school = SchoolResolver::resolve($schoolParam);
         $user = $this->user();
 
         $rules = [
