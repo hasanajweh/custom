@@ -189,10 +189,27 @@
                                     headers: {
                                         "X-CSRF-TOKEN": document.querySelector('#lang-switcher input[name=_token]').value,
                                         "Content-Type": "application/json",
+                                        "Accept": "application/json"
                                     },
-                                    body: JSON.stringify({ locale: locale })
-                                }).then(() => {
-                                    window.location.reload(); // Reload SAME URL
+                                    body: JSON.stringify({ locale: locale }),
+                                    credentials: 'same-origin'
+                                })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 100);
+                                })
+                                .catch(error => {
+                                    console.error('Language switch error:', error);
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 100);
                                 });
                             }
                             </script>

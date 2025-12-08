@@ -586,7 +586,18 @@ return [
     ],
 
     // Subjects Management
-    'subjects' => 'Subjects',
+    'subjects' => [
+        'title' => 'Subjects',
+        'total_subjects' => 'subject|subjects',
+        'current_subjects' => 'Current Subjects',
+        'add_new_subject' => 'Add New Subject',
+        'create_subjects_for_grades' => 'Create subjects for your grades',
+        'subject_name' => 'Subject Name',
+        'subject_placeholder' => 'e.g., Mathematics, Science, History',
+        'create_subject' => 'Create Subject',
+        'created' => 'Created',
+        'archived_subjects' => 'Archived Subjects',
+    ],
     'subjects_management' => [
         'title' => 'Subject Management',
         'subject_management' => 'Subject Management',

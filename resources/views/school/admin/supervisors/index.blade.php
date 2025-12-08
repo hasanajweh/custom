@@ -130,7 +130,7 @@
 
                                 <!-- Action Buttons -->
                                 <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                                    <a href="{{ tenant_route('school.admin.supervisors.files', [$school, $supervisor]) }}"
+                                    <a href="{{ tenant_route('school.admin.supervisors.files', $school, ['supervisor' => $supervisor]) }}"
                                        class="inline-flex items-center px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-lg transition-colors group-hover:shadow-md">
                                         <i class="ri-folder-line mr-1"></i>
                                         {{ __('messages.files.view_file') }}

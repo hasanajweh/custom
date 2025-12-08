@@ -28,7 +28,7 @@
 
         <!-- Filters -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <form method="GET" action="{{ tenant_route('school.admin.supervisors.files', [$school, $supervisor]) }}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <form method="GET" action="{{ tenant_route('school.admin.supervisors.files', $school, ['supervisor' => $supervisor]) }}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.common.search') }}</label>
                     <input type="text"

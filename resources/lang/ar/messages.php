@@ -627,7 +627,18 @@ return [
     ],
 
     // Subjects Management
-    'subjects' => 'المواد',
+    'subjects' => [
+        'title' => 'المواد',
+        'total_subjects' => 'مادة|مواد',
+        'current_subjects' => 'المواد الحالية',
+        'add_new_subject' => 'إضافة مادة جديدة',
+        'create_subjects_for_grades' => 'أنشئ مواد لصفوفك',
+        'subject_name' => 'اسم المادة',
+        'subject_placeholder' => 'مثال: الرياضيات، العلوم، التاريخ',
+        'create_subject' => 'إنشاء مادة',
+        'created' => 'تاريخ الإنشاء',
+        'archived_subjects' => 'المواد المؤرشفة',
+    ],
     'subjects_management' => [
         'title' => 'إدارة المواد',
         'subject_management' => 'إدارة المواد',

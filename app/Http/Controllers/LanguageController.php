@@ -17,8 +17,8 @@ class LanguageController extends Controller
         ])->validate();
 
         Session::put('locale', $data['locale']);
+        Session::save(); // Save session immediately
         App::setLocale($data['locale']);
-        Session::save();
 
         // If AJAX request, return JSON
         if ($request->expectsJson() || $request->wantsJson()) {

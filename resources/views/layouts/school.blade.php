@@ -1450,23 +1450,30 @@ function switchLocale(locale) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+            "Accept": "application/json"
         },
-        body: JSON.stringify({ locale })
+        body: JSON.stringify({ locale: locale }),
+        credentials: 'same-origin'
     })
     .then(response => {
-        if (response.ok) {
-            return response.json();
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
-        throw new Error('Network response was not ok');
+        return response.json();
     })
-    .then(() => {
-        window.location.reload();
+    .then(data => {
+        // Wait a moment to ensure session is saved
+        setTimeout(() => {
+            window.location.reload();
+        }, 100);
     })
     .catch(error => {
         console.error('Language switch error:', error);
-        // Fallback: reload anyway
-        window.location.reload();
+        // Fallback: reload anyway after a delay
+        setTimeout(() => {
+            window.location.reload();
+        }, 100);
     });
 }
 
