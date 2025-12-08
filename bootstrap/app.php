@@ -26,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // API middleware for tenant identification (optional, via headers/body)
         $middleware->api(prepend: [
+            \App\Http\Middleware\HandleCors::class,
             \App\Http\Middleware\IdentifyTenantApi::class,
         ]);
 
