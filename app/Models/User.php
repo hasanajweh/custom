@@ -14,10 +14,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\SchoolUserRole;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, BelongsToTenant, LogsActivity, SoftDeletes;
+    use HasFactory, Notifiable, BelongsToTenant, LogsActivity, SoftDeletes, HasApiTokens;
 
     protected $fillable = [
         'name',
