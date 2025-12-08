@@ -278,6 +278,29 @@
             uploadForm.addEventListener('submit', function(e) {
                 e.preventDefault();
 
+                // Ensure submission type is set correctly
+                updateFinalSubmissionType();
+
+                // For plans, make sure subject_id and grade_id are not in the form
+                const isPlanActive = planBtn.classList.contains('active');
+                if (isPlanActive) {
+                    // Remove name attributes if they exist (they should already be removed)
+                    if (subjectField.hasAttribute('name')) {
+                        subjectField.removeAttribute('name');
+                    }
+                    if (gradeField.hasAttribute('name')) {
+                        gradeField.removeAttribute('name');
+                    }
+                } else {
+                    // Restore name attributes for general resources
+                    if (subjectField.hasAttribute('data-original-name')) {
+                        subjectField.name = subjectField.getAttribute('data-original-name');
+                    }
+                    if (gradeField.hasAttribute('data-original-name')) {
+                        gradeField.name = gradeField.getAttribute('data-original-name');
+                    }
+                }
+
                 // Validate form
                 if (!uploadForm.checkValidity()) {
                     uploadForm.reportValidity();

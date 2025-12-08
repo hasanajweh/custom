@@ -34,14 +34,11 @@ class StoreFileSubmissionRequest extends FormRequest
         $submissionType = $this->input('submission_type');
         $isPlan = in_array($submissionType, $planTypes);
 
-        // For plans, convert empty strings to null for subject_id and grade_id
+        // For plans, completely remove subject_id and grade_id from the request
         if ($isPlan) {
-            if ($this->has('subject_id') && $this->input('subject_id') === '') {
-                $this->merge(['subject_id' => null]);
-            }
-            if ($this->has('grade_id') && $this->input('grade_id') === '') {
-                $this->merge(['grade_id' => null]);
-            }
+            // Remove these fields entirely so they won't be validated
+            $this->request->remove('subject_id');
+            $this->request->remove('grade_id');
         }
     }
 
@@ -63,8 +60,7 @@ class StoreFileSubmissionRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                // More permissive regex - allows all Unicode letters, numbers, spaces, and common punctuation
-                'regex:/^[\p{L}\p{N}\p{M}\s\-_.,;:!?()\[\]{}'"\/]+$/u'
+                // No regex validation - allow any text characters
             ],
             'description' => [
                 'nullable',
@@ -84,12 +80,8 @@ class StoreFileSubmissionRequest extends FormRequest
             ],
         ];
 
-        // For plans, subject and grade are not required
-        if ($isPlan) {
-            // Plans don't need subject or grade - make them nullable and allow empty strings
-            $rules['subject_id'] = ['nullable', 'sometimes'];
-            $rules['grade_id'] = ['nullable', 'sometimes'];
-        } else {
+        // For plans, subject and grade are not required - don't add them to rules at all
+        if (!$isPlan) {
             // For general resources, subject and grade are required
             $subjectRules = [];
             $gradeRules = [];
@@ -126,7 +118,6 @@ class StoreFileSubmissionRequest extends FormRequest
     {
         return [
             'title.required' => 'Please provide a title for your file.',
-            'title.regex' => 'Title contains invalid characters. Please use only letters, numbers, spaces, and common punctuation.',
             'file.required' => 'Please select a file to upload.',
             'file.max' => 'File size error.',
             'submission_type.required' => 'Please select a submission type.',

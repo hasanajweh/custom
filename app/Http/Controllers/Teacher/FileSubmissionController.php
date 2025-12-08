@@ -158,18 +158,15 @@ class FileSubmissionController extends Controller
         ));
     }
 
-    public function store(Network $network, School $branch, Request $request)
+    public function store(Network $network, School $branch, StoreFileSubmissionRequest $request)
     {
         if ($branch->network_id !== $network->id) {
             abort(404);
         }
 
         $school = $branch;
-        $formRequest = new StoreFileSubmissionRequest();
-        $validated = $request->validate(
-            $formRequest->rules(),
-            method_exists($formRequest, 'messages') ? $formRequest->messages() : []
-        );
+        // FormRequest automatically validates and provides validated data
+        $validated = $request->validated();
         Log::info('=== FILE UPLOAD START ===', [
             'user_id' => Auth::id(),
             'school_id' => $school->id,
