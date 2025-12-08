@@ -9,8 +9,9 @@
         <div class="absolute top-4 {{ app()->getLocale() === 'ar' ? 'left-4' : 'right-4' }} z-50">
             <form id="lang-switcher" method="POST">
                 @csrf
-                <button type="button" onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')" class="lang-toggle-btn">
-                    {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
+                <button type="button" onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')" class="px-4 py-2 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-white hover:shadow-md transition-all duration-200 flex items-center gap-2">
+                    <span>{{ app()->getLocale() === 'ar' ? '🇬🇧' : '🇸🇦' }}</span>
+                    <span>{{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}</span>
                 </button>
             </form>
         </div>

@@ -1746,9 +1746,9 @@
                 {{ app()->getLocale() === 'ar' ? 'ابدأ مجاناً' : 'Get Started Free' }}
                 <i class="ri-arrow-right-line"></i>
             </a>
-            <a href="mailto:sales@scholder.io" class="cta-btn cta-btn-secondary">
+            <a href="mailto:info@scholders.com" class="cta-btn cta-btn-secondary">
                 <i class="ri-mail-line"></i>
-                {{ app()->getLocale() === 'ar' ? 'اتصل بالمبيعات' : 'Contact Sales' }}
+                {{ app()->getLocale() === 'ar' ? 'اتصل بنا' : 'Contact Us' }}
             </a>
         </div>
         <p class="cta-note">
@@ -1775,7 +1775,11 @@
                         ? 'منصة إدارة التعليم من الجيل القادم للمدارس والشبكات والمعلمين في جميع أنحاء العالم.'
                         : 'The next-generation educational management platform for schools, networks, and educators worldwide.' }}
                 </p>
-                <div class="footer-lang">
+                <div class="footer-contact" style="margin-top: 16px;">
+                    <i class="ri-mail-line" style="margin-right: 8px;"></i>
+                    <a href="mailto:info@scholders.com" style="color: var(--text-secondary); text-decoration: none;">info@scholders.com</a>
+                </div>
+                <div class="footer-lang" style="margin-top: 16px;">
                     <i class="ri-global-line"></i>
                     <span>{{ app()->getLocale() === 'ar' ? 'English | العربية' : 'English | العربية' }}</span>
                 </div>
@@ -1795,7 +1799,7 @@
                     <li><a href="#">{{ app()->getLocale() === 'ar' ? 'من نحن' : 'About' }}</a></li>
                     <li><a href="#">{{ app()->getLocale() === 'ar' ? 'المدونة' : 'Blog' }}</a></li>
                     <li><a href="#">{{ app()->getLocale() === 'ar' ? 'الوظائف' : 'Careers' }}</a></li>
-                    <li><a href="#">{{ app()->getLocale() === 'ar' ? 'الصحافة' : 'Press' }}</a></li>
+                    <li><a href="mailto:info@scholders.com">{{ app()->getLocale() === 'ar' ? 'اتصل بنا' : 'Contact Us' }}</a></li>
                 </ul>
             </div>
             <div class="footer-column">

@@ -71,15 +71,6 @@
                 @csrf
 
                 <div class="p-5 sm:p-8 space-y-6 sm:space-y-8">
-                    {{-- Toggle Buttons --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.files.what_type_resource') }}</label>
-                        <div class="flex border border-gray-200 rounded-lg p-1 bg-gray-100 flex-col sm:flex-row gap-2 sm:gap-0">
-                            <button id="generalBtn" type="button" class="form-toggle-btn active w-full sm:w-1/2 py-2">{{ __('messages.files.general_resource') }}</button>
-                            <button id="planBtn" type="button" class="form-toggle-btn w-full sm:w-1/2 py-2">{{ __('messages.files.lesson_plans') }}</button>
-                        </div>
-                    </div>
-
                     {{-- Title --}}
                     <div>
                         <label for="title" class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.files.resource_title') }} <span class="text-red-500">*</span></label>
@@ -87,56 +78,13 @@
                                class="w-full px-3 py-2 sm:px-4 sm:py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm sm:text-base focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
-
-                    @php($missingAssignments = $subjects->isEmpty() || $grades->isEmpty())
-                    <div id="generalResourceFields" class="space-y-6">
-                        @if($missingAssignments)
-                            @php($assignmentMessage = \Illuminate\Support\Facades\Lang::has('messages.files.no_assignments_warning')
-                                ? __('messages.files.no_assignments_warning')
-                                : 'You do not have any assigned subjects or grades yet. Please contact your administrator to continue.')
-                            <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
-                                {{ $assignmentMessage }}
-                            </div>
-                        @endif                    <div id="generalResourceFields" class="space-y-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.files.content_type') }} <span class="text-red-500">*</span></label>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-                                <label class="card-radio-label"><input type="radio" name="general_type" value="exam" class="sr-only peer" checked><span>{{ __('messages.files.exam') }}</span></label>
-                                <label class="card-radio-label"><input type="radio" name="general_type" value="worksheet" class="sr-only peer"><span>{{ __('messages.files.worksheet') }}</span></label>
-                                <label class="card-radio-label"><input type="radio" name="general_type" value="summary" class="sr-only peer"><span>{{ __('messages.files.summary') }}</span></label>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label for="subject_id" class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.users.subject') }} <span class="text-red-500">*</span></label>
-<select id="subject_id" name="subject_id" class="w-full px-3 py-2 sm:px-4 bg-gray-50 border border-gray-300 rounded-lg text-sm sm:text-base focus:ring-blue-500 focus:border-blue-500" @disabled($subjects->isEmpty())>                                    <option value="">{{ __('messages.files.select_subject') }}</option>
-                                    @foreach($subjects as $subject)
-                                        <option value="{{ $subject->id }}" {{ old('subject_id') == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label for="grade_id" class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.files.grade_level') }} <span class="text-red-500">*</span></label>
-                                <select id="grade_id" name="grade_id" class="w-full px-3 py-2 sm:px-4 bg-gray-50 border border-gray-300 rounded-lg text-sm sm:text-base focus:ring-blue-500 focus:border-blue-500" @disabled($grades->isEmpty())>
-                                    <option value="">{{ __('messages.files.select_grade') }}</option>
-                                    @foreach($grades as $grade)
-                                        <option value="{{ $grade->id }}" {{ old('grade_id') == $grade->id ? 'selected' : '' }}>{{ $grade->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Plan Fields --}}
-                    <div id="planFields" class="hidden space-y-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.files.plan_duration') }} <span class="text-red-500">*</span></label>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-                                <label class="card-radio-label"><input type="radio" name="plan_type" value="daily_plan" class="sr-only peer" checked><span>{{ __('messages.plans.daily') }}</span></label>
-                                <label class="card-radio-label"><input type="radio" name="plan_type" value="weekly_plan" class="sr-only peer"><span>{{ __('messages.plans.weekly') }}</span></label>
-                                <label class="card-radio-label"><input type="radio" name="plan_type" value="monthly_plan" class="sr-only peer"><span>{{ __('messages.plans.monthly') }}</span></label>
-                            </div>
+                    {{-- Plan Type Selection --}}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.files.plan_duration') }} <span class="text-red-500">*</span></label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+                            <label class="card-radio-label"><input type="radio" name="plan_type" value="daily_plan" class="sr-only peer" {{ old('plan_type', 'daily_plan') == 'daily_plan' ? 'checked' : '' }}><span>{{ __('messages.plans.daily') }}</span></label>
+                            <label class="card-radio-label"><input type="radio" name="plan_type" value="weekly_plan" class="sr-only peer" {{ old('plan_type') == 'weekly_plan' ? 'checked' : '' }}><span>{{ __('messages.plans.weekly') }}</span></label>
+                            <label class="card-radio-label"><input type="radio" name="plan_type" value="monthly_plan" class="sr-only peer" {{ old('plan_type') == 'monthly_plan' ? 'checked' : '' }}><span>{{ __('messages.plans.monthly') }}</span></label>
                         </div>
                     </div>
 
@@ -159,7 +107,7 @@
                     </div>
 
                     {{-- Hidden submission type --}}
-                    <input type="hidden" id="final_submission_type" name="submission_type" value="exam">
+                    <input type="hidden" id="final_submission_type" name="submission_type" value="daily_plan">
                 </div>
 
                 <div class="px-5 sm:px-8 py-3 sm:py-4 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
@@ -205,63 +153,25 @@
 <script>
         document.addEventListener('DOMContentLoaded', function() {
             // UI Elements
-            const generalBtn = document.getElementById('generalBtn');
-            const planBtn = document.getElementById('planBtn');
-            const generalResourceFields = document.getElementById('generalResourceFields');
-            const planFields = document.getElementById('planFields');
             const finalTypeInput = document.getElementById('final_submission_type');
             const uploadForm = document.getElementById('uploadForm');
             const submitBtn = document.getElementById('submitBtn');
-            const subjectField = document.getElementById('subject_id');
-            const gradeField = document.getElementById('grade_id');
 
-            // ✅ FIXED: Toggle form function
-            function toggleForm(showType) {
-                const isGeneral = showType === 'general';
-
-                generalBtn.classList.toggle('active', isGeneral);
-                planBtn.classList.toggle('active', !isGeneral);
-                generalResourceFields.classList.toggle('hidden', !isGeneral);
-                planFields.classList.toggle('hidden', isGeneral);
-
-                // For general resources, subject and grade are required
-                if (isGeneral) {
-                    subjectField.required = true;
-                    gradeField.required = true;
-                    subjectField.disabled = false;
-                    gradeField.disabled = false;
-                } else {
-                    // For lesson plans, clear and disable
-                    subjectField.value = '';
-                    gradeField.value = '';
-                    subjectField.required = false;
-                    gradeField.required = false;
-                    subjectField.disabled = true;
-                    gradeField.disabled = true;
-                }
-
-                updateFinalSubmissionType();
-            }
-
-            // ✅ FIXED: Update hidden submission_type input
+            // Update hidden submission_type input based on selected plan type
             function updateFinalSubmissionType() {
-                const isPlanActive = planBtn.classList.contains('active');
-                const selector = isPlanActive ? 'input[name="plan_type"]:checked' : 'input[name="general_type"]:checked';
-                const selectedRadio = document.querySelector(selector);
-
+                const selectedRadio = document.querySelector('input[name="plan_type"]:checked');
                 if (selectedRadio) {
                     finalTypeInput.value = selectedRadio.value;
-                    console.log('Submission type set to:', selectedRadio.value); // Debug log
                 }
             }
 
             // Event Listeners
-            generalBtn.addEventListener('click', () => toggleForm('general'));
-            planBtn.addEventListener('click', () => toggleForm('plan'));
-
-            document.querySelectorAll('input[name="general_type"], input[name="plan_type"]').forEach(radio => {
+            document.querySelectorAll('input[name="plan_type"]').forEach(radio => {
                 radio.addEventListener('change', updateFinalSubmissionType);
             });
+
+            // Initialize submission type
+            updateFinalSubmissionType();
 
             // ✅ Form submission with success redirect
             uploadForm.addEventListener('submit', function(e) {
@@ -306,24 +216,6 @@
                     }
                 }, 5000);
             }
-
-            // ✅ Initialize form on page load (handles validation errors)
-            const oldSubmissionType = '{{ old("submission_type") }}';
-            const planTypes = ['daily_plan', 'weekly_plan', 'monthly_plan'];
-
-            if (oldSubmissionType && planTypes.includes(oldSubmissionType)) {
-                toggleForm('plan');
-                const oldPlanRadio = document.querySelector(`input[name="plan_type"][value="${oldSubmissionType}"]`);
-                if (oldPlanRadio) oldPlanRadio.checked = true;
-            } else {
-                toggleForm('general');
-                if (oldSubmissionType && !planTypes.includes(oldSubmissionType)) {
-                    const oldGeneralRadio = document.querySelector(`input[name="general_type"][value="${oldSubmissionType}"]`);
-                    if (oldGeneralRadio) oldGeneralRadio.checked = true;
-                }
-            }
-
-            updateFinalSubmissionType();
         });
 
         // File Upload & Drag-n-Drop UI
