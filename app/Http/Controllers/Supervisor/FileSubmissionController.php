@@ -60,7 +60,7 @@ class FileSubmissionController extends Controller
         $school = $branch;
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:' . config('uploads.max_size_kb', 102400),
+            'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx', // No size limit
         ]);
 
         $user = Auth::user();

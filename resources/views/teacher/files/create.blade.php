@@ -7,13 +7,7 @@
 <div class="min-h-screen bg-slate-50 py-6 px-3 sm:py-8 sm:px-4">
     <div class="max-w-2xl mx-auto">
 
-        @if (session('status'))
-            <div class="alert alert-success">
-                {{ session('status') }}
-            </div>
-        @endif
-
-        {{-- ✅ Success Message --}}
+        {{-- ✅ Enhanced Success Message --}}
         @if(session('upload_success'))
             @php
                 $successTitleEn = __('messages.files.upload_successful', [], 'en');
@@ -22,23 +16,33 @@
                 $successMessageAr = __('messages.files.file_has_been_uploaded', [], 'ar');
             @endphp
 
-            <div class="mb-6 bg-emerald-50 border-2 border-emerald-300 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center shadow-lg animate-slideDown text-center sm:text-left">
-                <div class="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center mb-3 sm:mb-0 sm:mr-4 shadow-md">
-                    <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                    </svg>
+            <div class="mb-6 bg-gradient-to-r from-emerald-50 via-green-50 to-teal-50 border-2 border-emerald-400 rounded-2xl p-6 sm:p-8 shadow-2xl animate-slideDown relative overflow-hidden">
+                {{-- Animated background decoration --}}
+                <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-200 rounded-full opacity-20 blur-3xl"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-teal-200 rounded-full opacity-20 blur-2xl"></div>
+                
+                <div class="relative flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                    <div class="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-xl transform hover:scale-110 transition-transform duration-300">
+                        <svg class="w-10 h-10 sm:w-12 sm:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1 text-center sm:text-left">
+                        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4">
+                            <div class="flex-1">
+                                <p class="text-xl sm:text-2xl font-bold text-emerald-900 mb-1">{{ $successTitleEn }}</p>
+                                <p class="text-xl sm:text-2xl font-bold text-emerald-900 mb-3">{{ $successTitleAr }}</p>
+                                <p class="text-base sm:text-lg text-emerald-800 mb-1">{{ $successMessageEn }}</p>
+                                <p class="text-base sm:text-lg text-emerald-800">{{ $successMessageAr }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="flex-shrink-0 p-2 text-emerald-700 hover:text-emerald-900 hover:bg-emerald-100 rounded-lg transition-all duration-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                 </div>
-                <div class="flex-1">
-                    <p class="text-base sm:text-lg font-bold text-emerald-900">{{ $successTitleEn }}</p>
-                    <p class="text-base sm:text-lg font-bold text-emerald-900 sm:mt-1">{{ $successTitleAr }}</p>
-                    <p class="text-sm sm:text-base text-emerald-700 mt-2">{{ $successMessageEn }}</p>
-                    <p class="text-sm sm:text-base text-emerald-700">{{ $successMessageAr }}</p>
-                </div>
-                <button onclick="this.parentElement.remove()" class="absolute top-2 right-3 text-emerald-600 hover:text-emerald-800 transition sm:static sm:ml-4">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
             </div>
         @endif
 
@@ -71,6 +75,15 @@
                 @csrf
 
                 <div class="p-5 sm:p-8 space-y-6 sm:space-y-8">
+                    {{-- Toggle Buttons --}}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.files.what_type_resource') }}</label>
+                        <div class="flex border border-gray-200 rounded-lg p-1 bg-gray-100 flex-col sm:flex-row gap-2 sm:gap-0">
+                            <button id="generalBtn" type="button" class="form-toggle-btn active w-full sm:w-1/2 py-2">{{ __('messages.files.general_resource') }}</button>
+                            <button id="planBtn" type="button" class="form-toggle-btn w-full sm:w-1/2 py-2">{{ __('messages.files.lesson_plans') }}</button>
+                        </div>
+                    </div>
+
                     {{-- Title --}}
                     <div>
                         <label for="title" class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.files.resource_title') }} <span class="text-red-500">*</span></label>
@@ -78,13 +91,56 @@
                                class="w-full px-3 py-2 sm:px-4 sm:py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm sm:text-base focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
-                    {{-- Plan Type Selection --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.files.plan_duration') }} <span class="text-red-500">*</span></label>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
-                            <label class="card-radio-label"><input type="radio" name="plan_type" value="daily_plan" class="sr-only peer" {{ old('plan_type', 'daily_plan') == 'daily_plan' ? 'checked' : '' }}><span>{{ __('messages.plans.daily') }}</span></label>
-                            <label class="card-radio-label"><input type="radio" name="plan_type" value="weekly_plan" class="sr-only peer" {{ old('plan_type') == 'weekly_plan' ? 'checked' : '' }}><span>{{ __('messages.plans.weekly') }}</span></label>
-                            <label class="card-radio-label"><input type="radio" name="plan_type" value="monthly_plan" class="sr-only peer" {{ old('plan_type') == 'monthly_plan' ? 'checked' : '' }}><span>{{ __('messages.plans.monthly') }}</span></label>
+                    @php($missingAssignments = $subjects->isEmpty() || $grades->isEmpty())
+                    <div id="generalResourceFields" class="space-y-6">
+                        @if($missingAssignments)
+                            @php($assignmentMessage = \Illuminate\Support\Facades\Lang::has('messages.files.no_assignments_warning')
+                                ? __('messages.files.no_assignments_warning')
+                                : 'You do not have any assigned subjects or grades yet. Please contact your administrator to continue.')
+                            <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
+                                {{ $assignmentMessage }}
+                            </div>
+                        @endif
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.files.content_type') }} <span class="text-red-500">*</span></label>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                                <label class="card-radio-label"><input type="radio" name="general_type" value="exam" class="sr-only peer" checked><span>{{ __('messages.files.exam') }}</span></label>
+                                <label class="card-radio-label"><input type="radio" name="general_type" value="worksheet" class="sr-only peer"><span>{{ __('messages.files.worksheet') }}</span></label>
+                                <label class="card-radio-label"><input type="radio" name="general_type" value="summary" class="sr-only peer"><span>{{ __('messages.files.summary') }}</span></label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="subject_id" class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.users.subject') }} <span class="text-red-500">*</span></label>
+                                <select id="subject_id" name="subject_id" class="w-full px-3 py-2 sm:px-4 bg-gray-50 border border-gray-300 rounded-lg text-sm sm:text-base focus:ring-blue-500 focus:border-blue-500" @disabled($subjects->isEmpty())>
+                                    <option value="">{{ __('messages.files.select_subject') }}</option>
+                                    @foreach($subjects as $subject)
+                                        <option value="{{ $subject->id }}" {{ old('subject_id') == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label for="grade_id" class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.files.grade_level') }} <span class="text-red-500">*</span></label>
+                                <select id="grade_id" name="grade_id" class="w-full px-3 py-2 sm:px-4 bg-gray-50 border border-gray-300 rounded-lg text-sm sm:text-base focus:ring-blue-500 focus:border-blue-500" @disabled($grades->isEmpty())>
+                                    <option value="">{{ __('messages.files.select_grade') }}</option>
+                                    @foreach($grades as $grade)
+                                        <option value="{{ $grade->id }}" {{ old('grade_id') == $grade->id ? 'selected' : '' }}>{{ $grade->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Plan Fields --}}
+                    <div id="planFields" class="hidden space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.files.plan_duration') }} <span class="text-red-500">*</span></label>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                                <label class="card-radio-label"><input type="radio" name="plan_type" value="daily_plan" class="sr-only peer" checked><span>{{ __('messages.plans.daily') }}</span></label>
+                                <label class="card-radio-label"><input type="radio" name="plan_type" value="weekly_plan" class="sr-only peer"><span>{{ __('messages.plans.weekly') }}</span></label>
+                                <label class="card-radio-label"><input type="radio" name="plan_type" value="monthly_plan" class="sr-only peer"><span>{{ __('messages.plans.monthly') }}</span></label>
+                            </div>
                         </div>
                     </div>
 
@@ -96,7 +152,7 @@
                             <div id="uploadPrompt" class="text-center text-sm sm:text-base">
                                 <svg class="mx-auto h-8 w-8 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                                 <p class="mt-1 text-gray-600"><span class="font-semibold text-blue-600">{{ __('messages.files.click_to_upload') }}</span> or drag & drop</p>
-                                <p class="text-xs text-gray-500">{{ __('messages.files.max_size', ['size' => '10MB']) }}</p>
+                                <p class="text-xs text-gray-500 mt-1">{{ __('messages.files.unlimited_size') }}</p>
                             </div>
                             <div id="fileInfo" class="hidden text-center text-sm sm:text-base">
                                 <p id="fileName" class="font-medium text-gray-800"></p>
@@ -107,7 +163,7 @@
                     </div>
 
                     {{-- Hidden submission type --}}
-                    <input type="hidden" id="final_submission_type" name="submission_type" value="daily_plan">
+                    <input type="hidden" id="final_submission_type" name="submission_type" value="exam">
                 </div>
 
                 <div class="px-5 sm:px-8 py-3 sm:py-4 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
@@ -153,25 +209,63 @@
 <script>
         document.addEventListener('DOMContentLoaded', function() {
             // UI Elements
+            const generalBtn = document.getElementById('generalBtn');
+            const planBtn = document.getElementById('planBtn');
+            const generalResourceFields = document.getElementById('generalResourceFields');
+            const planFields = document.getElementById('planFields');
             const finalTypeInput = document.getElementById('final_submission_type');
             const uploadForm = document.getElementById('uploadForm');
             const submitBtn = document.getElementById('submitBtn');
+            const subjectField = document.getElementById('subject_id');
+            const gradeField = document.getElementById('grade_id');
 
-            // Update hidden submission_type input based on selected plan type
+            // ✅ FIXED: Toggle form function
+            function toggleForm(showType) {
+                const isGeneral = showType === 'general';
+
+                generalBtn.classList.toggle('active', isGeneral);
+                planBtn.classList.toggle('active', !isGeneral);
+                generalResourceFields.classList.toggle('hidden', !isGeneral);
+                planFields.classList.toggle('hidden', isGeneral);
+
+                // For general resources, subject and grade are required
+                if (isGeneral) {
+                    subjectField.required = true;
+                    gradeField.required = true;
+                    subjectField.disabled = false;
+                    gradeField.disabled = false;
+                } else {
+                    // For lesson plans, clear and disable
+                    subjectField.value = '';
+                    gradeField.value = '';
+                    subjectField.required = false;
+                    gradeField.required = false;
+                    subjectField.disabled = true;
+                    gradeField.disabled = true;
+                }
+
+                updateFinalSubmissionType();
+            }
+
+            // ✅ FIXED: Update hidden submission_type input
             function updateFinalSubmissionType() {
-                const selectedRadio = document.querySelector('input[name="plan_type"]:checked');
+                const isPlanActive = planBtn.classList.contains('active');
+                const selector = isPlanActive ? 'input[name="plan_type"]:checked' : 'input[name="general_type"]:checked';
+                const selectedRadio = document.querySelector(selector);
+
                 if (selectedRadio) {
                     finalTypeInput.value = selectedRadio.value;
+                    console.log('Submission type set to:', selectedRadio.value); // Debug log
                 }
             }
 
             // Event Listeners
-            document.querySelectorAll('input[name="plan_type"]').forEach(radio => {
+            generalBtn.addEventListener('click', () => toggleForm('general'));
+            planBtn.addEventListener('click', () => toggleForm('plan'));
+
+            document.querySelectorAll('input[name="general_type"], input[name="plan_type"]').forEach(radio => {
                 radio.addEventListener('change', updateFinalSubmissionType);
             });
-
-            // Initialize submission type
-            updateFinalSubmissionType();
 
             // ✅ Form submission with success redirect
             uploadForm.addEventListener('submit', function(e) {
@@ -206,7 +300,7 @@
             if (sessionStorage.getItem('fileUploadInProgress') === 'true') {
                 sessionStorage.removeItem('fileUploadInProgress');
 
-                // ✅ Auto-hide success message after 5 seconds
+                // ✅ Auto-hide success message after 8 seconds (increased from 5)
                 setTimeout(() => {
                     const successMsg = document.querySelector('.animate-slideDown');
                     if (successMsg) {
@@ -214,8 +308,26 @@
                         successMsg.style.opacity = '0';
                         setTimeout(() => successMsg.remove(), 500);
                     }
-                }, 5000);
+                }, 8000);
             }
+
+            // ✅ Initialize form on page load (handles validation errors)
+            const oldSubmissionType = '{{ old("submission_type") }}';
+            const planTypes = ['daily_plan', 'weekly_plan', 'monthly_plan'];
+
+            if (oldSubmissionType && planTypes.includes(oldSubmissionType)) {
+                toggleForm('plan');
+                const oldPlanRadio = document.querySelector(`input[name="plan_type"][value="${oldSubmissionType}"]`);
+                if (oldPlanRadio) oldPlanRadio.checked = true;
+            } else {
+                toggleForm('general');
+                if (oldSubmissionType && !planTypes.includes(oldSubmissionType)) {
+                    const oldGeneralRadio = document.querySelector(`input[name="general_type"][value="${oldSubmissionType}"]`);
+                    if (oldGeneralRadio) oldGeneralRadio.checked = true;
+                }
+            }
+
+            updateFinalSubmissionType();
         });
 
         // File Upload & Drag-n-Drop UI
@@ -240,7 +352,7 @@
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }

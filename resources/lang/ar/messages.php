@@ -537,6 +537,7 @@ return [
         'click_to_upload' => 'انقر للرفع',
         'drag_drop' => 'أو اسحب وأفلت',
         'max_size' => 'الحد الأقصى :size',
+        'unlimited_size' => 'حجم ملف غير محدود',
         'remove_file' => 'إزالة الملف',
         'supports_formats' => 'يدعم: PDF، Word، Excel، PowerPoint',
         'file_formats' => 'تنسيقات الملفات',

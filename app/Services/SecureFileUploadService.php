@@ -47,10 +47,7 @@ class SecureFileUploadService
             $errors[] = "Invalid file type. Detected: {$actualMime}. Only PDF and Office documents are allowed.";
         }
 
-        // 2. Check file size
-       if ($file->getSize() > $this->getMaxFileSize()) {
-            $errors[] = 'File too large. Maximum size is ' . config('uploads.max_size_mb', 100) . 'MB.';
-        }
+        // 2. File size check removed - unlimited file size
 
         // 3. Check extension
         $extension = strtolower($file->getClientOriginalExtension());
@@ -93,10 +90,7 @@ class SecureFileUploadService
             'hash' => hash_file('sha256', $file->getRealPath())
         ];
     }
-private function getMaxFileSize(): int
-    {
-        return (int) config('uploads.max_size_bytes', 104857600);
-    }
+    // Removed getMaxFileSize() - unlimited file size
 
     /**
      * Check if file is an Office document

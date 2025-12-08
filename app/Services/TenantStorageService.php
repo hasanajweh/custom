@@ -97,10 +97,7 @@ class TenantStorageService
         if (!in_array($actualMime, self::ALLOWED_MIME_TYPES)) {
             $errors[] = "Invalid file type detected: {$actualMime}";
         }
-        $maxSize = config('uploads.max_size_bytes', 104857600);
-        if ($file->getSize() > $maxSize) {
-            $errors[] = 'File too large. Maximum size is ' . config('uploads.max_size_mb', 100) . 'MB';
-        }
+        // File size check removed - unlimited file size
         $extension = strtolower($file->getClientOriginalExtension());
         if (in_array($extension, self::DANGEROUS_EXTENSIONS)) {
             $errors[] = "Dangerous file extension: {$extension}";
@@ -238,9 +235,8 @@ class TenantStorageService
 
     public static function hasStorageSpace(int $requiredBytes, ?School $school = null): bool
     {
-        $school = $school ?? app(School::class);
-        $availableSpace = $school->storage_limit - $school->storage_used;
-        return $availableSpace >= $requiredBytes;
+        // Storage limit check removed - unlimited storage for admin
+        return true;
     }
 
     public static function updateStorageUsage(int $bytes, ?School $school = null): void

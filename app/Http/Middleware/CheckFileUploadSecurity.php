@@ -65,9 +65,7 @@ class CheckFileUploadSecurity
             }
         }
 
-        if ($file->getSize() > 104_857_600) {
-            return false;
-        }
+        // File size check removed - unlimited file size
 
         return true;
     }

@@ -498,6 +498,7 @@ return [
         'click_to_upload' => 'Click to upload',
         'drag_drop' => 'or drag and drop',
         'max_size' => 'Max :size',
+        'unlimited_size' => 'Unlimited file size',
         'remove_file' => 'Remove file',
         'resource_type_helper' => 'Choose the resource type to display the right fields.',
         'supports_formats' => 'Supports: PDF, Word, Excel, PowerPoint',

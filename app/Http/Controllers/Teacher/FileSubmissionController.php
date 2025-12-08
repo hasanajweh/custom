@@ -181,16 +181,7 @@ class FileSubmissionController extends Controller
         $file = $request->file('file');
 
         try {
-            if (!TenantStorageService::hasStorageSpace($file->getSize(), $school)) {
-                Log::warning('Storage limit exceeded', [
-                    'required' => $file->getSize(),
-                    'available' => $school->storage_limit - $school->storage_used
-                ]);
-
-                return back()->withErrors([
-                    'file' => 'Storage limit exceeded. Please contact your administrator.'
-                ])->withInput();
-            }
+            // Storage limit check removed - unlimited storage
 
             $tempResult = TenantStorageService::storeToTemp($file);
 

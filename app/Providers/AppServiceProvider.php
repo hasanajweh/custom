@@ -26,22 +26,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $maxUploadSizeMb = config('uploads.max_size_mb', 100);
-        $uploadLimit = $maxUploadSizeMb . 'M';
-
+        // File size limits removed - unlimited file size
+        // Set PHP upload limits to a very high value (10GB) to allow large files
         if (function_exists('ini_set')) {
-            @ini_set('upload_max_filesize', $uploadLimit);
-            @ini_set('post_max_size', $uploadLimit);
-
-            $currentMemoryLimit = ini_get('memory_limit');
-            if ($currentMemoryLimit !== false && $currentMemoryLimit !== '-1') {
-                $numericLimit = (int) filter_var($currentMemoryLimit, FILTER_SANITIZE_NUMBER_INT);
-                $requiredLimit = $maxUploadSizeMb * 2;
-
-                if ($numericLimit > 0 && $numericLimit < $requiredLimit) {
-                    @ini_set('memory_limit', $requiredLimit . 'M');
-                }
-            }
+            @ini_set('upload_max_filesize', '10240M'); // 10GB
+            @ini_set('post_max_size', '10240M'); // 10GB
         }
 
         View::composer('*', function ($view) {

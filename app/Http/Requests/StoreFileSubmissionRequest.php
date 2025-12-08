@@ -72,7 +72,7 @@ class StoreFileSubmissionRequest extends FormRequest
             'file' => [
                 'required',
                 'file',
-                'max:' . config('uploads.max_size_kb', 102400),
+                // No size limit - unlimited file size
                 // Don't validate mimes here - we do deeper validation in the service
             ],
             'submission_type' => [
@@ -104,7 +104,7 @@ class StoreFileSubmissionRequest extends FormRequest
             'title.required' => 'Please provide a title for your file.',
             'title.regex' => 'Title can only contain letters, numbers, spaces, hyphens, underscores, and dots.',
             'file.required' => 'Please select a file to upload.',
-            'file.max' => 'File size must not exceed ' . config('uploads.max_size_mb', 100) . 'MB.',
+            'file.max' => 'File size error.',
             'submission_type.required' => 'Please select a submission type.',
             'submission_type.in' => 'Invalid submission type selected.',
             'subject_id.required' => 'Subject is required for this submission type.',
