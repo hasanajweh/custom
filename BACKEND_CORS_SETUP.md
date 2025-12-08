@@ -71,15 +71,15 @@ return [
 In your deployed Laravel backend, ensure your `.env` has:
 
 ```env
-APP_URL=https://your-domain.com
+APP_URL=https://enterprise.scholders.com
 APP_ENV=production
 
 # CORS Settings
-SANCTUM_STATEFUL_DOMAINS=your-domain.com,www.your-domain.com
+SANCTUM_STATEFUL_DOMAINS=enterprise.scholders.com,localhost,127.0.0.1
 
 # If using Sanctum
 SESSION_DRIVER=cookie
-SESSION_DOMAIN=.your-domain.com  # Use dot prefix for subdomains
+SESSION_DOMAIN=.scholders.com  # Use dot prefix for subdomains
 ```
 
 ## Step 3: Publish CORS Config (if needed)

@@ -16,7 +16,7 @@
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
-        "--dart-define=API_BASE_URL=https://your-domain.com/api"
+        "--dart-define=API_BASE_URL=https://enterprise.scholders.com/api"
       ]
     }
   ]

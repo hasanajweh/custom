@@ -5,10 +5,10 @@ class AppConfig {
   // IMPORTANT: Update this to your deployed API URL
   
   // Option 1: Set via environment variable (recommended for production)
-  // Run: flutter run --dart-define=API_BASE_URL=https://your-domain.com/api
+  // Run: flutter run --dart-define=API_BASE_URL=https://enterprise.scholders.com/api
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://your-domain.com/api', // ⚠️ CHANGE THIS TO YOUR DEPLOYED API URL
+    defaultValue: 'https://enterprise.scholders.com/api', // ✅ Your deployed API URL
   );
   
   // Option 2: Direct configuration (easier for quick testing)
