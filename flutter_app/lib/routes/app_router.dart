@@ -9,6 +9,9 @@ import '../screens/profile/change_password_screen.dart';
 import '../screens/files/my_files_screen.dart';
 import '../screens/files/upload_file_screen.dart';
 import '../screens/files/file_detail_screen.dart';
+import '../screens/files/upload_type_selector_screen.dart';
+import '../screens/files/upload_general_file_screen.dart';
+import '../screens/files/upload_plan_file_screen.dart';
 import '../models/file_submission.dart';
 
 class AppRouter {
@@ -21,6 +24,9 @@ class AppRouter {
   static const String changePassword = '/change-password';
   static const String myFiles = '/files';
   static const String uploadFile = '/upload';
+  static const String uploadTypeSelector = '/upload-type-selector';
+  static const String uploadGeneralFile = '/upload-general';
+  static const String uploadPlanFile = '/upload-plan';
   static const String fileDetail = '/file-detail';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -56,7 +62,16 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const MyFilesScreen());
       
       case uploadFile:
-        return MaterialPageRoute(builder: (_) => const UploadFileScreen());
+        return MaterialPageRoute(builder: (_) => const UploadTypeSelectorScreen());
+      
+      case uploadTypeSelector:
+        return MaterialPageRoute(builder: (_) => const UploadTypeSelectorScreen());
+      
+      case uploadGeneralFile:
+        return MaterialPageRoute(builder: (_) => const UploadGeneralFileScreen());
+      
+      case uploadPlanFile:
+        return MaterialPageRoute(builder: (_) => const UploadPlanFileScreen());
       
       case fileDetail:
         final file = settings.arguments as FileSubmission;

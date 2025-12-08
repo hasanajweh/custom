@@ -34,7 +34,7 @@
                         <input type="hidden" name="locale"
                                value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
                         <button type="submit" class="lang-toggle-btn">
-                            {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
+                            {{ app()->getLocale() === 'ar' ? __('messages.language.english') : __('messages.language.arabic') }}
                         </button>
                     </form>
                 </div>

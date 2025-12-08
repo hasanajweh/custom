@@ -11,7 +11,7 @@
                 @csrf
                 <button type="button" onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')" class="px-4 py-2 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-white hover:shadow-md transition-all duration-200 flex items-center gap-2">
                     <span>{{ app()->getLocale() === 'ar' ? '🇬🇧' : '🇸🇦' }}</span>
-                    <span>{{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}</span>
+                    <span>{{ app()->getLocale() === 'ar' ? __('messages.language.english') : __('messages.language.arabic') }}</span>
                 </button>
             </form>
         </div>

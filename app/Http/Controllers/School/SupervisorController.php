@@ -60,7 +60,7 @@ class SupervisorController extends Controller
                 if ($supervisorSubjects->isNotEmpty()) {
                     $supervisor->subject = $supervisorSubjects->pluck('subject.name')->implode(', ');
                 } else {
-                    $supervisor->subject = 'Not Assigned';
+                    $supervisor->subject = __('messages.users.not_specified');
                 }
 
                 // Store subject IDs for queries

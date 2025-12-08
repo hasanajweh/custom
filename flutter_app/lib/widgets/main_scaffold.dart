@@ -39,39 +39,7 @@ class MainScaffold extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
         elevation: 0,
-        actions: [
-          // Notifications with badge
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined),
-                onPressed: () {
-                  // Navigate to notifications
-                },
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Text(
-                    '0',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          ...?actions,
-        ],
+        actions: actions,
       ),
       body: body,
       floatingActionButton: floatingActionButton,

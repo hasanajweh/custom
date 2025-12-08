@@ -65,7 +65,7 @@
                         <i class="ri-user-forbid-line text-xl text-orange-600"></i>
                     </div>
                     <div class="text-2xl font-bold text-gray-900">{{ $inactiveCount }}</div>
-                    <div class="text-sm text-gray-600 mt-1 font-medium">Inactive Users</div>
+                    <div class="text-sm text-gray-600 mt-1 font-medium">{{ __('messages.users.inactive_users') }}</div>
                 </div>
             </div>
 
@@ -158,11 +158,11 @@
                                 <td class="px-6 py-6">
                                     @php
                                         $roleStyles = [
-                                            'admin' => ['Admin', 'bg-red-100 text-red-800', 'ri-shield-user-line'],
-                                            'teacher' => ['Teacher', 'bg-blue-100 text-blue-800', 'ri-user-line'],
-                                            'supervisor' => ['Supervisor', 'bg-green-100 text-green-800', 'ri-user-star-line'],
+                                            'admin' => [__('messages.roles.admin'), 'bg-red-100 text-red-800', 'ri-shield-user-line'],
+                                            'teacher' => [__('messages.roles.teacher'), 'bg-blue-100 text-blue-800', 'ri-user-line'],
+                                            'supervisor' => [__('messages.roles.supervisor'), 'bg-green-100 text-green-800', 'ri-user-star-line'],
                                         ];
-                                        $roleData = $roleStyles[$user->role] ?? ['User', 'bg-gray-100 text-gray-800', 'ri-user-line'];
+                                        $roleData = $roleStyles[$user->role] ?? [__('messages.roles.user'), 'bg-gray-100 text-gray-800', 'ri-user-line'];
                                     @endphp
                                     <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold {{ $roleData[1] }} shadow-sm">
                                             <i class="{{ $roleData[2] }} {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>
@@ -183,12 +183,12 @@
                                     @if($user->is_active)
                                         <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-800 shadow-sm">
                                                 <i class="ri-checkbox-circle-fill {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>
-                                                Active
+                                                {{ __('messages.status.active') }}
                                             </span>
                                     @else
                                         <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-800 shadow-sm">
                                                 <i class="ri-close-circle-fill {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>
-                                                Inactive
+                                                {{ __('messages.status.inactive') }}
                                             </span>
                                     @endif
                                 </td>
@@ -218,14 +218,14 @@
                                                 @method('PATCH')
                                                 <button type="submit"
                                                         class="p-2 {{ $user->is_active ? 'text-orange-600 hover:text-orange-800 hover:bg-orange-50' : 'text-green-600 hover:text-green-800 hover:bg-green-50' }} rounded-lg transition-all duration-150"
-                                                        title="{{ $user->is_active ? 'Deactivate' : 'Activate' }}">
+                                                        title="{{ $user->is_active ? __('messages.actions.deactivate') : __('messages.actions.activate') }}">
                                                     <i class="{{ $user->is_active ? 'ri-user-forbid-line' : 'ri-user-follow-line' }} text-lg"></i>
                                                 </button>
                                             </form>
 
                                             <form method="POST"
                                                   action="{{ tenant_route('school.admin.users.archive', [$school, $user]) }}"
-                                                  onsubmit="return confirm('Archive this user?')"
+                                                  onsubmit="return confirm('{{ __('messages.users.archived.archive_confirm') }}')"
                                                   class="inline">
                                                 @csrf
                                                 @method('DELETE')

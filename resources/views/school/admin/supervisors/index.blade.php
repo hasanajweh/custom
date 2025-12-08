@@ -135,14 +135,6 @@
                                         <i class="ri-folder-line mr-1"></i>
                                         {{ __('messages.files.view_file') }}
                                     </a>
-
-                                    <div class="flex items-center space-x-2">
-                                        <a href="{{ tenant_route('school.admin.users.edit', [$school, $supervisor]) }}"
-                                           class="p-1.5 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                                           title="{{ __('messages.users.edit_user') }}">
-                                            <i class="ri-edit-line"></i>
-                                        </a>
-                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -14,7 +14,7 @@
         <form id="lang-switcher" method="POST">
             @csrf
             <button type="button" onclick="switchLocale('{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}')" class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800">
-                {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
+                {{ app()->getLocale() === 'ar' ? __('messages.language.english') : __('messages.language.arabic') }}
             </button>
         </form>
     </div>

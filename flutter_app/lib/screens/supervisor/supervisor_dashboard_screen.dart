@@ -157,7 +157,7 @@ class SupervisorDashboardScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _QuickActionCard(
-                        icon: Icons.review_rounded,
+                        icon: Icons.check_circle_rounded,
                         title: 'Review Files',
                         color: Colors.blue,
                         onTap: () {},

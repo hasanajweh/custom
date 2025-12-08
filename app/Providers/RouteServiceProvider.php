@@ -71,11 +71,18 @@ class RouteServiceProvider extends ServiceProvider
             return $query->firstOrFail();
         });
 
-        // Bind supervisor parameter to User model
+        // Bind supervisor parameter to User model, scoped to current school
         Route::bind('supervisor', function ($value) {
-            return \App\Models\User::where('id', $value)
-                ->where('role', 'supervisor')
-                ->firstOrFail();
+            $query = \App\Models\User::where('id', $value)
+                ->where('role', 'supervisor');
+            
+            // If we have a school/branch in the route, scope to it
+            $school = request()->route('school') ?? request()->route('branch');
+            if ($school instanceof School) {
+                $query->where('school_id', $school->id);
+            }
+            
+            return $query->firstOrFail();
         });
     }
 }

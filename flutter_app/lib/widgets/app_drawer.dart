@@ -137,63 +137,88 @@ class AppDrawer extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        isExpanded: true,
-                        value: currentContext != null
-                            ? '${currentContext.network.slug}/${currentContext.school.slug}'
-                            : null,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        items: availableContexts.map((ctx) {
-                          return DropdownMenuItem<String>(
-                            value: '${ctx.networkSlug}/${ctx.schoolSlug}',
-                            child: Row(
-                              children: [
-                                Icon(
-                                  _getRoleIcon(ctx.role),
-                                  size: 18,
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        ctx.schoolName,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      Text(
-                                        ctx.role.toUpperCase(),
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                    ],
+                      child: Builder(
+                      builder: (context) {
+                        String? selectedValue;
+                        if (availableContexts.isNotEmpty && currentContext != null) {
+                          try {
+                            final matchingCtx = availableContexts.firstWhere(
+                              (ctx) => ctx.schoolId == currentContext!.school.id,
+                            );
+                            selectedValue = '${matchingCtx.networkSlug ?? ''}/${matchingCtx.schoolSlug}';
+                          } catch (e) {
+                            final firstCtx = availableContexts.first;
+                            selectedValue = '${firstCtx.networkSlug ?? ''}/${firstCtx.schoolSlug}';
+                          }
+                        } else if (availableContexts.isNotEmpty) {
+                          final firstCtx = availableContexts.first;
+                          selectedValue = '${firstCtx.networkSlug ?? ''}/${firstCtx.schoolSlug}';
+                        }
+                        
+                        // Verify the value exists in items
+                        final valueExists = availableContexts.any((ctx) {
+                          final valueKey = '${ctx.networkSlug ?? ''}/${ctx.schoolSlug}';
+                          return valueKey == selectedValue;
+                        });
+                        
+                        return DropdownButton<String>(
+                          isExpanded: true,
+                          value: valueExists ? selectedValue : null,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          items: availableContexts.map((ctx) {
+                            final valueKey = '${ctx.networkSlug ?? ''}/${ctx.schoolSlug}';
+                            return DropdownMenuItem<String>(
+                              value: valueKey,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    _getRoleIcon(ctx.role),
+                                    size: 18,
+                                    color: Theme.of(context).primaryColor,
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (value) async {
-                          if (value != null) {
-                            final parts = value.split('/');
-                            if (parts.length == 2) {
-                              final success = await authProvider.switchContext(
-                                network: parts[0],
-                                school: parts[1],
-                              );
-                              if (success && context.mounted) {
-                                Navigator.of(context).pop();
-                                Navigator.of(context).pushReplacementNamed(AppRouter.home);
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          ctx.schoolName,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          ctx.role.toUpperCase(),
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) async {
+                            if (value != null) {
+                              final parts = value.split('/');
+                              if (parts.length == 2) {
+                                final success = await authProvider.switchContext(
+                                  network: parts[0],
+                                  school: parts[1],
+                                );
+                                if (success && context.mounted) {
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context).pushReplacementNamed(AppRouter.home);
+                                }
                               }
                             }
-                          }
-                        },
+                          },
+                        );
+                      },
                       ),
                     ),
                   ),
@@ -254,8 +279,8 @@ class AppDrawer extends StatelessWidget {
                 ],
                 if (user?.isSupervisor ?? false) ...[
                   _DrawerTile(
-                    icon: Icons.review_outlined,
-                    selectedIcon: Icons.review,
+                    icon: Icons.check_circle_outline,
+                    selectedIcon: Icons.check_circle,
                     title: 'Review Files',
                     isSelected: currentIndex == 1,
                     onTap: () {
@@ -284,21 +309,6 @@ class AppDrawer extends StatelessWidget {
                     },
                   ),
                 ],
-                _DrawerTile(
-                  icon: Icons.notifications_outlined,
-                  selectedIcon: Icons.notifications,
-                  title: localizations.notifications,
-                  isSelected: currentIndex == 3,
-                  badge: 0, // TODO: Get unread count
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    NavigationHandler.handleDrawerNavigation(
-                      context,
-                      3,
-                      authProvider,
-                    );
-                  },
-                ),
                 const Divider(),
                 _DrawerTile(
                   icon: Icons.person_outline,

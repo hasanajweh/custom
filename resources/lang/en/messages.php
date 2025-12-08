@@ -74,6 +74,8 @@ return [
         'review' => 'Review',
         'archive' => 'Archive',
         'restore' => 'Restore',
+        'activate' => 'Activate',
+        'deactivate' => 'Deactivate',
     ],
 
     // Common Status & States
@@ -379,6 +381,7 @@ return [
         'user_info_card' => 'User Information',
         'clear_filters' => 'Clear Filters',
         'unknown' => 'Unknown',
+        'inactive_users' => 'Inactive Users',
     'archived' => [
             'title' => 'Archived Users - Scholder',
             'heading' => '📦 Archived Users',
@@ -392,6 +395,7 @@ return [
             'archived_on' => 'Archived :date',
             'restore' => 'Restore User',
             'delete' => 'Permanently Delete',
+            'archive_confirm' => 'Archive this user?',
             'restore_confirm' => 'Restore this user? They will be able to log in again.',
             'delete_confirm' => '⚠️ PERMANENTLY DELETE this user? This action CANNOT be undone and ALL data will be lost!',
             'empty' => [
