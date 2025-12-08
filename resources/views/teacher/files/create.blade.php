@@ -234,14 +234,21 @@
                     gradeField.required = true;
                     subjectField.disabled = false;
                     gradeField.disabled = false;
+                    subjectField.removeAttribute('disabled');
+                    gradeField.removeAttribute('disabled');
                 } else {
-                    // For lesson plans, clear and disable
+                    // For lesson plans, clear and disable - also remove from form submission
                     subjectField.value = '';
                     gradeField.value = '';
                     subjectField.required = false;
                     gradeField.required = false;
                     subjectField.disabled = true;
                     gradeField.disabled = true;
+                    // Remove name attributes so they won't be submitted
+                    subjectField.setAttribute('data-original-name', subjectField.name);
+                    gradeField.setAttribute('data-original-name', gradeField.name);
+                    subjectField.removeAttribute('name');
+                    gradeField.removeAttribute('name');
                 }
 
                 updateFinalSubmissionType();
@@ -326,6 +333,18 @@
                     if (oldGeneralRadio) oldGeneralRadio.checked = true;
                 }
             }
+
+            // Restore name attributes when switching back to general
+            generalBtn.addEventListener('click', () => {
+                if (subjectField.hasAttribute('data-original-name')) {
+                    subjectField.name = subjectField.getAttribute('data-original-name');
+                    subjectField.removeAttribute('data-original-name');
+                }
+                if (gradeField.hasAttribute('data-original-name')) {
+                    gradeField.name = gradeField.getAttribute('data-original-name');
+                    gradeField.removeAttribute('data-original-name');
+                }
+            });
 
             updateFinalSubmissionType();
         });

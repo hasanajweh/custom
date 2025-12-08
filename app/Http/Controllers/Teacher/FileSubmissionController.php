@@ -208,9 +208,14 @@ class FileSubmissionController extends Controller
                 'grade_id' => null,
             ];
 
-            if (!in_array($submissionType, $planTypes)) {
-                $submissionData['subject_id'] = $validated['subject_id'];
-                $submissionData['grade_id'] = $validated['grade_id'];
+            // For plans, ensure subject_id and grade_id are null
+            if (in_array($submissionType, $planTypes)) {
+                $submissionData['subject_id'] = null;
+                $submissionData['grade_id'] = null;
+            } else {
+                // For general resources, use the validated values
+                $submissionData['subject_id'] = $validated['subject_id'] ?? null;
+                $submissionData['grade_id'] = $validated['grade_id'] ?? null;
             }
 
             $submission = FileSubmission::create($submissionData);
@@ -252,7 +257,8 @@ class FileSubmissionController extends Controller
 
             return redirect()->to(
                 tenant_route('teacher.files.create', $branch)
-            )->with('status', __('messages.files.upload_success'));
+            )->with('upload_success', true)
+             ->with('status', __('messages.files.upload_success'));
 
         } catch (\InvalidArgumentException $e) {
             Log::error('File validation failed', [
