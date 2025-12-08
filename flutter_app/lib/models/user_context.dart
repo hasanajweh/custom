@@ -19,12 +19,12 @@ class UserContext {
 
   factory UserContext.fromJson(Map<String, dynamic> json) {
     return UserContext(
-      schoolId: json['school_id'] as int,
-      schoolSlug: json['school_slug'] as String,
-      schoolName: json['school_name'] as String,
+      schoolId: json['school_id'] != null ? (json['school_id'] as num).toInt() : 0,
+      schoolSlug: (json['school_slug'] ?? '') as String,
+      schoolName: (json['school_name'] ?? '') as String,
       networkSlug: json['network_slug'] as String?,
       networkName: json['network_name'] as String?,
-      role: json['role'] as String,
+      role: (json['role'] ?? '') as String,
     );
   }
 
@@ -50,6 +50,9 @@ class CurrentContext {
   });
 
   factory CurrentContext.fromJson(Map<String, dynamic> json) {
+    if (json['network'] == null || json['school'] == null) {
+      throw Exception('Network and school are required for CurrentContext');
+    }
     return CurrentContext(
       network: Network.fromJson(json['network'] as Map<String, dynamic>),
       school: School.fromJson(json['school'] as Map<String, dynamic>),

@@ -46,20 +46,22 @@ class FileSubmission {
 
   factory FileSubmission.fromJson(Map<String, dynamic> json) {
     return FileSubmission(
-      id: json['id'] as int,
-      title: json['title'] as String,
+      id: (json['id'] ?? 0) as int,
+      title: (json['title'] ?? '') as String,
       description: json['description'] as String?,
-      submissionType: json['submission_type'] as String,
+      submissionType: (json['submission_type'] ?? '') as String,
       filePath: json['file_path'] as String?,
-      fileName: json['file_name'] as String?,
-      fileSize: json['file_size'] as int?,
+      fileName: json['file_name'] as String? ?? json['original_filename'] as String?,
+      fileSize: json['file_size'] != null ? (json['file_size'] as num).toInt() : null,
       mimeType: json['mime_type'] as String?,
-      downloadCount: json['download_count'] as int? ?? 0,
-      userId: json['user_id'] as int,
-      schoolId: json['school_id'] as int,
-      subjectId: json['subject_id'] as int?,
-      gradeId: json['grade_id'] as int?,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      downloadCount: json['download_count'] != null ? (json['download_count'] as num).toInt() : 0,
+      userId: json['user_id'] != null ? (json['user_id'] as num).toInt() : 0,
+      schoolId: json['school_id'] != null ? (json['school_id'] as num).toInt() : 0,
+      subjectId: json['subject_id'] != null ? (json['subject_id'] as num).toInt() : null,
+      gradeId: json['grade_id'] != null ? (json['grade_id'] as num).toInt() : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : DateTime.now(),
       updatedAt: json['updated_at'] != null
           ? DateTime.parse(json['updated_at'] as String)
           : null,
@@ -114,10 +116,10 @@ class Subject {
 
   factory Subject.fromJson(Map<String, dynamic> json) {
     return Subject(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      schoolId: json['school_id'] as int,
-      isActive: json['is_active'] as bool? ?? true,
+      id: (json['id'] ?? 0) as int,
+      name: (json['name'] ?? '') as String,
+      schoolId: json['school_id'] != null ? (json['school_id'] as num).toInt() : 0,
+      isActive: (json['is_active'] as bool?) ?? true,
     );
   }
 }
@@ -137,10 +139,10 @@ class Grade {
 
   factory Grade.fromJson(Map<String, dynamic> json) {
     return Grade(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      schoolId: json['school_id'] as int,
-      isActive: json['is_active'] as bool? ?? true,
+      id: (json['id'] ?? 0) as int,
+      name: (json['name'] ?? '') as String,
+      schoolId: json['school_id'] != null ? (json['school_id'] as num).toInt() : 0,
+      isActive: (json['is_active'] as bool?) ?? true,
     );
   }
 }

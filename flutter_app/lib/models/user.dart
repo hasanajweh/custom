@@ -21,14 +21,14 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      email: json['email'] as String,
+      id: (json['id'] ?? 0) as int,
+      name: (json['name'] ?? '') as String,
+      email: (json['email'] ?? '') as String,
       role: json['role'] as String?,
-      isSuperAdmin: json['is_super_admin'] as bool? ?? false,
-      isMainAdmin: json['is_main_admin'] as bool? ?? false,
-      schoolId: json['school_id'] as int?,
-      networkId: json['network_id'] as int?,
+      isSuperAdmin: (json['is_super_admin'] as bool?) ?? false,
+      isMainAdmin: (json['is_main_admin'] as bool?) ?? false,
+      schoolId: json['school_id'] != null ? (json['school_id'] as num).toInt() : null,
+      networkId: json['network_id'] != null ? (json['network_id'] as num).toInt() : null,
     );
   }
 

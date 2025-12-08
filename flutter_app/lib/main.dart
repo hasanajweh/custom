@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'providers/auth_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/locale_provider.dart';
+import 'providers/files_provider.dart';
 import 'services/api_service.dart';
 import 'services/storage_service.dart';
 import 'routes/app_router.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => FilesProvider()),
       ],
       child: Consumer3<ThemeProvider, LocaleProvider, AuthProvider>(
         builder: (context, themeProvider, localeProvider, authProvider, _) {

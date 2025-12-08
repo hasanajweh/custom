@@ -5,6 +5,11 @@ import '../screens/teacher/teacher_dashboard_screen.dart';
 import '../screens/admin/admin_dashboard_screen.dart';
 import '../screens/supervisor/supervisor_dashboard_screen.dart';
 import '../screens/profile/profile_screen.dart';
+import '../screens/profile/change_password_screen.dart';
+import '../screens/files/my_files_screen.dart';
+import '../screens/files/upload_file_screen.dart';
+import '../screens/files/file_detail_screen.dart';
+import '../models/file_submission.dart';
 
 class AppRouter {
   static const String login = '/login';
@@ -13,6 +18,10 @@ class AppRouter {
   static const String adminDashboard = '/admin/dashboard';
   static const String supervisorDashboard = '/supervisor/dashboard';
   static const String profile = '/profile';
+  static const String changePassword = '/change-password';
+  static const String myFiles = '/files';
+  static const String uploadFile = '/upload';
+  static const String fileDetail = '/file-detail';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -39,6 +48,19 @@ class AppRouter {
       
       case profile:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
+      
+      case changePassword:
+        return MaterialPageRoute(builder: (_) => const ChangePasswordScreen());
+      
+      case myFiles:
+        return MaterialPageRoute(builder: (_) => const MyFilesScreen());
+      
+      case uploadFile:
+        return MaterialPageRoute(builder: (_) => const UploadFileScreen());
+      
+      case fileDetail:
+        final file = settings.arguments as FileSubmission;
+        return MaterialPageRoute(builder: (_) => FileDetailScreen(file: file));
       
       default:
         return MaterialPageRoute(

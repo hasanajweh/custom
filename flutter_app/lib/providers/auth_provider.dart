@@ -34,18 +34,19 @@ class AuthProvider with ChangeNotifier {
     try {
       final data = await ApiService.getUser();
       _user = User.fromJson(data['user'] as Map<String, dynamic>);
-      _availableContexts = (data['available_contexts'] as List)
-          .map((ctx) => UserContext.fromJson(ctx as Map<String, dynamic>))
-          .toList();
-      _isAuthenticated = true;
       
-      // Set current context if available from contexts
+      // Get available contexts
+      _availableContexts = (data['available_contexts'] as List?)
+              ?.map((ctx) => UserContext.fromJson(ctx as Map<String, dynamic>))
+              .toList() ?? [];
+      
+      // Set current context from available contexts if we have any
       if (_availableContexts.isNotEmpty && _currentContext == null) {
         final ctx = _availableContexts.first;
         _currentContext = CurrentContext(
           network: Network(
             id: 0,
-            name: ctx.networkName ?? '',
+            name: ctx.networkName ?? 'Unknown',
             slug: ctx.networkSlug ?? '',
           ),
           school: School(
@@ -56,6 +57,8 @@ class AuthProvider with ChangeNotifier {
           ),
         );
       }
+      
+      _isAuthenticated = true;
     } catch (e) {
       _isAuthenticated = false;
       _error = e.toString();
@@ -83,10 +86,34 @@ class AuthProvider with ChangeNotifier {
 
       _user = User.fromJson(data['user'] as Map<String, dynamic>);
       
-      // Set current context if available
+      // Set current context if available and valid
       if (data['current_context'] != null) {
-        _currentContext = CurrentContext.fromJson(
-          data['current_context'] as Map<String, dynamic>,
+        try {
+          final contextData = data['current_context'] as Map<String, dynamic>;
+          if (contextData['network'] != null && contextData['school'] != null) {
+            _currentContext = CurrentContext.fromJson(contextData);
+          }
+        } catch (e) {
+          // If current_context parsing fails, we'll set it from available_contexts
+          _currentContext = null;
+        }
+      }
+      
+      // If no current_context but we have available contexts, use the first one
+      if (_currentContext == null && _availableContexts.isNotEmpty) {
+        final ctx = _availableContexts.first;
+        _currentContext = CurrentContext(
+          network: Network(
+            id: 0, // Will be set from context if needed
+            name: ctx.networkName ?? 'Unknown',
+            slug: ctx.networkSlug ?? '',
+          ),
+          school: School(
+            id: ctx.schoolId,
+            name: ctx.schoolName,
+            slug: ctx.schoolSlug,
+            networkId: 0,
+          ),
         );
       }
       

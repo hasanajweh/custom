@@ -19,12 +19,12 @@ class School {
 
   factory School.fromJson(Map<String, dynamic> json) {
     return School(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      slug: json['slug'] as String,
-      networkId: json['network_id'] as int,
+      id: (json['id'] ?? 0) as int,
+      name: (json['name'] ?? '') as String,
+      slug: (json['slug'] ?? '') as String,
+      networkId: json['network_id'] != null ? (json['network_id'] as num).toInt() : 0,
       city: json['city'] as String?,
-      isActive: json['is_active'] as bool? ?? true,
+      isActive: (json['is_active'] as bool?) ?? true,
       network: json['network'] != null 
           ? Network.fromJson(json['network'] as Map<String, dynamic>)
           : null,
@@ -57,9 +57,9 @@ class Network {
 
   factory Network.fromJson(Map<String, dynamic> json) {
     return Network(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      slug: json['slug'] as String,
+      id: (json['id'] ?? 0) as int,
+      name: (json['name'] ?? '') as String,
+      slug: (json['slug'] ?? '') as String,
     );
   }
 
