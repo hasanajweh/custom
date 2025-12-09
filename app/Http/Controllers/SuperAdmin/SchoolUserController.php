@@ -53,7 +53,15 @@ class SchoolUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email:rfc,dns',
+                'max:255',
+                Rule::unique('users')->ignore($user->id),
+                'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+            ],
             'role' => ['required', Rule::in(['admin', 'teacher', 'supervisor'])],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
         ]);

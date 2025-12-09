@@ -16,7 +16,13 @@ class StoreNetworkUserRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'email' => [
+                'required',
+                'email:rfc,dns',
+                'max:255',
+                'unique:users,email',
+                'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+            ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'assignments' => ['required', 'array', 'min:1'],
             'assignments.*.school_id' => ['required', 'exists:schools,id'],

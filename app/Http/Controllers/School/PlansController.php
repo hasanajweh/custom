@@ -146,7 +146,15 @@ class PlansController extends Controller
             abort(404);
         }
 
-        return view('school.admin.plans.show', compact('plan', 'school'));
+        // Ensure plan is a lesson plan type
+        if (!in_array($plan->submission_type, ['daily_plan', 'weekly_plan', 'monthly_plan'])) {
+            abort(404);
+        }
+
+        // Load relationships
+        $plan->load(['user', 'subject', 'grade']);
+
+        return view('school.admin.plans.show', compact('plan', 'school', 'network'));
     }
 
     public function download(Request $request, Network $network, School $branch, FileSubmission $plan)
@@ -172,7 +180,72 @@ class PlansController extends Controller
             abort(404);
         }
 
+        // Ensure plan is a lesson plan type
+        if (!in_array($plan->submission_type, ['daily_plan', 'weekly_plan', 'monthly_plan'])) {
+            abort(404);
+        }
+
         // ✅ Use the trait method - it handles everything now
         return $this->downloadFile($plan);
+    }
+
+    public function preview(Request $request, Network $network, School $branch, FileSubmission $plan)
+    {
+        if ($branch->network_id !== $network->id) {
+            abort(404);
+        }
+
+        $user = Auth::user();
+        
+        // Main admin exception: can access any school in their network
+        if ($user->isMainAdmin()) {
+            if ($branch->network_id !== $user->network_id) {
+                abort(403, 'School does not belong to your network.');
+            }
+        } elseif ($user->school_id !== $branch->id) {
+            abort(403);
+        }
+
+        $school = $branch;
+
+        if ($plan->school_id !== $school->id) {
+            abort(404);
+        }
+
+        // Ensure plan is a lesson plan type
+        if (!in_array($plan->submission_type, ['daily_plan', 'weekly_plan', 'monthly_plan'])) {
+            abort(404);
+        }
+
+        // Check if file can be previewed
+        if (!$this->canPreviewInBrowser($plan->original_filename)) {
+            return back()->withErrors(['preview' => 'This file type cannot be previewed in the browser. Please download it instead.']);
+        }
+
+        // Increment download count
+        $plan->increment('download_count');
+        $plan->update(['last_accessed_at' => now()]);
+
+        try {
+            // Get the file URL
+            $fileUrl = $this->getFileUrl($plan, 30);
+
+            // Validate URL before redirecting
+            if (empty($fileUrl) || !filter_var($fileUrl, FILTER_VALIDATE_URL)) {
+                throw new \Exception('Invalid file URL generated');
+            }
+
+            // Redirect to file
+            return redirect()->away($fileUrl);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to generate preview URL for plan', [
+                'file_id' => $plan->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()->withErrors(['preview' => 'Unable to preview file at this time. Please try downloading it instead.']);
+        }
     }
 }

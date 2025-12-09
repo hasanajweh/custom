@@ -303,11 +303,23 @@ trait HandlesS3Storage
                     'url_length' => strlen($url)
                 ]);
 
+                // Ensure URL is valid
+                if (empty($url)) {
+                    throw new \Exception('Generated URL is empty');
+                }
+
                 return $url;
             }
 
             // Local storage fallback
-            return url(Storage::disk('local')->url($file->file_path));
+            $url = url(Storage::disk('local')->url($file->file_path));
+            
+            // Ensure URL is valid
+            if (empty($url)) {
+                throw new \Exception('Generated URL is empty');
+            }
+
+            return $url;
 
         } catch (\Exception $e) {
             Log::error('❌ Preview URL Generation Failed', [

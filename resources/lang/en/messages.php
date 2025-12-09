@@ -382,6 +382,7 @@ return [
         'clear_filters' => 'Clear Filters',
         'unknown' => 'Unknown',
         'inactive_users' => 'Inactive Users',
+        'not_specified' => 'Not specified',
     'archived' => [
             'title' => 'Archived Users - Scholder',
             'heading' => '📦 Archived Users',

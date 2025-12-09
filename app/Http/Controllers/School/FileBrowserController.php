@@ -181,6 +181,11 @@ class FileBrowserController extends Controller
             // Get the S3 signed URL
             $fileUrl = $this->getFileUrl($file, 30);
 
+            // Validate URL before redirecting
+            if (empty($fileUrl) || !filter_var($fileUrl, FILTER_VALIDATE_URL)) {
+                throw new \Exception('Invalid file URL generated');
+            }
+
             // Redirect to file
             return redirect()->away($fileUrl);
 
@@ -191,7 +196,7 @@ class FileBrowserController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
 
-            return back()->withErrors(['preview' => 'Unable to preview file at this time.']);
+            return back()->withErrors(['preview' => 'Unable to preview file at this time. Please try downloading it instead.']);
         }
     }
 

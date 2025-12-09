@@ -74,12 +74,26 @@ class SchoolController extends Controller
             'network_name' => ['required_if:network_mode,new', 'string', 'max:255'],
             'network_slug' => ['required_if:network_mode,new', 'string', 'max:255', 'alpha_dash', 'unique:networks,slug'],
             'main_admin_name' => ['required_if:network_mode,new', 'string', 'max:255'],
-            'main_admin_email' => ['required_if:network_mode,new', 'string', 'email', 'max:255', 'unique:users,email'],
+            'main_admin_email' => [
+                'required_if:network_mode,new',
+                'string',
+                'email:rfc,dns',
+                'max:255',
+                'unique:users,email',
+                'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+            ],
             'main_admin_password' => ['required_if:network_mode,new', 'confirmed', 'min:8'],
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:schools,slug'],
             'admin_name' => ['required', 'string', 'max:255'],
-            'admin_email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'admin_email' => [
+                'required',
+                'string',
+                'email:rfc,dns',
+                'max:255',
+                'unique:users,email',
+                'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+            ],
             'admin_password' => ['required', 'confirmed', 'min:8'],
         ]);
 

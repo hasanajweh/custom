@@ -224,13 +224,19 @@
                                         $canPreview = in_array($extension, ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'txt']);
                                     @endphp
                                     <div class="flex items-center justify-center space-x-2">
-                                        {{-- Preview Button --}}
+                                        {{-- View Button --}}
+                                        <a href="{{ tenant_route('school.admin.plans.show', [$school, $plan]) }}"
+                                           class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
+                                           title="{{ __('messages.actions.view') }}">
+                                            <i class="ri-eye-line text-lg"></i>
+                                        </a>
+                                        {{-- Preview Button (Open in New Tab) --}}
                                         @if($canPreview)
-                                            <a href="{{ tenant_route('school.admin.plans.show', [$school, $plan]) }}"
+                                            <a href="{{ tenant_route('school.admin.plans.preview', [$school, $plan]) }}"
                                                target="_blank"
-                                               class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-150"
+                                               class="p-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-all duration-150"
                                                title="{{ __('messages.files.preview_file') }}">
-                                                <i class="ri-eye-line text-lg"></i>
+                                                <i class="ri-external-link-line text-lg"></i>
                                             </a>
                                         @else
                                             <button disabled
@@ -249,7 +255,7 @@
 
                                         {{-- Print Button --}}
                                         @if($canPreview)
-                                            <button onclick="printFile('{{ tenant_route('school.admin.plans.show', [$school, $plan]) }}', '{{ $plan->title }}', '{{ $plan->user->name }}', '{{ $plan->created_at->format('M d, Y') }}')"
+                                            <button onclick="printFile('{{ tenant_route('school.admin.plans.preview', [$school, $plan]) }}', '{{ $plan->title }}', '{{ $plan->user->name }}', '{{ $plan->created_at->format('M d, Y') }}')"
                                                     class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
                                                     title="{{ __('messages.files.print_file') }}">
                                                 <i class="ri-printer-line text-lg"></i>

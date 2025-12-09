@@ -300,15 +300,22 @@ class FileSubmissionController extends Controller
 
         try {
             $url = TenantStorageService::url($fileSubmission->file_path, $school);
-            return redirect($url);
+            
+            // Validate URL before redirecting
+            if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+                throw new \Exception('Invalid file URL generated');
+            }
+            
+            return redirect()->away($url);
         } catch (\Exception $e) {
             Log::error('Failed to generate file URL', [
                 'file_id' => $fileSubmission->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
 
             return back()->withErrors([
-                'preview' => 'Unable to preview file at this time.'
+                'preview' => 'Unable to preview file at this time. Please try downloading it instead.'
             ]);
         }
     }

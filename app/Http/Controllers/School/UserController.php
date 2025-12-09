@@ -150,7 +150,14 @@ class UserController extends Controller
         $school = $this->validateContext($network, $branch);
         $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => [
+                'required',
+                'string',
+                'email:rfc,dns',
+                'max:255',
+                'unique:users',
+                'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+            ],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'roles' => ['required', 'array', 'min:1'],
             'roles.*' => ['required', Rule::in(['teacher', 'supervisor', 'admin'])],
@@ -279,7 +286,14 @@ class UserController extends Controller
 
         $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'email' => [
+                'required',
+                'string',
+                'email:rfc,dns',
+                'max:255',
+                'unique:users,email,' . $user->id,
+                'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+            ],
             'roles' => ['required', 'array', 'min:1'],
             'roles.*' => ['required', Rule::in(['teacher', 'supervisor', 'admin'])],
         ];

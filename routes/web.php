@@ -449,6 +449,7 @@ Route::prefix('{network:slug}/{branch:slug}/admin')
         // Plans Management
         Route::get('plans', [PlansController::class, 'index'])->name('plans.index');
         Route::get('plans/{plan}', [PlansController::class, 'show'])->name('plans.show');
+        Route::get('plans/{plan}/preview', [PlansController::class, 'preview'])->name('plans.preview');
         Route::get('plans/{plan}/download', [PlansController::class, 'download'])->name('plans.download');
 
         // Supervisors Management

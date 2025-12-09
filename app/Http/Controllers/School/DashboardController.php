@@ -175,6 +175,12 @@ class DashboardController extends Controller
         try {
             // ✅ Use the trait method
             $url = $this->getFileUrl($file, 30);
+            
+            // Validate URL before redirecting
+            if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+                throw new \Exception('Invalid file URL generated');
+            }
+            
             return redirect()->away($url);
 
         } catch (\Exception $e) {
@@ -184,7 +190,7 @@ class DashboardController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
 
-            return back()->withErrors(['preview' => 'Unable to preview file at this time.']);
+            return back()->withErrors(['preview' => 'Unable to preview file at this time. Please try downloading it instead.']);
         }
     }
 
