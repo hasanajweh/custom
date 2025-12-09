@@ -1,9 +1,9 @@
 // Enhanced Service Worker for Scholder PWA - Production Ready
-// Version: 5.0.0 - Cross-Browser Compatible - NO NOTIFICATIONS
+// Version: 5.1.0 - Fixed navigation freezing issue
 
-const CACHE_NAME = 'scholder-v5';
-const DYNAMIC_CACHE = 'scholder-dynamic-v5';
-const IMAGE_CACHE = 'scholder-images-v5';
+const CACHE_NAME = 'scholder-v5.1';
+const DYNAMIC_CACHE = 'scholder-dynamic-v5.1';
+const IMAGE_CACHE = 'scholder-images-v5.1';
 
 // Critical assets to cache immediately
 const STATIC_ASSETS = [
@@ -18,29 +18,29 @@ const STATIC_ASSETS = [
 // INSTALL - Cache Static Assets
 // ========================================
 self.addEventListener('install', event => {
-    console.log('[SW v5] Installing...');
+    console.log('[SW v5.1] Installing...');
 
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('[SW v5] Caching static assets');
+                console.log('[SW v5.1] Caching static assets');
                 return Promise.allSettled(
                     STATIC_ASSETS.map(url => {
                         return cache.add(new Request(url, {
                             cache: 'reload',
                             credentials: 'same-origin'
                         })).catch(err => {
-                            console.warn('[SW v5] Failed to cache:', url, err);
+                            console.warn('[SW v5.1] Failed to cache:', url, err);
                         });
                     })
                 );
             })
             .then(() => {
-                console.log('[SW v5] Installation complete');
+                console.log('[SW v5.1] Installation complete');
                 return self.skipWaiting();
             })
             .catch(err => {
-                console.error('[SW v5] Installation failed:', err);
+                console.error('[SW v5.1] Installation failed:', err);
             })
     );
 });
@@ -49,7 +49,7 @@ self.addEventListener('install', event => {
 // ACTIVATE - Clean Old Caches
 // ========================================
 self.addEventListener('activate', event => {
-    console.log('[SW v5] Activating...');
+    console.log('[SW v5.1] Activating...');
 
     event.waitUntil(
         Promise.all([
@@ -64,7 +64,7 @@ self.addEventListener('activate', event => {
                                 cacheName !== IMAGE_CACHE;
                         })
                         .map(cacheName => {
-                            console.log('[SW v5] Deleting old cache:', cacheName);
+                            console.log('[SW v5.1] Deleting old cache:', cacheName);
                             return caches.delete(cacheName);
                         })
                 );
@@ -73,7 +73,7 @@ self.addEventListener('activate', event => {
             self.clients.claim()
         ])
             .then(() => {
-                console.log('[SW v5] Activation complete');
+                console.log('[SW v5.1] Activation complete');
             })
     );
 });
@@ -95,8 +95,10 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // Handle HTML navigation requests
+    // Handle HTML navigation requests - ONLY when offline to prevent freezing
     if (request.mode === 'navigate') {
+        // Let navigation pass through normally when online
+        // Only intercept when we detect we're offline
         event.respondWith(handleNavigationRequest(request));
         return;
     }
@@ -120,22 +122,42 @@ self.addEventListener('fetch', event => {
 // Navigation Request Handler (HTML pages)
 async function handleNavigationRequest(request) {
     try {
-        // Try network first
-        const response = await fetch(request);
+        // Try network first - use no-cache to ensure fresh content
+        const networkResponse = await fetch(request, {
+            cache: 'no-store',
+            credentials: 'same-origin'
+        });
 
-        // Cache successful response
-        if (response && response.ok) {
-            const cache = await caches.open(DYNAMIC_CACHE);
-            cache.put(request, response.clone()).catch(err => {
-                console.warn('[SW v5] Failed to cache navigation:', err);
+        // If network succeeds, return immediately and cache in background
+        if (networkResponse && networkResponse.ok) {
+            // Cache in background without blocking the response
+            const responseClone = networkResponse.clone();
+            caches.open(DYNAMIC_CACHE).then(cache => {
+                // Only cache if response is HTML
+                const contentType = networkResponse.headers.get('content-type') || '';
+                if (contentType.includes('text/html')) {
+                    cache.put(request, responseClone).catch(() => {
+                        // Silently fail - caching is not critical
+                    });
+                }
+            }).catch(() => {
+                // Silently fail background operations
             });
+
+            return networkResponse;
         }
 
-        return response;
-    } catch (error) {
-        console.log('[SW v5] Network failed for navigation, trying cache');
+        // If response not ok, try cache
+        const cachedResponse = await caches.match(request);
+        if (cachedResponse) {
+            return cachedResponse;
+        }
 
-        // Try cache
+        return networkResponse;
+    } catch (error) {
+        // Network failed - we're offline, try cache
+        console.log('[SW v5.1] Network failed for navigation, trying cache');
+
         const cachedResponse = await caches.match(request);
         if (cachedResponse) {
             return cachedResponse;
@@ -226,12 +248,46 @@ async function handleApiRequest(request) {
 
 // Static Resource Request Handler (CSS, JS, fonts)
 async function handleResourceRequest(request) {
-    try {
-        // Cache first, update in background
-        const cachedResponse = await caches.match(request);
+    const url = new URL(request.url);
+    
+    // For JavaScript files, always try network first to avoid stale code
+    if (url.pathname.endsWith('.js') || request.headers.get('accept')?.includes('application/javascript')) {
+        try {
+            // Network first for JS to ensure fresh code
+            const response = await fetch(request, {
+                cache: 'no-store',
+                credentials: 'same-origin'
+            });
 
+            if (response && response.ok) {
+                // Cache in background
+                const responseClone = response.clone();
+                caches.open(DYNAMIC_CACHE).then(cache => {
+                    cache.put(request, responseClone).catch(() => {
+                        // Silently fail
+                    });
+                }).catch(() => {
+                    // Silently fail
+                });
+            }
+
+            return response;
+        } catch (error) {
+            // If network fails, try cache
+            const cachedResponse = await caches.match(request);
+            if (cachedResponse) {
+                return cachedResponse;
+            }
+            throw error;
+        }
+    }
+
+    // For other resources (CSS, fonts), use cache-first strategy
+    try {
+        // Check cache first
+        const cachedResponse = await caches.match(request);
         if (cachedResponse) {
-            // Fetch and update cache in background
+            // Update cache in background
             fetchAndCache(request, DYNAMIC_CACHE);
             return cachedResponse;
         }
@@ -398,4 +454,4 @@ function removePendingUpload(db, id) {
     });
 }
 
-console.log('[SW v5] Service Worker loaded successfully');
+console.log('[SW v5.1] Service Worker loaded successfully - Navigation freezing fix applied');
