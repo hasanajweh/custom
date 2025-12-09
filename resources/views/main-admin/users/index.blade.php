@@ -22,7 +22,7 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label class="text-sm font-medium text-gray-700 block mb-2">{{ __('messages.main_admin.users.role') }}</label>
-                <select name="role" class="w-full border border-gray-200 rounded-xl p-3 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                <select name="role" onchange="this.form.submit()" class="w-full border border-gray-200 rounded-xl p-3 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
                     <option value="">{{ __('messages.main_admin.common.all') }}</option>
                     <option value="admin" @selected(request('role')==='admin')>{{ __('messages.roles.admin') }}</option>
                     <option value="supervisor" @selected(request('role')==='supervisor')>{{ __('messages.roles.supervisor') }}</option>
@@ -31,7 +31,7 @@
             </div>
             <div>
                 <label class="text-sm font-medium text-gray-700 block mb-2">{{ __('messages.labels.status') }}</label>
-                <select name="status" class="w-full border border-gray-200 rounded-xl p-3 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                <select name="status" onchange="this.form.submit()" class="w-full border border-gray-200 rounded-xl p-3 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
                     <option value="">{{ __('messages.main_admin.common.all') }}</option>
                     <option value="active" @selected(request('status')==='active')>{{ __('messages.status.active') }}</option>
                     <option value="archived" @selected(request('status')==='archived')>{{ __('messages.status.archived') }}</option>
@@ -39,7 +39,7 @@
             </div>
             <div>
                 <label class="text-sm font-medium text-gray-700 block mb-2">{{ __('messages.main_admin.users.branch') }}</label>
-                <select name="branch" class="w-full border border-gray-200 rounded-xl p-3 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                <select name="branch" onchange="this.form.submit()" class="w-full border border-gray-200 rounded-xl p-3 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
                     <option value="">{{ __('messages.main_admin.common.all') }}</option>
                     @foreach($network->schools ?? [] as $branch)
                         <option value="{{ $branch->id }}" @selected(request('branch')==$branch->id)>{{ $branch->name }}</option>

@@ -41,7 +41,6 @@
                     <li><x-nav-link :href="$dashboardUrl" :active="request()->routeIs('dashboard') || request()->routeIs('school.admin.dashboard')">Dashboard</x-nav-link></li>
                     @if ($activeRole === 'teacher')
                         <li><x-nav-link :href="tenant_route('teacher.files.index', $school)" :active="request()->routeIs('teacher.files.*')">My Files</x-nav-link></li>
-                        <li><x-nav-link :href="tenant_route('notifications.index', $school)" :active="request()->routeIs('notifications.*')" class="flex items-center">Notifications @if(auth()->user()->unreadNotifications->count() > 0)<span class="ml-auto w-6 min-w-max whitespace-nowrap rounded-full bg-red-500 px-2.5 py-0.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-red-500">{{ auth()->user()->unreadNotifications->count() }}</span>@endif</x-nav-link></li>
                     @endif
                     @if ($activeRole === 'supervisor')
                         <li><x-nav-link :href="tenant_route('supervisor.reviews.index', $school)" :active="request()->routeIs('supervisor.reviews.*')">Review Files</x-nav-link></li>

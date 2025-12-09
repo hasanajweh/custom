@@ -598,6 +598,9 @@
         .sidebar-item.active {
             color: var(--primary);
             font-weight: 700;
+            background: linear-gradient(to right, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));
+            border-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}: 4px solid var(--primary);
+            padding-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}: 8px;
         }
 
         .sidebar-item i {
@@ -1829,6 +1832,42 @@ function switchLocale(locale) {
     // FILE PREVIEW LOGIC (Unchanged)
     // ========================================
     const previewDataUrlTemplate = @json(tenant_route('school.admin.file-browser.preview-data', [$school, '__FILE_ID__']));
+    
+    // Show preview modal for non-previewable files
+    function showPreviewModal(data) {
+        const modal = document.createElement('div');
+        modal.id = 'previewModal';
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-900">${data.title || 'File Preview'}</h3>
+                    <button onclick="this.closest('#previewModal').remove()" class="text-gray-400 hover:text-gray-600">
+                        <i class="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+                <div class="mb-4">
+                    <p class="text-sm text-gray-600 mb-2"><strong>${data.filename || 'File'}</strong></p>
+                    <p class="text-xs text-gray-500">Size: ${data.size || 'Unknown'}</p>
+                    <p class="text-xs text-gray-500 mt-2">This file type (${data.extension?.toUpperCase() || 'UNKNOWN'}) cannot be previewed in the browser. Please download it to view.</p>
+                </div>
+                <div class="flex gap-3 justify-end">
+                    <button onclick="this.closest('#previewModal').remove()" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                        {{ __('messages.actions.close') }}
+                    </button>
+                    <a href="${data.downloadUrl || '#'}" class="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                        <i class="ri-download-line"></i> {{ __('messages.files.download_file') }}
+                    </a>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    }
 
     function handlePreviewClick(event, schoolSlug, fileId) {
         event.preventDefault();

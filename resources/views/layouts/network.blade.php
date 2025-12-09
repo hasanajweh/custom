@@ -586,6 +586,9 @@
         .sidebar-item.active {
             color: var(--primary);
             font-weight: 700;
+            background: linear-gradient(to right, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));
+            border-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}: 4px solid var(--primary);
+            padding-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}: 8px;
         }
 
         .sidebar-item i {

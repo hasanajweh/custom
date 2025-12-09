@@ -59,7 +59,7 @@
                     <i class="ri-book-open-line text-green-600 text-xl"></i>
                 </div>
             </div>
-            <p class="text-sm text-gray-500 mb-1">{{ __('messages.subjects') }}</p>
+            <p class="text-sm text-gray-500 mb-1">{{ __('messages.dashboard.subjects') }}</p>
             <p class="text-2xl font-bold text-gray-900">{{ (int) ($summary['subjects'] ?? 0) }}</p>
         </div>
         

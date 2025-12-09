@@ -76,7 +76,7 @@
                                 <i class="ri-book-open-line text-white text-xl"></i>
                             </div>
                             <p class="text-2xl font-bold text-orange-700">{{ ($branch->subjects_count ?? 0) + ($branch->grades_count ?? 0) }}</p>
-                            <p class="text-xs text-orange-600 font-medium">{{ __('messages.subjects') }} & {{ __('messages.grades_label') }}</p>
+                            <p class="text-xs text-orange-600 font-medium">{{ __('messages.dashboard.subjects') }} & {{ __('messages.grades_label') }}</p>
                         </div>
                     </div>
 
@@ -85,7 +85,7 @@
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-600 flex items-center gap-2">
                                 <i class="ri-book-2-line text-indigo-500"></i>
-                                {{ __('messages.subjects') }}
+                                {{ __('messages.dashboard.subjects') }}
                             </span>
                             <span class="font-bold text-gray-900">{{ $branch->subjects_count ?? 0 }}</span>
                         </div>

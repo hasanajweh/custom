@@ -32,10 +32,4 @@
         <i class="ri-upload-cloud-2-line"></i>
         <span class="sidebar-text">{{ __('messages.navigation.upload_file') }}</span>
     </a>
-
-    <a href="{{ $school ? tenant_route('notifications.index', $school) : '#' }}"
-       class="sidebar-item {{ request()->routeIs('notifications.*') ? 'active' : '' }}">
-        <i class="ri-notification-2-line"></i>
-        <span class="sidebar-text">{{ __('messages.navigation.notifications') }}</span>
-    </a>
 </nav>

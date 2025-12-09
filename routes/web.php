@@ -4,7 +4,6 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\LanguageController;
-use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\School\DashboardController;
 use App\Http\Controllers\School\FileBrowserController;
@@ -366,19 +365,6 @@ Route::prefix('{network:slug}/{branch:slug}')
 
                     // Supervisor specific files
                     Route::get('/{supervisor}/files', [SupervisorController::class, 'files'])->name('files');
-                });
-
-            // ===========================
-            // NOTIFICATIONS (ALL AUTHENTICATED USERS)
-            // ===========================
-            Route::controller(NotificationController::class)
-                ->prefix('notifications')
-                ->name('notifications.')
-                ->group(function () {
-                    Route::get('/', 'index')->name('index');
-                    Route::post('/{notification}/read', 'markAsRead')->name('read');
-                    Route::post('/mark-all-read', 'markAllAsRead')->name('mark-all-read');
-                    Route::get('/unread-count', 'unreadCount')->name('unread-count');
                 });
 
             // Logout
