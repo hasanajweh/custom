@@ -59,7 +59,11 @@
                     <i class="ri-book-open-line text-green-600 text-xl"></i>
                 </div>
             </div>
-            <p class="text-sm text-gray-500 mb-1">{{ __('messages.dashboard.subjects') }}</p>
+            @php
+                $subjectsText = __('messages.dashboard.subjects', [], app()->getLocale());
+                $subjectsText = is_string($subjectsText) ? $subjectsText : (app()->getLocale() === 'ar' ? 'المواد' : 'Subjects');
+            @endphp
+            <p class="text-sm text-gray-500 mb-1">{{ $subjectsText }}</p>
             <p class="text-2xl font-bold text-gray-900">{{ (int) ($summary['subjects'] ?? 0) }}</p>
         </div>
         
@@ -69,7 +73,11 @@
                     <i class="ri-graduation-cap-line text-orange-600 text-xl"></i>
                 </div>
             </div>
-            <p class="text-sm text-gray-500 mb-1">{{ __('messages.grades_label') }}</p>
+            @php
+                $gradesText = __('messages.dashboard.grades', [], app()->getLocale());
+                $gradesText = is_string($gradesText) ? $gradesText : (app()->getLocale() === 'ar' ? 'الصفوف' : 'Grades');
+            @endphp
+            <p class="text-sm text-gray-500 mb-1">{{ $gradesText }}</p>
             <p class="text-2xl font-bold text-gray-900">{{ (int) ($summary['grades'] ?? 0) }}</p>
         </div>
         

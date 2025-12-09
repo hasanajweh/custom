@@ -10,6 +10,38 @@ use Illuminate\Support\Facades\Route;
  * Helper functions for the Scholder application
  */
 
+if (!function_exists('safe_trans')) {
+    /**
+     * Safely translate a key, ensuring it always returns a string (never an array)
+     *
+     * @param string $key
+     * @param array $replace
+     * @param string|null $locale
+     * @param string|null $fallback
+     * @return string
+     */
+    function safe_trans(string $key, array $replace = [], ?string $locale = null, ?string $fallback = null): string
+    {
+        $translation = __($key, $replace, $locale);
+        
+        // If translation returns an array, try to get a default key or use fallback
+        if (is_array($translation)) {
+            // Try common default keys
+            $defaultKeys = ['title', 'name', 'label', 'text'];
+            foreach ($defaultKeys as $defaultKey) {
+                if (isset($translation[$defaultKey]) && is_string($translation[$defaultKey])) {
+                    return $translation[$defaultKey];
+                }
+            }
+            
+            // If no default key found, use fallback or key itself
+            return $fallback ?? $key;
+        }
+        
+        return (string) $translation;
+    }
+}
+
 if (!function_exists('formatBytes')) {
     /**
      * Format bytes to human readable format
