@@ -15,41 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <!-- ============================================ -->
-    <!-- UNIVERSAL PWA META TAGS - ALL PLATFORMS -->
-    <!-- ============================================ -->
-
-    <!-- Core PWA -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="{{ $networkName }}">
-
-    <!-- iOS Safari - CRITICAL FOR iOS PWA -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="{{ $networkName }}">
-    <meta name="apple-touch-fullscreen" content="yes">
-
-    <!-- iOS Splash Screens - iPhone (Most Common Models) -->
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iPhone_15_Pro_Max_portrait.png">
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iPhone_15_Pro_portrait.png">
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iPhone_14_Plus_portrait.png">
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iPhone_14_portrait.png">
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iPhone_13_mini_portrait.png">
-
-    <!-- iOS Splash Screens - iPad (Most Common Models) -->
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iPad_Pro_12.9_portrait.png">
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iPad_Pro_11_portrait.png">
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iPad_Air_portrait.png">
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iPad_portrait.png">
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iPad_9.7_portrait.png">
-
-    <!-- Windows/IE -->
-    <meta name="msapplication-TileColor" content="#3B82F6">
-    <meta name="msapplication-TileImage" content="/Scholder-144.png">
-    <meta name="msapplication-tap-highlight" content="no">
-    <meta name="msapplication-config" content="/browserconfig.xml">
-
-    <!-- Theme Colors - All Browsers -->
+    <!-- Theme Colors -->
     <meta name="theme-color" content="#3B82F6">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#3B82F6">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1E40AF">
@@ -87,9 +53,6 @@
     <!-- Android/Chrome -->
     <link rel="icon" type="image/png" sizes="192x192" href="/Scholder-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/Scholder-512.png">
-
-    <!-- Web App Manifest - UNIVERSAL -->
-    <link rel="manifest" href="{{ url('/manifest.json') }}">
 
     <!-- Enhanced Font Loading with Language Support -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -263,104 +226,6 @@
             }
         }
 
-        /* UNIVERSAL PWA Install Banners */
-        .pwa-install-banner {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 16px 24px;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
-            display: none;
-            align-items: center;
-            gap: 16px;
-            z-index: 99999;
-            max-width: 90%;
-            animation: slideUp 0.3s ease;
-        }
-
-        .pwa-install-banner.show {
-            display: flex;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
-            to { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
-
-        .pwa-install-btn {
-            background: white;
-            color: #667eea;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .pwa-install-btn:hover {
-            transform: scale(1.05);
-        }
-
-        /* iOS Safari Install Banner */
-        .ios-install-banner {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.9) 100%);
-            color: white;
-            padding: 24px 20px;
-            text-align: center;
-            display: none;
-            z-index: 99999;
-            animation: slideUpIOS 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .ios-install-banner.show {
-            display: block;
-        }
-
-        @keyframes slideUpIOS {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
-        .ios-share-icon {
-            font-size: 28px;
-            animation: bounce 1.5s infinite;
-            display: inline-block;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        .pwa-offline-indicator {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #EF4444;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 12px;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-            z-index: 99999;
-        }
-
-        .pwa-offline-indicator.show {
-            display: flex;
-        }
 
         .rtl {
             direction: rtl;
@@ -843,13 +708,6 @@
                 opacity: 1;
             }
 
-            /* PWA banner mobile */
-            .pwa-install-banner {
-                flex-direction: column;
-                text-align: center;
-                padding: 12px 16px;
-                max-width: calc(100% - 32px);
-            }
 
             /* Sidebar header visible on mobile */
             .sidebar-header {
@@ -1083,41 +941,6 @@
 <body class="bg-white {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
 @auth
 
-<!-- Chrome/Edge/Brave/Opera Install Banner -->
-<div id="pwaInstallBanner" class="pwa-install-banner">
-    <div>
-        <div class="font-bold mb-1">Install {{ $networkName }}</div>
-        <div class="text-sm opacity-90">Quick access from your home screen or desktop</div>
-    </div>
-    <button id="pwaInstallBtn" class="pwa-install-btn">
-        <i class="ri-download-line mr-2"></i>Install App
-    </button>
-    <button onclick="dismissInstallBanner()" class="text-white opacity-75 hover:opacity-100">
-        <i class="ri-close-line text-xl"></i>
-    </button>
-</div>
-
-<!-- iOS Safari Install Banner -->
-<div id="iosInstallBanner" class="ios-install-banner">
-    <div class="ios-install-instructions">
-        <div class="ios-share-icon">
-            <i class="ri-share-box-line"></i>
-        </div>
-        <div class="font-bold text-lg mb-2">Install {{ $networkName }}</div>
-        <div class="text-sm opacity-90 mb-3">
-            Tap <strong>Share</strong> <i class="ri-share-box-line mx-1"></i> then <strong>"Add to Home Screen"</strong>
-        </div>
-        <button onclick="dismissIOSBanner()" class="px-6 py-2 bg-white/20 rounded-lg text-white font-semibold">
-            Got it!
-        </button>
-    </div>
-</div>
-
-<!-- Offline Indicator -->
-<div id="offlineIndicator" class="pwa-offline-indicator">
-    <i class="ri-wifi-off-line text-xl"></i>
-    <span>You're offline</span>
-</div>
 
 <!-- Mobile Overlay -->
 <div id="mobileOverlay" class="mobile-overlay" onclick="closeMobileSidebar()"></div>
@@ -1455,159 +1278,6 @@
                 window.location.reload();
             }, 100);
         });
-    }
-
-    // ========================================
-    // UNIVERSAL PWA SERVICE WORKER - ALL BROWSERS
-    // ========================================
-    let deferredPrompt;
-    let isInstalled = false;
-
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then(registration => {
-                    console.log('✅ Service Worker registered:', registration.scope);
-
-                    setInterval(() => {
-                        registration.update();
-                    }, 60000);
-
-                    registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                console.log('🔄 New version available!');
-                                setTimeout(() => {
-                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
-                                    window.location.reload();
-                                }, 3000);
-                            }
-                        });
-                    });
-                })
-                .catch(err => console.error('❌ Service Worker registration failed:', err));
-        });
-    }
-
-    function detectBrowserAndPlatform() {
-        const ua = navigator.userAgent.toLowerCase();
-        const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
-        return {
-            isIOS: /iphone|ipad|ipod/.test(ua),
-            isSafari: /safari/.test(ua) && !/chrome/.test(ua),
-            isChrome: /chrome/.test(ua) && !/edge/.test(ua),
-            isEdge: /edge/.test(ua),
-            isBrave: navigator.brave !== undefined,
-            isFirefox: /firefox/.test(ua),
-            isOpera: /opr/.test(ua) || /opera/.test(ua),
-            isStandalone: standalone,
-            isMobile: /mobile/.test(ua)
-        };
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        const browser = detectBrowserAndPlatform();
-
-        if (browser.isStandalone) {
-            isInstalled = true;
-            console.log('✅ App is already installed');
-            return;
-        }
-
-        if (browser.isIOS && browser.isSafari) {
-            setTimeout(() => {
-                if (!localStorage.getItem('iosBannerDismissed')) {
-                    document.getElementById('iosInstallBanner').classList.add('show');
-                }
-            }, 2000);
-        }
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            console.log('✅ Install prompt captured');
-            e.preventDefault();
-            deferredPrompt = e;
-
-            if (!localStorage.getItem('pwaBannerDismissed')) {
-                setTimeout(() => {
-                    showInstallBanner();
-                }, 2000);
-            }
-        });
-
-        window.addEventListener('appinstalled', () => {
-            console.log('✅ PWA installed successfully');
-            isInstalled = true;
-            hideInstallBanner();
-            hideIOSBanner();
-            localStorage.setItem('pwaInstalled', 'true');
-        });
-    });
-
-    function showInstallBanner() {
-        const banner = document.getElementById('pwaInstallBanner');
-        if (banner && deferredPrompt && !isInstalled) {
-            banner.classList.add('show');
-        }
-    }
-
-    function hideInstallBanner() {
-        const banner = document.getElementById('pwaInstallBanner');
-        if (banner) {
-            banner.classList.remove('show');
-        }
-    }
-
-    function dismissInstallBanner() {
-        hideInstallBanner();
-        localStorage.setItem('pwaBannerDismissed', 'true');
-        deferredPrompt = null;
-    }
-
-    function hideIOSBanner() {
-        const banner = document.getElementById('iosInstallBanner');
-        if (banner) {
-            banner.classList.remove('show');
-        }
-    }
-
-    function dismissIOSBanner() {
-        hideIOSBanner();
-        localStorage.setItem('iosBannerDismissed', 'true');
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const installBtn = document.getElementById('pwaInstallBtn');
-        if (installBtn) {
-            installBtn.addEventListener('click', async () => {
-                if (!deferredPrompt) {
-                    alert('To install: Click the menu (⋮) and select "Install app"');
-                    return;
-                }
-
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-
-                if (outcome === 'accepted') {
-                    hideInstallBanner();
-                }
-
-                deferredPrompt = null;
-            });
-        }
-    });
-
-    window.addEventListener('online', () => {
-        document.getElementById('offlineIndicator').classList.remove('show');
-    });
-
-    window.addEventListener('offline', () => {
-        document.getElementById('offlineIndicator').classList.add('show');
-    });
-
-    if (!navigator.onLine) {
-        document.getElementById('offlineIndicator').classList.add('show');
     }
 
     // ========================================

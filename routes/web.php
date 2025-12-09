@@ -459,133 +459,16 @@ Route::get('/', [LandingController::class, 'index'])
 // PWA ROUTES & ASSETS
 // ===========================
 
-// PWA Manifest with Enhanced Desktop Support
-Route::get('/manifest.json', function (Request $request) {
-    $schoolSlug = $request->query('school');
-    $school = School::with('network')->where('slug', $schoolSlug)->first();
-    $locale = App::getLocale();
-
-    $slugPrefix = $school && $school->network ? "/{$school->network->slug}/{$school->slug}" : '';
-
-    $manifest = [
-        'name' => ($school ? $school->name : 'Scholder') . ' - ' . __('messages.educational_platform', [], $locale),
-        'short_name' => $school ? $school->name : 'Scholder',
-        'description' => __('messages.platform_description', [], $locale),
-        'start_url' => $school ? "{$slugPrefix}/dashboard" : '/',
-        'scope' => $school ? "{$slugPrefix}/" : '/',
-        'display' => 'standalone',
-        'background_color' => '#ffffff',
-        'theme_color' => $school->theme_color ?? '#3B82F6',
-        'orientation' => 'any',
-        'categories' => ['education', 'productivity'],
-        'lang' => $locale,
-        'dir' => $locale === 'ar' ? 'rtl' : 'ltr',
-        'id' => $school ? "scholder-pwa-{$school->slug}" : 'scholder-pwa',
-        'prefer_related_applications' => false,
-
-        // Desktop-specific enhancements
-        'display_override' => ['window-controls-overlay', 'standalone', 'minimal-ui'],
-        'protocol_handlers' => [
-            [
-                'protocol' => 'web+scholder',
-                'url' => "{$slugPrefix}/handle-protocol?url=%s"
-            ]
-        ],
-        'share_target' => [
-            'action' => "{$slugPrefix}/share-target",
-            'method' => 'POST',
-            'enctype' => 'multipart/form-data',
-            'params' => [
-                'title' => 'title',
-                'text' => 'text',
-                'url' => 'url',
-                'files' => [
-                    [
-                        'name' => 'files',
-                        'accept' => ['*/*']
-                    ]
-                ]
-            ]
-        ],
-
-        // Icons (can be customized per school later)
-        'icons' => [
-            [
-                'src' => '/Scholder-192.png',
-                'sizes' => '192x192',
-                'type' => 'image/png',
-                'purpose' => 'any maskable'
-            ],
-            [
-                'src' => '/Scholder-512.png',
-                'sizes' => '512x512',
-                'type' => 'image/png',
-                'purpose' => 'any maskable'
-            ],
-            [
-                'src' => '/Scholder-1024.png',
-                'sizes' => '1024x1024',
-                'type' => 'image/png',
-                'purpose' => 'any'
-            ],
-        ],
-
-        // Shortcuts (now scoped per school)
-        'shortcuts' => [
-            [
-                'name' => __('messages.upload_file', [], $locale),
-                'short_name' => __('messages.upload', [], $locale),
-                'description' => __('messages.quick_upload', [], $locale),
-                'url' => "{$slugPrefix}/teacher/files/create",
-                'icons' => [['src' => '/Scholder-192.png', 'sizes' => '192x192']]
-            ],
-            [
-                'name' => __('messages.my_files', [], $locale),
-                'short_name' => __('messages.files', [], $locale),
-                'description' => __('messages.view_files', [], $locale),
-                'url' => "{$slugPrefix}/teacher/files",
-                'icons' => [['src' => '/Scholder-192.png', 'sizes' => '192x192']]
-            ],
-            [
-                'name' => __('messages.dashboard.dashboard', [], $locale),
-                'short_name' => __('messages.dashboard.dashboard', [], $locale),
-                'description' => __('messages.go_to_dashboard', [], $locale),
-                'url' => "{$slugPrefix}/dashboard",
-                'icons' => [['src' => '/Scholder-192.png', 'sizes' => '192x192']]
-            ]
-        ],
-
-        // Screenshots and platform info
-        'screenshots' => [
-            [
-                'src' => '/screenshots/desktop-dashboard.png',
-                'sizes' => '1920x1080',
-                'type' => 'image/png',
-                'platform' => 'wide',
-                'label' => 'Dashboard view on desktop'
-            ],
-            [
-                'src' => '/screenshots/mobile-upload.png',
-                'sizes' => '1080x1920',
-                'type' => 'image/png',
-                'platform' => 'narrow',
-                'label' => 'Upload feature on mobile'
-            ]
-        ],
-
-        'edge_side_panel' => [
-            'preferred_width' => 480
-        ]
-    ];
-
-    return response()->json($manifest)
-        ->header('Content-Type', 'application/manifest+json')
-        ->header('Cache-Control', 'public, max-age=3600');
+// Service Worker disabled - Web only mode
+Route::get('/sw.js', function () {
+    // Return empty service worker to prevent registration
+    return response('// Service Worker disabled - Web only mode', 200)
+        ->header('Content-Type', 'application/javascript')
+        ->header('Cache-Control', 'no-cache');
 });
 
-
-// Enhanced Service Worker with Desktop Features
-Route::get('/sw.js', function () {
+// Old service worker code (disabled)
+Route::get('/sw.js.old', function () {
     $js = <<<'JS'
 const CACHE_NAME = 'scholder-v2';
 const urlsToCache = [
@@ -729,34 +612,6 @@ JS;
         ->header('Service-Worker-Allowed', '/')
         ->header('Cache-Control', 'no-cache');
 })->name('service-worker');
-
-// Offline fallback page
-Route::get('/offline.html', function () {
-    return view('offline');
-})->name('offline');
-
-// Install Instructions Page
-Route::prefix('{network:slug}/{branch:slug}')
-    ->middleware(['setlocale', 'setNetwork', 'setBranch'])
-    ->scopeBindings()
-    ->group(function () {
-        Route::get('/install', function (Network $network, School $branch) {
-            if ($branch->network_id !== $network->id) {
-                abort(404);
-            }
-
-            return view('install-instructions', ['school' => $branch]);
-        })->name('install.instructions');
-
-        // Desktop App Download Page
-        Route::get('/desktop', function (Network $network, School $branch) {
-            if ($branch->network_id !== $network->id) {
-                abort(404);
-            }
-
-            return view('desktop-app', ['school' => $branch]);
-        })->name('desktop.app');
-    });
 
 // Handle protocol for desktop
 Route::get('/handle-protocol', function (Request $request) {
