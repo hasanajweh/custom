@@ -1678,7 +1678,6 @@ function switchLocale(locale) {
     });
 </script>
 
-
 @stack('scripts')
 
 @endauth
