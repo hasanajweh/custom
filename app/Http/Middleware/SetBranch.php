@@ -14,18 +14,48 @@ class SetBranch
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $network = $request->attributes->get('network') ?? $request->route('network');
-        if (is_string($network)) {
-            $network = Network::where('slug', $network)->first();
-        }
+        try {
+            $network = $request->attributes->get('network') ?? $request->route('network');
+            if (is_string($network)) {
+                $network = Network::where('slug', $network)->first();
+            }
 
-        $branchParam = $request->route('branch') ?? $request->route('school');
-        $branch = $branchParam instanceof School
-            ? $branchParam
-            : School::where('slug', $branchParam)->first();
+            $branchParam = $request->route('branch') ?? $request->route('school');
+            
+            if (! $branchParam) {
+                \Log::warning('SetBranch middleware: No branch parameter in route', [
+                    'route' => $request->route()?->getName(),
+                    'url' => $request->url(),
+                ]);
+                abort(404, 'Branch parameter is required');
+            }
 
-        if (! $branch || ($network instanceof Network && $branch->network_id !== $network->id)) {
-            abort(404, 'Branch not found');
+            $branch = $branchParam instanceof School
+                ? $branchParam
+                : School::where('slug', $branchParam)->first();
+
+            if (! $branch) {
+                \Log::warning('SetBranch middleware: Branch not found', [
+                    'slug' => $branchParam,
+                    'route' => $request->route()?->getName(),
+                ]);
+                abort(404, 'Branch not found');
+            }
+
+            if ($network instanceof Network && $branch->network_id !== $network->id) {
+                \Log::warning('SetBranch middleware: Branch network mismatch', [
+                    'branch_id' => $branch->id,
+                    'branch_network_id' => $branch->network_id,
+                    'route_network_id' => $network->id,
+                ]);
+                abort(404, 'Branch does not belong to this network');
+            }
+        } catch (\Exception $e) {
+            \Log::error('SetBranch middleware exception', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            abort(500, 'Error setting branch context');
         }
 
         $request->attributes->set('branch', $branch);

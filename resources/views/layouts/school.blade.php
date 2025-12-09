@@ -9,20 +9,20 @@
             ?? request()->attributes->get('branch')
             ?? request()->attributes->get('school')
             ?? $activeContextSchool
-            ?? Auth::user()->school;
+            ?? (auth()->check() && auth()->user()?->school ? auth()->user()->school : null);
 
         $branch = $branch ?? request()->route('branch') ?? $school;
-        $network = $network ?? request()->route('network') ?? $school?->network ?? auth()->user()?->network;
+        $network = $network ?? request()->route('network') ?? $school?->network ?? (auth()->check() ? auth()->user()?->network : null);
 
         $currentSchool = $activeContextSchool ?? $school;
         $currentRole = $activeContextRole;
 
-        $availableContexts = auth()->user()?->availableContexts();
+        $availableContexts = auth()->check() ? auth()->user()?->availableContexts() : collect();
 
         $schoolName = $school?->name ?? config('app.name');
         $schoolSlug = $school?->slug ?? '';
-        $networkSlug = $network?->slug ?? $school?->network?->slug ?? auth()->user()?->network?->slug ?? '';
-        $isMainAdmin = $isMainAdmin ?? (bool) auth()->user()?->is_main_admin;
+        $networkSlug = $network?->slug ?? $school?->network?->slug ?? (auth()->check() ? auth()->user()?->network?->slug : '');
+        $isMainAdmin = $isMainAdmin ?? (bool) (auth()->check() ? auth()->user()?->is_main_admin : false);
         $hasTenantContext = $school && $school->network;
     @endphp
     <meta charset="UTF-8">
@@ -1152,8 +1152,13 @@
                                     $profileUrl = $networkSlug ? route('main-admin.dashboard', ['network' => $networkSlug]) : '#';
                                     $logoutUrl = $networkSlug ? route('main-admin.logout', ['network' => $networkSlug]) : '#';
                                 } else {
-                                    $profileUrl = $hasTenantContext ? tenant_route('profile.edit', $school) : '#';
-                                    $logoutUrl = $hasTenantContext ? tenant_route('logout', $school) : '#';
+                                    try {
+                                        $profileUrl = $hasTenantContext && $school ? tenant_route('profile.edit', $school) : '#';
+                                        $logoutUrl = $hasTenantContext && $school ? tenant_route('logout', $school) : '#';
+                                    } catch (\Exception $e) {
+                                        $profileUrl = '#';
+                                        $logoutUrl = '#';
+                                    }
                                 }
                             @endphp
                             <a href="{{ $profileUrl }}"
@@ -1162,8 +1167,15 @@
                                 <span>{{ __('messages.navigation.profile') }}</span>
                             </a>
 
-                            @if($currentRole === 'admin')
-                                <a href="{{ tenant_route('school.admin.activity-logs.index', $school) }}"
+                            @if($currentRole === 'admin' && $school)
+                                @php
+                                    try {
+                                        $activityLogsUrl = tenant_route('school.admin.activity-logs.index', $school);
+                                    } catch (\Exception $e) {
+                                        $activityLogsUrl = '#';
+                                    }
+                                @endphp
+                                <a href="{{ $activityLogsUrl }}"
                                    class="dropdown-item">
                                     <i class="ri-history-line text-indigo-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
                                     <span>{{ __('messages.navigation.activity_logs') }}</span>
@@ -1501,7 +1513,17 @@ function switchLocale(locale) {
     // ========================================
     // FILE PREVIEW LOGIC (Unchanged)
     // ========================================
-    const previewDataUrlTemplate = @json(tenant_route('school.admin.file-browser.preview-data', [$school, '__FILE_ID__']));
+    @php
+        $previewUrl = '#';
+        if ($school && $school->network) {
+            try {
+                $previewUrl = tenant_route('school.admin.file-browser.preview-data', [$school, '__FILE_ID__']);
+            } catch (\Exception $e) {
+                \Log::warning('Failed to generate preview URL', ['error' => $e->getMessage()]);
+            }
+        }
+    @endphp
+    const previewDataUrlTemplate = @json($previewUrl);
     
     // Show preview modal for non-previewable files
     function showPreviewModal(data) {
