@@ -26,7 +26,7 @@
         $hasTenantContext = $school && $school->network;
     @endphp
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Theme Colors -->
@@ -198,35 +198,6 @@
         /* Smooth scrolling */
         html {
             scroll-behavior: smooth;
-        }
-
-        /* Tablet optimizations */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            body {
-                font-size: 15px;
-            }
-        }
-
-        /* Hide mobile-only on desktop */
-        @media (min-width: 769px) {
-            .mobile-only {
-                display: none !important;
-            }
-            
-            .sidebar-header {
-                display: none !important;
-            }
-
-            .mobile-language-switcher {
-                display: none !important;
-            }
-        }
-
-        /* Landscape mobile */
-        @media (max-width: 768px) and (orientation: landscape) {
-            .navbar {
-                height: 56px !important;
-            }
         }
 
 
@@ -617,214 +588,9 @@
             padding: 12px;
         }
 
-        /* === MOBILE LANGUAGE SWITCHER STYLES === */
-        .mobile-language-switcher {
-            display: none; /* Hidden by default, shown in media query */
-            padding: 16px 12px;
-        }
-
-        .mobile-language-switcher .language-btn {
-            width: 100%;
-            background: var(--primary-lighter);
-            color: var(--primary) !important;
-            box-shadow: none;
-        }
-        
-        .mobile-language-switcher .language-btn:hover {
-            background: var(--primary-light);
-            transform: none; /* Disable hover transform */
-        }
-        
-        .mobile-language-switcher .language-btn span,
-        .mobile-language-switcher .language-btn i {
-            color: var(--primary) !important;
-        }
-        
-        .mobile-language-switcher .language-dropdown {
-            /* Adjust dropdown for sidebar */
-            position: relative; /* Unset absolute */
-            top: auto;
-            left: auto;
-            right: auto;
-            width: 100%;
-            margin-top: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            opacity: 1; /* Always visible when toggled */
-            transform: none; /* No animation */
-        }
-
-
-        @media (max-width: 768px) {
-            .navbar {
-                background: rgba(255, 255, 255, 0.95);
-                backdrop-filter: blur(12px);
-                -webkit-backdrop-filter: blur(12px);
-                border-bottom: 1px solid var(--border);
-                height: 60px;
-                padding: 0 16px;
-            }
-
-            /* === HIDE DESKTOP LANGUAGE SWITCHER === */
-            .navbar .desktop-language-switcher {
-                display: none !important;
-            }
-
-            /* HIDE SIDEBAR BY DEFAULT ON MOBILE */
-            .sidebar {
-                position: fixed;
-                top: 0;
-            {{ app()->getLocale() === 'ar' ? 'right' : 'left' }}: 0;
-                height: 100vh;
-                width: var(--sidebar-width); /* Use expanded width */
-                background: #FFFFFF;
-                z-index: 1000;
-                display: flex;
-                flex-direction: column;
-                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-                transform: translateX(-100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-
-            /* RTL: Hide sidebar to the right */
-            .rtl .sidebar {
-                transform: translateX(100%);
-            }
-
-            /* Show sidebar when mobile-open class is added */
-            .sidebar.mobile-open {
-                transform: translateX(0) !important;
-            }
-
-            /* REMOVE SIDEBAR MARGIN FROM MAIN CONTENT ON MOBILE */
-            .main-content {
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-                padding-top: 60px;
-                width: 100%;
-                min-width: 100%;
-            }
-
-            /* Mobile overlay backdrop */
-            .mobile-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 999;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-            }
-
-            .mobile-overlay.show {
-                display: block;
-                opacity: 1;
-            }
-
-
-            /* Sidebar header visible on mobile */
-            .sidebar-header {
-                display: flex !important;
-                justify-content: space-between;
-                align-items: center;
-                padding: 16px;
-                border-bottom: 1px solid var(--border);
-                /* Match navbar height roughly */
-                height: 60px;
-            }
-
-            /* === SHOW MOBILE LANGUAGE SWITCHER === */
-            .sidebar .mobile-language-switcher {
-                display: block !important;
-            }
-
-            /* === SHOW SIDEBAR LABELS ON MOBILE === */
-            .sidebar .sidebar-text {
-                max-width: 200px;
-                opacity: 1;
-            }
-
-            .sidebar .sidebar-divider-title {
-                opacity: 1;
-                max-height: 30px;
-            }
-
-            /* Fix icon margin on mobile (resetting desktop collapsed rule) */
-            .sidebar:not(.expanded) .sidebar-item i {
-                margin-right: 12px;
-                margin-left: 0;
-            }
-            .rtl .sidebar:not(.expanded) .sidebar-item i {
-                margin-left: 12px;
-                margin-right: 0;
-            }
-            /* === END SIDEBAR LABEL FIX === */
-
-
-            /* Better touch targets */
-            button:not(.language-option):not(.dropdown-item), a.btn {
-                min-height: 44px;
-                padding: 12px 16px;
-            }
-
-            /* Prevent iOS zoom on inputs */
-            input[type="text"],
-            input[type="email"],
-            input[type="password"],
-            input[type="number"],
-            input[type="tel"],
-            input[type="search"],
-            select,
-            textarea {
-                font-size: 16px !important;
-            }
-
-            /* Full width dropdowns */
-            #userMenuDropdown {
-                position: fixed !important;
-                left: 16px !important;
-                right: 16px !important;
-                width: calc(100vw - 32px) !important;
-                max-width: calc(100vw - 32px) !important;
-            }
-
-            /* Better content padding */
-            .main-content > div {
-                padding: 16px !important;
-            }
-
-            /* Hide desktop elements */
-            .desktop-only {
-                display: none !important;
-            }
-
-            /* Logo adjustments */
-            .brand-name {
-                font-size: 18px !important;
-            }
-
-            .school-name {
-                font-size: 12px !important;
-            }
-
-            /* Responsive tables */
-            table {
-                display: block;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            /* Better spacing */
-            body {
-                font-size: 16px;
-            }
-
-            /* Prevent body scroll when sidebar open */
-            body.sidebar-open {
-                overflow: hidden;
-            }
+        /* Prevent body scroll when sidebar open */
+        body.sidebar-open {
+            overflow: hidden;
         }
 
         select,
@@ -862,29 +628,6 @@
         textarea::placeholder {
             color: #9CA3AF !important;
             opacity: 1;
-        }
-
-        @media (max-width: 768px) {
-            thead th,
-            tbody td {
-                padding: 12px 16px;
-                font-size: 13px;
-            }
-
-            thead th:first-child,
-            tbody td:first-child {
-                padding-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}: 16px;
-            }
-
-            thead th:last-child,
-            tbody td:last-child {
-                padding-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}: 16px;
-            }
-
-            tbody td .btn {
-                padding: 6px 10px;
-                font-size: 12px;
-            }
         }
 
         table.table-striped tbody tr:nth-child(even) {
@@ -954,26 +697,16 @@
 
 </head>
 <body class="bg-white {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
-@auth
-
-<!-- Mobile Overlay -->
-<div id="mobileOverlay" class="mobile-overlay" onclick="closeMobileSidebar()"></div>
+@if(Auth::check())
 
 <!-- Enhanced Navigation -->
 <nav class="navbar fixed w-full top-0 z-50">
     <div class="px-6 sm:px-8 lg:px-10 h-full">
         <div class="flex justify-between items-center h-full">
             <div class="flex items-center">
-                <!-- Mobile Menu Toggle -->
-                <button onclick="toggleMobileSidebar()"
-                        class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg md:hidden"
-                        aria-label="{{ __('messages.navigation.open_sidebar') }}">
-                    <i class="ri-menu-line text-xl"></i>
-                </button>
-
-                <!-- Desktop Sidebar Toggle -->
+                <!-- Sidebar Toggle -->
                 <button onclick="toggleSidebar()"
-                        class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg hidden md:block"
+                        class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
                         aria-label="{{ __('messages.navigation.open_sidebar') }}">
                     <i class="ri-menu-line text-xl"></i>
                 </button>
@@ -1201,19 +934,8 @@
 </nav>
 
 @if($hasTenantContext || $isMainAdmin)
-<!-- Enhanced Sidebar with Mobile Support -->
+<!-- Enhanced Sidebar -->
 <aside id="sidebar" class="sidebar {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
-    <!-- Mobile Sidebar Header -->
-    <div class="sidebar-header md:hidden">
-        <div class="flex items-center space-x-3 {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}">
-            <img src="/WayUp.png" alt="{{ __('messages.app.name') }}" class="w-8 h-8 rounded-lg">
-            <h2 class="font-bold text-lg">{{ __('messages.navigation.menu') }}</h2>
-        </div>
-        <button onclick="closeMobileSidebar()" class="p-2 hover:bg-gray-100 rounded-lg">
-            <i class="ri-close-line text-xl"></i>
-        </button>
-    </div>
-
     <div class="sidebar-content">
         @php($activeSidebarRole = $currentRole)
 
@@ -1226,26 +948,6 @@
         @elseif($hasTenantContext && $activeSidebarRole === 'supervisor')
             @include('layouts.partials.supervisor-sidebar')
         @endif
-
-        <!-- Mobile Language Switcher -->
-        <div class="mobile-language-switcher p-4">
-            <div class="flex gap-2">
-                <button
-                    onclick="switchLocale('ar')"
-                    class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-200 {{ app()->getLocale() === 'ar' ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
-                >
-                    <span class="text-lg">🇸🇦</span>
-                    <span class="font-medium">العربية</span>
-                </button>
-                <button
-                    onclick="switchLocale('en')"
-                    class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-200 {{ app()->getLocale() === 'en' ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
-                >
-                    <span class="text-lg">🇬🇧</span>
-                    <span class="font-medium">English</span>
-                </button>
-            </div>
-        </div>
 
         <div class="sidebar-footer">
             <div class="sidebar-footer-text">by: Ajw</div>
@@ -1320,23 +1022,16 @@ function switchLocale(locale) {
         const sidebar = document.getElementById('sidebar');
         const main = document.querySelector('.main-content');
         const savedState = localStorage.getItem('sidebarExpanded');
-        const isDesktop = window.innerWidth > 768;
         const isRTL = getComputedStyle(document.documentElement).direction === 'rtl';
 
-        if (isDesktop) {
-            const expanded = savedState !== 'false';
-            sidebar.classList.toggle('expanded', expanded);
+        const expanded = savedState !== 'false';
+        sidebar.classList.toggle('expanded', expanded);
 
-            if (isRTL) {
-                main.style.marginRight = expanded ? '280px' : '80px';
-                main.style.marginLeft = '0px';
-            } else {
-                main.style.marginLeft = expanded ? '280px' : '80px';
-                main.style.marginRight = '0px';
-            }
-        } else {
-            sidebar.classList.remove('expanded');
+        if (isRTL) {
+            main.style.marginRight = expanded ? '280px' : '80px';
             main.style.marginLeft = '0px';
+        } else {
+            main.style.marginLeft = expanded ? '280px' : '80px';
             main.style.marginRight = '0px';
         }
     }
@@ -1393,40 +1088,10 @@ function switchLocale(locale) {
         requestAnimationFrame(animate);
     }
 
-    // ========================================
-    // MOBILE SIDEBAR & DROPDOWN LOGIC
-    // ========================================
-    function toggleMobileSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('mobileOverlay');
-
-        sidebar.classList.toggle('mobile-open');
-        overlay.classList.toggle('show');
-
-        document.body.classList.toggle('sidebar-open');
-    }
-
-    function closeMobileSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('mobileOverlay');
-
-        sidebar.classList.remove('mobile-open');
-        overlay.classList.remove('show');
-        document.body.classList.remove('sidebar-open');
-    }
-
     function toggleLanguageDropdown(event, dropdownId) {
         event.stopPropagation();
         const dropdown = document.getElementById(dropdownId);
         if (!dropdown) return;
-
-        // Close the other dropdown if it exists
-        const otherDropdownId = dropdownId === 'languageDropdown' ? 'languageDropdownMobile' : 'languageDropdown';
-        const otherDropdown = document.getElementById(otherDropdownId);
-        if (otherDropdown) {
-            otherDropdown.style.display = 'none';
-            otherDropdown.classList.remove('show');
-        }
 
         // Close user menu
         document.getElementById('userMenuDropdown').style.display = 'none';
@@ -1453,11 +1118,6 @@ function switchLocale(locale) {
             langDropdown.style.display = 'none';
             langDropdown.classList.remove('show');
         }
-        const langDropdownMobile = document.getElementById('languageDropdownMobile');
-        if (langDropdownMobile) {
-            langDropdownMobile.style.display = 'none';
-            langDropdownMobile.classList.remove('show');
-        }
 
         const isCurrentlyOpen = dropdown.style.display === 'block';
         dropdown.style.display = isCurrentlyOpen ? 'none' : 'block';
@@ -1469,17 +1129,12 @@ function switchLocale(locale) {
         // Global click listener to close dropdowns
         document.addEventListener('click', function (event) {
             const langDropdown = document.getElementById('languageDropdown');
-            const langDropdownMobile = document.getElementById('languageDropdownMobile');
             const langSwitcher = event.target.closest('.language-switcher');
-            
+
             if (!langSwitcher) {
                 if (langDropdown) {
                     langDropdown.style.display = 'none';
                     langDropdown.classList.remove('show');
-                }
-                if (langDropdownMobile) {
-                    langDropdownMobile.style.display = 'none';
-                    langDropdownMobile.classList.remove('show');
                 }
             }
 
@@ -1487,15 +1142,6 @@ function switchLocale(locale) {
             const userMenuButton = event.target.closest('[onclick*="toggleUserMenu"]');
             if (!userMenuButton && userMenuDropdown && !userMenuDropdown.contains(event.target)) {
                 userMenuDropdown.style.display = 'none';
-            }
-        });
-
-        // Resize handler
-        window.addEventListener('resize', function () {
-            if (window.innerWidth <= 768) {
-                closeMobileSidebar();
-            } else {
-                initializeSidebar();
             }
         });
 
@@ -1591,11 +1237,11 @@ function switchLocale(locale) {
                 button.innerHTML = originalHTML;
                 button.disabled = false;
 
-                @if(app()->getLocale() === 'ar')
-                alert('حدث خطأ أثناء تحميل معلومات الملف');
-                @else
-                alert('Error loading file information');
-                @endif
+                const errorMessage = @json(app()->getLocale() === 'ar'
+                    ? 'حدث خطأ أثناء تحميل معلومات الملف'
+                    : 'Error loading file information'
+                );
+                alert(errorMessage);
             });
     }
 
@@ -1669,7 +1315,7 @@ function switchLocale(locale) {
 
     window.addEventListener('beforeunload', function () {
         const sidebar = document.getElementById('sidebar');
-        if (sidebar && window.innerWidth > 768) {
+        if (sidebar) {
             const isExpanded = sidebar.classList.contains('expanded');
             localStorage.setItem('sidebarExpanded', isExpanded.toString());
         }
@@ -1678,7 +1324,7 @@ function switchLocale(locale) {
 
 @stack('scripts')
 
-@endauth
+@endif
 
 </body>
 </html>
