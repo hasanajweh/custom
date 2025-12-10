@@ -15,7 +15,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <!-- Theme Colors -->
+    <!-- ============================================ -->
+    <!-- UNIVERSAL PWA META TAGS - ALL PLATFORMS -->
+    <!-- ============================================ -->
+
+    <!-- Core PWA -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="{{ $networkName }}">
+
+    <!-- iOS Safari - CRITICAL FOR iOS PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="{{ $networkName }}">
+    <meta name="apple-touch-fullscreen" content="yes">
+
+    <!-- iOS Splash Screens - iPhone (Most Common Models) -->
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iPhone_15_Pro_Max_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iPhone_15_Pro_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iPhone_14_Plus_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iPhone_14_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iPhone_13_mini_portrait.png">
+
+    <!-- iOS Splash Screens - iPad (Most Common Models) -->
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iPad_Pro_12.9_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iPad_Pro_11_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iPad_Air_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iPad_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iPad_9.7_portrait.png">
+
+    <!-- Windows/IE -->
+    <meta name="msapplication-TileColor" content="#3B82F6">
+    <meta name="msapplication-TileImage" content="/Scholder-144.png">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+
+    <!-- Theme Colors - All Browsers -->
     <meta name="theme-color" content="#3B82F6">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#3B82F6">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1E40AF">
@@ -53,6 +87,9 @@
     <!-- Android/Chrome -->
     <link rel="icon" type="image/png" sizes="192x192" href="/Scholder-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/Scholder-512.png">
+
+    <!-- Web App Manifest - UNIVERSAL -->
+    <link rel="manifest" href="{{ url('/manifest.json') }}">
 
     <!-- Enhanced Font Loading with Language Support -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1485,6 +1522,7 @@
 </script>
 
 
+@include('layouts.partials.service-worker-cleanup')
 @stack('scripts')
 
 @endauth

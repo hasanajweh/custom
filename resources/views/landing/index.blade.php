@@ -1249,10 +1249,10 @@
             </div>
             <div class="card">
                 <div class="card-icon">
-                    <i class="ri-cloud-line"></i>
+                    <i class="ri-wifi-off-line"></i>
                 </div>
-                <h3>{{ app()->getLocale() === 'ar' ? 'سحابة آمنة' : 'Secure Cloud' }}</h3>
-                <p>{{ app()->getLocale() === 'ar' ? 'تخزين آمن وموثوق لجميع ملفاتك ومواردك التعليمية.' : 'Secure and reliable storage for all your files and educational resources.' }}</p>
+                <h3>{{ app()->getLocale() === 'ar' ? 'PWA والعمل دون اتصال' : 'PWA & Offline' }}</h3>
+                <p>{{ app()->getLocale() === 'ar' ? 'يعمل دون اتصال كتطبيق ويب تقدمي.' : 'Works offline as a Progressive Web App.' }}</p>
             </div>
             <div class="card">
                 <div class="card-icon">

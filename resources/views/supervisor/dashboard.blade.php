@@ -310,4 +310,5 @@
         </div>
     </div>
 
+    @include('components.pwa-install-button')
 @endsection

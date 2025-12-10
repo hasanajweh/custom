@@ -52,6 +52,7 @@
     }
     </script>
 
+    @include('layouts.partials.service-worker-cleanup')
     @yield('content')
 </body>
 </html>
