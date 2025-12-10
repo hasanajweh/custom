@@ -1591,11 +1591,11 @@ function switchLocale(locale) {
                 button.innerHTML = originalHTML;
                 button.disabled = false;
 
-                @if(app()->getLocale() === 'ar')
-                alert('حدث خطأ أثناء تحميل معلومات الملف');
-                @else
-                alert('Error loading file information');
-                @endif
+                const errorMessage = @json(app()->getLocale() === 'ar'
+                    ? 'حدث خطأ أثناء تحميل معلومات الملف'
+                    : 'Error loading file information'
+                );
+                alert(errorMessage);
             });
     }
 
