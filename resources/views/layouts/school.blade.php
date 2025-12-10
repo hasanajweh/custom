@@ -149,6 +149,11 @@
             line-height: 1.4;
         }
         @else
+        * {
+            letter-spacing: normal;
+            line-height: 1.6;
+        }
+
         .font-heading {
             font-family: 'Inter', sans-serif;
             font-weight: 700;
