@@ -954,7 +954,7 @@
 
 </head>
 <body class="bg-white {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
-@auth
+@if(Auth::check())
 
 <!-- Mobile Overlay -->
 <div id="mobileOverlay" class="mobile-overlay" onclick="closeMobileSidebar()"></div>
@@ -1678,7 +1678,7 @@ function switchLocale(locale) {
 
 @stack('scripts')
 
-@endauth
+@endif
 
 </body>
 </html>
