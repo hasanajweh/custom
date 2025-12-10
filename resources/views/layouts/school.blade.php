@@ -1322,9 +1322,9 @@ function switchLocale(locale) {
     });
 </script>
 
-@stack('scripts')
-
 @endif
+
+@stack('scripts')
 
 </body>
 </html>
