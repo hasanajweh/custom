@@ -956,12 +956,10 @@
 <body class="bg-white {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
 @auth
 
-
 <!-- Mobile Overlay -->
 <div id="mobileOverlay" class="mobile-overlay" onclick="closeMobileSidebar()"></div>
 
 <!-- Enhanced Navigation -->
-@auth
 <nav class="navbar fixed w-full top-0 z-50">
     <div class="px-6 sm:px-8 lg:px-10 h-full">
         <div class="flex justify-between items-center h-full">
@@ -1201,9 +1199,7 @@
         </div>
     </div>
 </nav>
-@endauth
 
-@auth
 @if($hasTenantContext || $isMainAdmin)
 <!-- Enhanced Sidebar with Mobile Support -->
 <aside id="sidebar" class="sidebar {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
@@ -1257,7 +1253,6 @@
     </div>
 </aside>
 @endif
-@endauth
 
 <!-- Enhanced Main Content -->
 <main class="main-content {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
