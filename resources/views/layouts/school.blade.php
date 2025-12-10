@@ -1147,7 +1147,6 @@
 
 </head>
 <body class="bg-white {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
-<<<<<<< HEAD
 @auth
 
 <!-- Chrome/Edge/Brave/Opera Install Banner -->
@@ -1185,12 +1184,8 @@
     <i class="ri-wifi-off-line text-xl"></i>
     <span>You're offline</span>
 </div>
-=======
-@if(auth()->check())
->>>>>>> c8ecb451223afcee0353153efada5bed23378674
 
 <!-- Enhanced Navigation -->
-@auth
 <nav class="navbar fixed w-full top-0 z-50">
     <div class="px-6 sm:px-8 lg:px-10 h-full">
         <div class="flex justify-between items-center h-full">
@@ -1975,14 +1970,9 @@ function switchLocale(locale) {
     }
 </script>
 
-@include('layouts.partials.service-worker-cleanup')
 @stack('scripts')
 
-<<<<<<< HEAD
 @endauth
-=======
-@endif
->>>>>>> c8ecb451223afcee0353153efada5bed23378674
 
 </body>
 </html>
