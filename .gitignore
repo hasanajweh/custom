@@ -23,3 +23,8 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 vvvvvvvvvv
+
+# Temporary debugging/check scripts
+check_*.php
+*_check.php
+*_debug.php

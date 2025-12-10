@@ -1203,6 +1203,7 @@
 </nav>
 @endauth
 
+@auth
 @if($hasTenantContext || $isMainAdmin)
 <!-- Enhanced Sidebar with Mobile Support -->
 <aside id="sidebar" class="sidebar {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
@@ -1256,6 +1257,7 @@
     </div>
 </aside>
 @endif
+@endauth
 
 <!-- Enhanced Main Content -->
 <main class="main-content {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
