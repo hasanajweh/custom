@@ -1255,6 +1255,8 @@
         </div>
     </div>
 </aside>
+@else
+<!-- No sidebar when no tenant context -->
 @endif
 
 <!-- Enhanced Main Content -->
