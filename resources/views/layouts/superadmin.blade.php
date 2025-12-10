@@ -275,7 +275,6 @@
     @yield('content')
 @endauth
 
-@include('layouts.partials.service-worker-cleanup')
 @stack('scripts')
 </body>
 </html>
