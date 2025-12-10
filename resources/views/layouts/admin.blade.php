@@ -49,6 +49,7 @@
     </div>
 </div>
 
+@include('layouts.partials.service-worker-cleanup')
 @stack('scripts')
 
 </body>

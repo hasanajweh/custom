@@ -220,6 +220,7 @@
 <!-- Livewire scripts -->
 @livewireScripts
 
+@include('layouts.partials.service-worker-cleanup')
 <!-- Scripts -->
 @stack('scripts')
 
