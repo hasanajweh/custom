@@ -982,6 +982,8 @@
     </div>
 </main>
 
+@endif
+
 <script>
 function switchLocale(locale) {
     fetch("{{ route('locale.update') }}", {
@@ -1321,8 +1323,6 @@ function switchLocale(locale) {
         }
     });
 </script>
-
-@endif
 
 @stack('scripts')
 
