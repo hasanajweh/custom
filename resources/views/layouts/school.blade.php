@@ -1011,7 +1011,7 @@
 
 </head>
 <body class="bg-white {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
-@auth
+@if(auth()->check())
 
 <!-- Enhanced Navigation -->
 <nav class="navbar fixed w-full top-0 z-50">
@@ -1639,7 +1639,7 @@ function switchLocale(locale) {
 @include('layouts.partials.service-worker-cleanup')
 @stack('scripts')
 
-@endauth
+@endif
 
 </body>
 </html>
