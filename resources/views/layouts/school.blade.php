@@ -1324,6 +1324,7 @@ function switchLocale(locale) {
     });
 </script>
 
+@include('layouts.partials.service-worker-cleanup')
 @stack('scripts')
 
 </body>
