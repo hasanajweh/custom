@@ -7,7 +7,9 @@
 
 
 # PWA - Service Worker must be served from root with correct MIME type
+    # Only process sw.js if file exists, otherwise let Laravel handle it
     RewriteCond %{REQUEST_URI} ^/sw\.js$ [NC]
+    RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^sw\.js$ sw.js [L,NC]
 
     # PWA - Manifest with correct MIME type

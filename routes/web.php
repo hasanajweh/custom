@@ -449,6 +449,21 @@ Route::prefix('{network:slug}/{branch:slug}/admin')
     });
 
 // ===========================
+// SERVICE WORKER (must be before tenant routes to avoid conflicts)
+// ===========================
+Route::get('/sw.js', function () {
+    $path = public_path('sw.js');
+    if (file_exists($path)) {
+        return response()->file($path, [
+            'Content-Type' => 'application/javascript',
+            'Service-Worker-Allowed' => '/',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+        ]);
+    }
+    abort(404);
+})->name('sw.js');
+
+// ===========================
 // ROOT REDIRECT
 // ===========================
 Route::get('/', [LandingController::class, 'index'])
