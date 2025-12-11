@@ -1426,14 +1426,12 @@
 
         @if($isMainAdmin)
             @include('layouts.partials.admin-sidebar')
-        @else
-            @if($hasTenantContext && $activeSidebarRole === 'admin')
-                @include('layouts.partials.admin-sidebar')
-            @elseif($hasTenantContext && $activeSidebarRole === 'teacher')
-                @include('layouts.partials.teacher-sidebar')
-            @elseif($hasTenantContext && $activeSidebarRole === 'supervisor')
-                @include('layouts.partials.supervisor-sidebar')
-            @endif
+        @elseif($hasTenantContext && $activeSidebarRole === 'admin')
+            @include('layouts.partials.admin-sidebar')
+        @elseif($hasTenantContext && $activeSidebarRole === 'teacher')
+            @include('layouts.partials.teacher-sidebar')
+        @elseif($hasTenantContext && $activeSidebarRole === 'supervisor')
+            @include('layouts.partials.supervisor-sidebar')
         @endif
 
         <div class="sidebar-footer">
