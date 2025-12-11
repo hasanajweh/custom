@@ -26,6 +26,14 @@ class UpdateNetworkUserRequest extends FormRequest
             'assignments.*.subjects.*' => ['exists:subjects,id'],
             'assignments.*.grades' => ['array'],
             'assignments.*.grades.*' => ['exists:grades,id'],
+            'assignments.*.teacher_subjects' => ['array'],
+            'assignments.*.teacher_subjects.*' => ['exists:subjects,id'],
+            'assignments.*.teacher_grades' => ['array'],
+            'assignments.*.teacher_grades.*' => ['exists:grades,id'],
+            'assignments.*.supervisor_subjects' => ['array'],
+            'assignments.*.supervisor_subjects.*' => ['exists:subjects,id'],
+            'assignments.*.supervisor_grades' => ['array'],
+            'assignments.*.supervisor_grades.*' => ['exists:grades,id'],
         ];
     }
 }

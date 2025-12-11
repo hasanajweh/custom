@@ -121,7 +121,7 @@ class UserController extends Controller
         });
 
         return redirect()->route('main-admin.users.create', ['network' => $network->slug])
-            ->with('status', __('User created successfully.'));
+            ->with('status', __('messages.main_admin.users.user_created'));
     }
 
     public function edit(Network $network, User $user): View
@@ -139,10 +139,17 @@ class UserController extends Controller
                 ->map(function ($roles) use ($user) {
                     $schoolId = $roles->first()->school_id;
 
+                    $subjects = $user->subjects->where('pivot.school_id', $schoolId)->pluck('id')->all();
+                    $grades = $user->grades->where('pivot.school_id', $schoolId)->pluck('id')->all();
+
                     return [
                         'roles' => $roles->pluck('role')->all(),
-                        'subjects' => $user->subjects->where('pivot.school_id', $schoolId)->pluck('id')->all(),
-                        'grades' => $user->grades->where('pivot.school_id', $schoolId)->pluck('id')->all(),
+                        'subjects' => $subjects,
+                        'grades' => $grades,
+                        'teacher_subjects' => $subjects,
+                        'teacher_grades' => $grades,
+                        'supervisor_subjects' => $subjects,
+                        'supervisor_grades' => $grades,
                     ];
                 })
                 ->toArray();
@@ -181,7 +188,7 @@ class UserController extends Controller
         $this->syncAssignments($user, $assignments, $network);
 
         return redirect()->route('main-admin.users.index', ['network' => $network->slug])
-            ->with('status', __('User updated successfully.'));
+            ->with('status', __('messages.main_admin.users.user_updated'));
     }
 
     public function destroy(Network $network, User $user): RedirectResponse
@@ -215,11 +222,32 @@ class UserController extends Controller
                 continue;
             }
 
+            $teacherSubjects = array_values(array_unique($assignment['teacher_subjects'] ?? []));
+            $teacherGrades = array_values(array_unique($assignment['teacher_grades'] ?? []));
+            $supervisorSubjects = array_values(array_unique($assignment['supervisor_subjects'] ?? []));
+            $supervisorGrades = array_values(array_unique($assignment['supervisor_grades'] ?? []));
+
+            $subjects = array_values(array_unique(array_merge(
+                $assignment['subjects'] ?? [],
+                $teacherSubjects,
+                $supervisorSubjects
+            )));
+
+            $grades = array_values(array_unique(array_merge(
+                $assignment['grades'] ?? [],
+                $teacherGrades,
+                $supervisorGrades
+            )));
+
             $normalized[$schoolId] = [
                 'school_id' => $schoolId,
                 'roles' => array_values(array_unique($assignment['roles'] ?? [])),
-                'subjects' => array_values(array_unique($assignment['subjects'] ?? [])),
-                'grades' => array_values(array_unique($assignment['grades'] ?? [])),
+                'subjects' => $subjects,
+                'grades' => $grades,
+                'teacher_subjects' => $teacherSubjects,
+                'teacher_grades' => $teacherGrades,
+                'supervisor_subjects' => $supervisorSubjects,
+                'supervisor_grades' => $supervisorGrades,
             ];
         }
 
@@ -300,6 +328,10 @@ class UserController extends Controller
             $assignments[$branchId]['roles'] = $assignments[$branchId]['roles'] ?? [];
             $assignments[$branchId]['subjects'] = $assignments[$branchId]['subjects'] ?? [];
             $assignments[$branchId]['grades'] = $assignments[$branchId]['grades'] ?? [];
+            $assignments[$branchId]['teacher_subjects'] = $assignments[$branchId]['teacher_subjects'] ?? $assignments[$branchId]['subjects'];
+            $assignments[$branchId]['teacher_grades'] = $assignments[$branchId]['teacher_grades'] ?? $assignments[$branchId]['grades'];
+            $assignments[$branchId]['supervisor_subjects'] = $assignments[$branchId]['supervisor_subjects'] ?? $assignments[$branchId]['subjects'];
+            $assignments[$branchId]['supervisor_grades'] = $assignments[$branchId]['supervisor_grades'] ?? $assignments[$branchId]['grades'];
         }
 
         return $assignments;

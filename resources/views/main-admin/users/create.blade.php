@@ -1,10 +1,10 @@
 @extends('layouts.network')
 
-@section('title', __('Create user'))
+@section('title', __('messages.main_admin.users.create_form_title'))
 
 @section('content')
 <div class="container mx-auto px-4 py-6 space-y-4">
-    <h1 class="text-2xl font-bold">@lang('Create new user')</h1>
+    <h1 class="text-2xl font-bold">{{ __('messages.main_admin.users.create_form_title') }}</h1>
 
     @if (session('status'))
         <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl text-sm">
