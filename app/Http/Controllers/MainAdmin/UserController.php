@@ -120,7 +120,7 @@ class UserController extends Controller
             }
         });
 
-        return redirect()->route('main-admin.users.create', ['network' => $network->slug])
+        return redirect()->route('main-admin.users.index', ['network' => $network->slug])
             ->with('status', __('messages.main_admin.users.user_created'));
     }
 
