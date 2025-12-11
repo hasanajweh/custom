@@ -5,10 +5,21 @@
         ?? request()->attributes->get('branch')
         ?? request()->attributes->get('school')
         ?? auth()->user()?->school;
+    
+    // Safely generate URLs with try-catch
+    try {
+        $dashboardUrl = $school ? tenant_route('teacher.dashboard', $school) : '#';
+        $filesIndexUrl = $school ? tenant_route('teacher.files.index', $school) : '#';
+        $filesCreateUrl = $school ? tenant_route('teacher.files.create', $school) : '#';
+    } catch (\Exception $e) {
+        $dashboardUrl = '#';
+        $filesIndexUrl = '#';
+        $filesCreateUrl = '#';
+    }
 @endphp
 
 <nav class="space-y-1">
-    <a href="{{ $school ? tenant_route('teacher.dashboard', $school) : '#' }}"
+    <a href="{{ $dashboardUrl }}"
        class="sidebar-item {{ request()->routeIs('teacher.dashboard') ? 'active' : '' }}">
         <i class="ri-dashboard-3-line"></i>
         <span class="sidebar-text">{{ __('messages.navigation.dashboard') }}</span>
@@ -21,13 +32,13 @@
         </div>
     </div>
 
-    <a href="{{ $school ? tenant_route('teacher.files.index', $school) : '#' }}"
+    <a href="{{ $filesIndexUrl }}"
        class="sidebar-item {{ request()->routeIs('teacher.files.index') || request()->routeIs('teacher.files.show') ? 'active' : '' }}">
         <i class="ri-file-list-3-line"></i>
         <span class="sidebar-text">{{ __('messages.navigation.my_files') }}</span>
     </a>
 
-    <a href="{{ $school ? tenant_route('teacher.files.create', $school) : '#' }}"
+    <a href="{{ $filesCreateUrl }}"
        class="sidebar-item {{ request()->routeIs('teacher.files.create') ? 'active' : '' }}">
         <i class="ri-upload-cloud-2-line"></i>
         <span class="sidebar-text">{{ __('messages.navigation.upload_file') }}</span>
