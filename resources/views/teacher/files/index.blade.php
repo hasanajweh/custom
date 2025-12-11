@@ -170,14 +170,18 @@
                                         </span>
                                     </td>
 
+                                    @php
+                                        $subjectLabel = localizedSubject($file->subject_name ?? '');
+                                        $gradeLabel = localizedGrade($file->grade_name ?? '');
+                                    @endphp
                                     <td class="px-6 py-6">
-                                        <div class="text-sm text-gray-900 font-semibold">{{ $file->subject_name ?? __('messages.subjects.not_specified') }}</div>
-                                        <div class="text-xs text-gray-500">{{ $file->grade_name ?? __('messages.grades.not_specified') }}</div>
+                                        <div class="text-sm text-gray-900 font-semibold">{{ $subjectLabel ?: __('messages.subjects.not_specified') }}</div>
+                                        <div class="text-xs text-gray-500">{{ $gradeLabel ?: __('messages.grades.not_specified') }}</div>
                                     </td>
 
                                     <td class="px-6 py-6">
-                                        <div class="text-sm text-gray-900 font-medium">{{ $file->created_at->format('M d, Y') }}</div>
-                                        <div class="text-xs text-gray-500">{{ $file->created_at->diffForHumans() }}</div>
+                                        <div class="text-sm text-gray-900 font-medium">{{ localizedDate($file->created_at) }}</div>
+                                        <div class="text-xs text-gray-500">{{ $file->created_at->locale(app()->getLocale())->diffForHumans() }}</div>
                                     </td>
 
                                     <td class="px-8 py-6">
@@ -211,7 +215,7 @@
 
                                             {{-- Print Button --}}
                                             @if($canPreview)
-                                                <button onclick="printFile('{{ tenant_route('teacher.files.preview', $school, ['fileSubmission' => $file->id]) }}', '{{ $file->title }}', '{{ Auth::user()->name }}', '{{ $file->created_at->format('M d, Y') }}')"
+                                                <button onclick="printFile('{{ tenant_route('teacher.files.preview', $school, ['fileSubmission' => $file->id]) }}', '{{ $file->title }}', '{{ Auth::user()->name }}', '{{ localizedDate($file->created_at) }}')"
                                                         class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
                                                         title="{{ __('messages.files.print_file') }}">
                                                     <i class="ri-printer-line text-lg"></i>
@@ -372,8 +376,8 @@
                                     </td>
 
                                     <td class="px-6 py-6">
-                                        <div class="text-sm text-gray-900 font-medium">{{ $plan->created_at->format('M d, Y') }}</div>
-                                        <div class="text-xs text-gray-500">{{ $plan->created_at->diffForHumans() }}</div>
+                                        <div class="text-sm text-gray-900 font-medium">{{ localizedDate($plan->created_at) }}</div>
+                                        <div class="text-xs text-gray-500">{{ $plan->created_at->locale(app()->getLocale())->diffForHumans() }}</div>
                                     </td>
 
                                     <td class="px-8 py-6">
@@ -407,7 +411,7 @@
 
                                             {{-- Print Button --}}
                                             @if($canPreview)
-                                                <button onclick="printFile('{{ tenant_route('teacher.files.preview', $school, ['fileSubmission' => $plan->id]) }}', '{{ $plan->title }}', '{{ Auth::user()->name }}', '{{ $plan->created_at->format('M d, Y') }}')"
+                                                <button onclick="printFile('{{ tenant_route('teacher.files.preview', $school, ['fileSubmission' => $plan->id]) }}', '{{ $plan->title }}', '{{ Auth::user()->name }}', '{{ localizedDate($plan->created_at) }}')"
                                                         class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
                                                         title="{{ __('messages.files.print_file') }}">
                                                     <i class="ri-printer-line text-lg"></i>

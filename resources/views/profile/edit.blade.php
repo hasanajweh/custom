@@ -16,7 +16,7 @@
                         <h3 class="mt-4 text-xl font-semibold text-gray-900">{{ Auth::user()->name }}</h3>
                         <p class="text-sm text-gray-500">{{ Auth::user()->email }}</p>
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mt-2">
-                            {{ ucfirst(Auth::user()->role) }}
+                            {{ __('messages.roles.' . Auth::user()->role) }}
                         </span>
                     </div>
 
@@ -24,17 +24,17 @@
                         <dl class="space-y-4">
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">{{ __('messages.profile.member_since') }}</dt>
-                                <dd class="mt-1 text-sm text-gray-900">{{ Auth::user()->created_at->format('M d, Y') }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900">{{ localizedDate(Auth::user()->created_at) }}</dd>
                             </div>
                             @if(Auth::user()->role === 'supervisor')
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500">{{ __('messages.users.subject') }}</dt>
-                                    <dd class="mt-1 text-sm text-gray-900">{{ Auth::user()->subject }}</dd>
+                                    <dd class="mt-1 text-sm text-gray-900">{{ localizedSubject(Auth::user()->subject) }}</dd>
                                 </div>
                             @elseif(Auth::user()->role === 'teacher' && Auth::user()->grade)
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500">{{ __('messages.users.grade') }}</dt>
-                                    <dd class="mt-1 text-sm text-gray-900">{{ Auth::user()->grade }}</dd>
+                                    <dd class="mt-1 text-sm text-gray-900">{{ localizedGrade(Auth::user()->grade) }}</dd>
                                 </div>
                             @endif
                         </dl>

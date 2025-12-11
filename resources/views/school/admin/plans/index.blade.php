@@ -215,8 +215,8 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-6">
-                                    <div class="text-sm text-gray-900">{{ $plan->created_at->format('M d, Y') }}</div>
-                                    <div class="text-xs text-gray-500">{{ $plan->created_at->format('l') }} • {{ $plan->created_at->format('g:i A') }}</div>
+                                    <div class="text-sm text-gray-900">{{ localizedDate($plan->created_at) }}</div>
+                                    <div class="text-xs text-gray-500">{{ $plan->created_at->locale(app()->getLocale())->translatedFormat('l • H:i') }}</div>
                                 </td>
                                 <td class="px-8 py-6">
                                     @php
@@ -255,7 +255,7 @@
 
                                         {{-- Print Button --}}
                                         @if($canPreview)
-                                            <button onclick="printFile('{{ tenant_route('school.admin.plans.preview', [$school, $plan]) }}', '{{ $plan->title }}', '{{ $plan->user->name }}', '{{ $plan->created_at->format('M d, Y') }}')"
+                                            <button onclick="printFile('{{ tenant_route('school.admin.plans.preview', [$school, $plan]) }}', '{{ $plan->title }}', '{{ $plan->user->name }}', '{{ localizedDate($plan->created_at) }}')"
                                                     class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
                                                     title="{{ __('messages.files.print_file') }}">
                                                 <i class="ri-printer-line text-lg"></i>

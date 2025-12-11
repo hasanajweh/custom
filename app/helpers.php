@@ -5,6 +5,7 @@ use App\Models\Network;
 use App\Models\School;
 use App\Services\ActiveContext;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 /**
  * Helper functions for the Scholder application
@@ -758,5 +759,37 @@ if (!function_exists('getFlexClass')) {
         ];
 
         return $rtlMap[$class] ?? $class;
+    }
+}
+
+if (!function_exists('localizedMappedValue')) {
+    /**
+     * Map common dynamic labels like subjects/grades to localized equivalents.
+     */
+    function localizedMappedValue(?string $value, string $type): string
+    {
+        if (!$value) {
+            return '';
+        }
+
+        $key = Str::slug(trim($value), '_');
+        $translationKey = "messages.dynamic_labels.$type.$key";
+        $translated = __($translationKey);
+
+        return $translated !== $translationKey ? $translated : $value;
+    }
+}
+
+if (!function_exists('localizedSubject')) {
+    function localizedSubject(?string $value): string
+    {
+        return localizedMappedValue($value, 'subjects');
+    }
+}
+
+if (!function_exists('localizedGrade')) {
+    function localizedGrade(?string $value): string
+    {
+        return localizedMappedValue($value, 'grades');
     }
 }

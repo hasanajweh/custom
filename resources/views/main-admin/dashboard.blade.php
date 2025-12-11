@@ -13,7 +13,7 @@
             </div>
             <div class="mt-4 md:mt-0 {{ app()->getLocale() === 'ar' ? 'text-left' : 'text-right' }}">
                 <p class="text-sm text-indigo-100">{{ __('messages.dashboard.current_time') }}</p>
-                <p class="text-2xl font-semibold">{{ now('Asia/Gaza')->format('h:i A') }}</p>
+                <p class="text-2xl font-semibold">{{ now('Asia/Gaza')->locale(app()->getLocale())->translatedFormat('H:i') }}</p>
             </div>
         </div>
     </div>

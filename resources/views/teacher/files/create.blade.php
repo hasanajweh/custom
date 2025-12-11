@@ -151,7 +151,7 @@
                         <label for="file" id="dropZone" class="flex justify-center items-center w-full h-28 sm:h-32 px-4 sm:px-6 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
                             <div id="uploadPrompt" class="text-center text-sm sm:text-base">
                                 <svg class="mx-auto h-8 w-8 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                                <p class="mt-1 text-gray-600"><span class="font-semibold text-blue-600">{{ __('messages.files.click_to_upload') }}</span> or drag & drop</p>
+                                <p class="mt-1 text-gray-600"><span class="font-semibold text-blue-600">{{ __('messages.files.click_to_upload') }}</span> {{ __('messages.files.drag_drop') }}</p>
                                 <p class="text-xs text-gray-500 mt-1">{{ __('messages.files.unlimited_size') }}</p>
                             </div>
                             <div id="fileInfo" class="hidden text-center text-sm sm:text-base">
@@ -310,7 +310,7 @@
                 // Check file is selected
                 const fileInput = document.getElementById('file');
                 if (!fileInput.files || fileInput.files.length === 0) {
-                    alert('Please select a file to upload');
+                    alert(@js(__('messages.files.select_file_prompt')));
                     return false;
                 }
 

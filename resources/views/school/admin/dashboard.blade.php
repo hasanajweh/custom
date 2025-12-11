@@ -186,7 +186,7 @@
                             @foreach([10, 20, 30, 40, 50, 100] as $size)
                                 {{-- ✅ FIXED SYNTAX ERROR HERE --}}
                                 <option value="{{ $size }}" @selected($perPage == $size)>
-                                    {{ $size }} per page
+                                    {{ __('messages.tables.per_page', ['count' => localizedNumber($size)]) }}
                                 </option>
                             @endforeach
                         </select>
@@ -253,12 +253,12 @@
                                 <div class="text-xs text-gray-500">{{ __('messages.users.teacher') }}</div>
                             </td>
                             <td class="px-6 py-6">
-                                <div class="text-sm text-gray-900 font-semibold">{{ $file->subject_name ?? __('messages.subjects.not_specified') }}</div>
-                                <div class="text-xs text-gray-500">{{ $file->grade_name ?? __('messages.grades.not_specified') }}</div>
+                                <div class="text-sm text-gray-900 font-semibold">{{ localizedSubject($file->subject_name ?? '') ?: __('messages.subjects.not_specified') }}</div>
+                                <div class="text-xs text-gray-500">{{ localizedGrade($file->grade_name ?? '') ?: __('messages.grades.not_specified') }}</div>
                             </td>
                             <td class="px-6 py-6">
-                                <div class="text-sm text-gray-900 font-medium">{{ $file->created_at->format('M d, Y') }}</div>
-                                <div class="text-xs text-gray-500">{{ $file->created_at->diffForHumans() }}</div>
+                                <div class="text-sm text-gray-900 font-medium">{{ localizedDate($file->created_at) }}</div>
+                                <div class="text-xs text-gray-500">{{ $file->created_at->locale(app()->getLocale())->diffForHumans() }}</div>
                             </td>
                             <td class="px-8 py-6 no-print">
                                 <div class="flex items-center justify-center space-x-2">

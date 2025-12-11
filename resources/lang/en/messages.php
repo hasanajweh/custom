@@ -502,6 +502,7 @@ return [
         'grade_level' => 'Grade Level',
         'click_to_upload' => 'Click to upload',
         'drag_drop' => 'or drag and drop',
+        'tagged_with' => 'Your file will be tagged with',
         'max_size' => 'Max :size',
         'unlimited_size' => 'Unlimited file size',
         'remove_file' => 'Remove file',
@@ -591,6 +592,7 @@ return [
         'title' => 'Subjects',
         'total_subjects' => 'subject|subjects',
         'current_subjects' => 'Current Subjects',
+        'all_subjects' => 'All Subjects',
         'add_new_subject' => 'Add New Subject',
         'create_subjects_for_grades' => 'Create subjects for your grades',
         'subject_name' => 'Subject Name',
@@ -638,6 +640,7 @@ return [
         'edit_grade' => 'Edit Grade',
         'grade_name' => 'Grade Name',
         'grade_level' => 'Grade Level',
+        'all_grades' => 'All Grades',
         'created' => 'Created',
         'current_grades' => 'Current Grades',
         'create_grade_levels' => 'Create grade levels for your school',
@@ -1368,6 +1371,19 @@ return [
             'assigned_branches' => 'Assign to branches',
             'select_all' => 'Select All',
             'deselect_all' => 'Deselect All',
+        ],
+    ],
+
+    'dynamic_labels' => [
+        'subjects' => [
+            'math' => 'Math',
+            'science' => 'Science',
+            'english' => 'English',
+        ],
+        'grades' => [
+            'grade_1' => 'Grade 1',
+            'grade_2' => 'Grade 2',
+            'grade_3' => 'Grade 3',
         ],
     ],
 

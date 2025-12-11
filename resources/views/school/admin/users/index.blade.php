@@ -147,7 +147,7 @@
                                                 @if($user->email_verified_at)
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
                                                             <i class="ri-checkbox-circle-fill {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>
-                                                            Verified
+                                                            {{ __('messages.status.verified') }}
                                                         </span>
                                                 @endif
                                             </div>
@@ -195,8 +195,8 @@
 
                                 <td class="px-6 py-6">
                                     @if($user->last_login_at)
-                                        <div class="text-sm text-gray-900 font-medium">{{ $user->last_login_at->format('M d, Y') }}</div>
-                                        <div class="text-xs text-gray-500">{{ $user->last_login_at->diffForHumans() }}</div>
+                                        <div class="text-sm text-gray-900 font-medium">{{ localizedDate($user->last_login_at) }}</div>
+                                        <div class="text-xs text-gray-500">{{ $user->last_login_at->locale(app()->getLocale())->diffForHumans() }}</div>
                                     @else
                                         <span class="text-sm text-gray-400">{{ __('messages.users.never') }}</span>
                                     @endif

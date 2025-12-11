@@ -314,7 +314,7 @@
                                 </svg>
                             </div>
                             <div class="ml-3">
-                                <p class="text-sm font-semibold text-blue-900 mb-1">Your file will be tagged with:</p>
+                                <p class="text-sm font-semibold text-blue-900 mb-1">{{ __('messages.files.tagged_with') }}:</p>
                                 <ul class="text-sm text-blue-800 space-y-1">
                                     <li class="flex items-center">
                                         <svg class="w-4 h-4 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">

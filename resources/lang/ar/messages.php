@@ -539,6 +539,7 @@ return [
         'grade_level' => 'مستوى الصف',
         'click_to_upload' => 'انقر للرفع',
         'drag_drop' => 'أو اسحب وأفلت',
+        'tagged_with' => 'سيتم وسم ملفك بـ',
         'max_size' => 'الحد الأقصى :size',
         'unlimited_size' => 'حجم ملف غير محدود',
         'remove_file' => 'إزالة الملف',
@@ -631,6 +632,7 @@ return [
         'title' => 'المواد',
         'total_subjects' => 'مادة|مواد',
         'current_subjects' => 'المواد الحالية',
+        'all_subjects' => 'جميع المواد',
         'add_new_subject' => 'إضافة مادة جديدة',
         'create_subjects_for_grades' => 'أنشئ مواد لصفوفك',
         'subject_name' => 'اسم المادة',
@@ -678,6 +680,7 @@ return [
         'edit_grade' => 'تعديل الصف',
         'grade_name' => 'اسم الصف',
         'grade_level' => 'مستوى الصف',
+        'all_grades' => 'جميع الصفوف',
         'created' => 'تاريخ الإنشاء',
         'current_grades' => 'الصفوف الحالية',
         'create_grade_levels' => 'إنشاء مستويات الصفوف لمدرستك',
@@ -1365,6 +1368,19 @@ return [
             'assigned_branches' => 'الفروع المعيّنة',
             'select_all' => 'تحديد الكل',
             'deselect_all' => 'إلغاء تحديد الكل',
+        ],
+    ],
+
+    'dynamic_labels' => [
+        'subjects' => [
+            'math' => 'الرياضيات',
+            'science' => 'العلوم',
+            'english' => 'اللغة الإنجليزية',
+        ],
+        'grades' => [
+            'grade_1' => 'الصف الأول',
+            'grade_2' => 'الصف الثاني',
+            'grade_3' => 'الصف الثالث',
         ],
     ],
 

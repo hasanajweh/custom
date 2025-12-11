@@ -1151,11 +1151,11 @@
 <!-- Chrome/Edge/Brave/Opera Install Banner -->
 <div id="pwaInstallBanner" class="pwa-install-banner">
     <div>
-        <div class="font-bold mb-1">Install {{ $schoolName }}</div>
-        <div class="text-sm opacity-90">Quick access from your home screen or desktop</div>
+        <div class="font-bold mb-1">{{ __('messages.pwa.install_title', ['name' => $schoolName]) }}</div>
+        <div class="text-sm opacity-90">{{ __('messages.pwa.install_description') }}</div>
     </div>
     <button id="pwaInstallBtn" class="pwa-install-btn">
-        <i class="ri-download-line mr-2"></i>Install App
+        <i class="ri-download-line mr-2"></i>{{ __('messages.pwa.install_app') }}
     </button>
     <button onclick="dismissInstallBanner()" class="text-white opacity-75 hover:opacity-100">
         <i class="ri-close-line text-xl"></i>
@@ -1168,12 +1168,12 @@
         <div class="ios-share-icon">
             <i class="ri-share-box-line"></i>
         </div>
-        <div class="font-bold text-lg mb-2">Install {{ $schoolName }}</div>
+        <div class="font-bold text-lg mb-2">{{ __('messages.pwa.install_title', ['name' => $schoolName]) }}</div>
         <div class="text-sm opacity-90 mb-3">
-            Tap <strong>Share</strong> <i class="ri-share-box-line mx-1"></i> then <strong>"Add to Home Screen"</strong>
+            {{ __('messages.pwa.tap_share_button') }} <i class="ri-share-box-line mx-1"></i> {{ __('messages.pwa.scroll_add_home') }}
         </div>
         <button onclick="dismissIOSBanner()" class="px-6 py-2 bg-white/20 rounded-lg text-white font-semibold">
-            Got it!
+            {{ __('messages.pwa.got_it') }}
         </button>
     </div>
 </div>
@@ -1181,7 +1181,7 @@
 <!-- Offline Indicator -->
 <div id="offlineIndicator" class="pwa-offline-indicator">
     <i class="ri-wifi-off-line text-xl"></i>
-    <span>You're offline</span>
+    <span>{{ __('messages.pwa.offline') }}</span>
 </div>
 
 <!-- Enhanced Navigation -->

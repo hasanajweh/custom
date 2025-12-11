@@ -127,10 +127,10 @@
                                             {{ $file->created_at->diffForHumans() }}
                                             @if(!in_array($file->submission_type, ['daily_plan', 'weekly_plan', 'monthly_plan']))
                                                 @if($file->subject || $file->grade)
-                                                    • {{ $file->subject?->name }} {{ $file->grade?->name }}
+                                                    • {{ localizedSubject($file->subject?->name) }} {{ localizedGrade($file->grade?->name) }}
                                                 @endif
                                             @else
-                                                • {{ ucfirst(str_replace('_', ' ', $file->submission_type)) }}
+                                                • {{ __('messages.files.submission_types.' . $file->submission_type) }}
                                             @endif
                                         </p>
                                     </div>

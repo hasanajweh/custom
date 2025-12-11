@@ -14,7 +14,7 @@
                 </div>
                 <div class="mt-4 md:mt-0 text-right">
                     <p class="text-sm text-green-100">{{ __('messages.dashboard.current_time') }}</p>
-                    <p class="text-2xl font-semibold">{{ now('Asia/Gaza')->format('h:i A') }}</p>
+                    <p class="text-2xl font-semibold">{{ now('Asia/Gaza')->locale(app()->getLocale())->translatedFormat('H:i') }}</p>
 
                 </div>
             </div>
@@ -226,7 +226,7 @@
                                     <div class="flex-1 min-w-0">
                                         <p class="text-sm font-medium text-gray-900 truncate">{{ $file->title }}</p>
                                         <p class="text-xs text-gray-500">
-                                            {{ __('messages.labels.by') }} {{ $teacherName }} • {{ $file->created_at->diffForHumans() }}
+                                            {{ __('messages.labels.by') }} {{ $teacherName }} • {{ $file->created_at->locale(app()->getLocale())->diffForHumans() }}
                                         </p>
                                     </div>
                                 </div>

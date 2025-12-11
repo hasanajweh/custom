@@ -235,6 +235,8 @@
                             $typeInfo = $file->type_info ?? ['label' => 'File', 'classes' => 'bg-gray-100 text-gray-800', 'icon' => 'ri-file-line'];
                             $subjectName = $file->subject_name ?? 'Not specified';
                             $gradeName = $file->grade_name ?? 'Not specified';
+                            $subjectLabel = localizedSubject($subjectName);
+                            $gradeLabel = localizedGrade($gradeName);
                             $formattedSize = $file->formatted_file_size ?? '0 B';
                         @endphp
                         <tr class="hover:bg-gray-50 transition-colors">
@@ -268,15 +270,15 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-medium">
-                                {{ $subjectName }}
+                                {{ $subjectLabel }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-medium">
-                                {{ $gradeName }}
+                                {{ $gradeLabel }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">
-                                    <div class="font-semibold">{{ $file->created_at->format('M d, Y') }}</div>
-                                    <div class="text-xs text-gray-500">{{ $file->created_at->format('h:i A') }}</div>
+                                    <div class="font-semibold">{{ localizedDate($file->created_at) }}</div>
+                                    <div class="text-xs text-gray-500">{{ $file->created_at->locale(app()->getLocale())->translatedFormat('H:i') }}</div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -310,7 +312,7 @@
 
                                     {{-- Print Button --}}
                                     @if($canPreview)
-                                        <button onclick="printFile('{{ tenant_route('supervisor.reviews.preview', $school, ['fileSubmission' => $file->id]) }}', '{{ $file->title }}', '{{ $teacherName }}', '{{ $file->created_at->format('M d, Y') }}')"
+                                        <button onclick="printFile('{{ tenant_route('supervisor.reviews.preview', $school, ['fileSubmission' => $file->id]) }}', '{{ $file->title }}', '{{ $teacherName }}', '{{ localizedDate($file->created_at) }}')"
                                                 class="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-all duration-150"
                                                 title="{{ __('messages.files.print_file') }}">
                                             <i class="ri-printer-line text-lg"></i>
