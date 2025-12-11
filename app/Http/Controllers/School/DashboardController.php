@@ -32,7 +32,16 @@ class DashboardController extends Controller
                 abort(403, 'School does not belong to your network.');
             }
             // Main admin can proceed - no school_id check needed
-        } elseif ($user && $user->school_id !== $branch->id) {
+        } elseif ($user) {
+            // Allow access if the user has any role assignment for this branch
+            $hasBranchRole = $user->schoolRoles()
+                ->where('school_id', $branch->id)
+                ->exists();
+
+            if (!$hasBranchRole && $user->school_id !== $branch->id) {
+                abort(403);
+            }
+        } else {
             abort(403);
         }
 
