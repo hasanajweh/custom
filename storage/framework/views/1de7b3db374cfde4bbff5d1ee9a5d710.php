@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" class="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
+<html lang="<?php echo e(app()->getLocale()); ?>" dir="<?php echo e(app()->getLocale() === 'ar' ? 'rtl' : 'ltr'); ?>" class="<?php echo e(app()->getLocale() === 'ar' ? 'rtl' : 'ltr'); ?>">
 <head>
-    @php
+    <?php
         $activeContextSchool = \App\Services\ActiveContext::getSchool();
         $activeContextRole = \App\Services\ActiveContext::getRole();
 
@@ -24,10 +24,10 @@
         $networkSlug = $network?->slug ?? $school?->network?->slug ?? (auth()->check() ? auth()->user()?->network?->slug : '');
         $isMainAdmin = $isMainAdmin ?? (bool) (auth()->check() ? auth()->user()?->is_main_admin : false);
         $hasTenantContext = $school && $school->network;
-    @endphp
+    ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 
     <!-- ============================================ -->
     <!-- UNIVERSAL PWA META TAGS - ALL PLATFORMS -->
@@ -35,12 +35,12 @@
 
     <!-- Core PWA -->
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="{{ $schoolName }}">
+    <meta name="application-name" content="<?php echo e($schoolName); ?>">
 
     <!-- iOS Safari - CRITICAL FOR iOS PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="{{ $schoolName }}">
+    <meta name="apple-mobile-web-app-title" content="<?php echo e($schoolName); ?>">
     <meta name="apple-touch-fullscreen" content="yes">
 
     <!-- iOS Splash Screens - iPhone (Most Common Models) -->
@@ -69,10 +69,10 @@
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1E40AF">
 
     <!-- Description & Keywords -->
-    <meta name="description" content="Educational platform for {{ $schoolName }} - Manage files, assignments, and resources">
-    <meta name="keywords" content="education, {{ $schoolName }}, learning, teaching, resources">
+    <meta name="description" content="Educational platform for <?php echo e($schoolName); ?> - Manage files, assignments, and resources">
+    <meta name="keywords" content="education, <?php echo e($schoolName); ?>, learning, teaching, resources">
 
-    <title>@yield('title', $schoolName . ' - ' . __('messages.app.name'))</title>
+    <title><?php echo $__env->yieldContent('title', $schoolName . ' - ' . __('messages.app.name')); ?></title>
 
     <!-- ============================================ -->
     <!-- ICONS - ALL PLATFORMS & SIZES -->
@@ -103,28 +103,28 @@
     <link rel="icon" type="image/png" sizes="512x512" href="/Scholder-512.png">
 
     <!-- Web App Manifest - UNIVERSAL -->
-    <link rel="manifest" href="{{ url('/manifest.json') }}">
+    <link rel="manifest" href="<?php echo e(url('/manifest.json')); ?>">
 
     <!-- Enhanced Font Loading with Language Support -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    @if(app()->getLocale() === 'ar')
+    <?php if(app()->getLocale() === 'ar'): ?>
         <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    @else
+    <?php else: ?>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    @endif
+    <?php endif; ?>
 
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 
 
-    @if(app()->getLocale() === 'ar')
+    <?php if(app()->getLocale() === 'ar'): ?>
         <link rel="stylesheet" href="/css/rtl.css">
-    @endif
+    <?php endif; ?>
 
 
     <style>
@@ -1143,15 +1143,15 @@
         }
     
 </style>
-    @stack('styles')
+    <?php echo $__env->yieldPushContent('styles'); ?>
 
 </head>
-<body class="bg-white {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
+<body class="bg-white <?php echo e(app()->getLocale() === 'ar' ? 'rtl' : ''); ?>">
 
 <!-- Chrome/Edge/Brave/Opera Install Banner -->
 <div id="pwaInstallBanner" class="pwa-install-banner">
     <div>
-        <div class="font-bold mb-1">Install {{ $schoolName }}</div>
+        <div class="font-bold mb-1">Install <?php echo e($schoolName); ?></div>
         <div class="text-sm opacity-90">Quick access from your home screen or desktop</div>
     </div>
     <button id="pwaInstallBtn" class="pwa-install-btn">
@@ -1168,7 +1168,7 @@
         <div class="ios-share-icon">
             <i class="ri-share-box-line"></i>
         </div>
-        <div class="font-bold text-lg mb-2">Install {{ $schoolName }}</div>
+        <div class="font-bold text-lg mb-2">Install <?php echo e($schoolName); ?></div>
         <div class="text-sm opacity-90 mb-3">
             Tap <strong>Share</strong> <i class="ri-share-box-line mx-1"></i> then <strong>"Add to Home Screen"</strong>
         </div>
@@ -1192,22 +1192,22 @@
                 <!-- Sidebar Toggle -->
                 <button onclick="toggleSidebar()"
                         class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
-                        aria-label="{{ __('messages.navigation.open_sidebar') }}">
+                        aria-label="<?php echo e(__('messages.navigation.open_sidebar')); ?>">
                     <i class="ri-menu-line text-xl"></i>
                 </button>
 
                 <!-- Enhanced Logo -->
-                <div class="logo-container {{ app()->getLocale() === 'ar' ? 'mr-4' : 'ml-4' }}">
-                    <img src="/WayUp.png" alt="{{ __('messages.app.name') }}" class="logo-img">
+                <div class="logo-container <?php echo e(app()->getLocale() === 'ar' ? 'mr-4' : 'ml-4'); ?>">
+                    <img src="/WayUp.png" alt="<?php echo e(__('messages.app.name')); ?>" class="logo-img">
                     <div class="brand-text">
-                        <h1 class="brand-name font-heading">{{ __('messages.app.name') }}</h1>
-                        <span class="school-name">{{ $schoolName }}</span>
+                        <h1 class="brand-name font-heading"><?php echo e(__('messages.app.name')); ?></h1>
+                        <span class="school-name"><?php echo e($schoolName); ?></span>
                     </div>
                 </div>
             </div>
 
             <!-- Right Navigation -->
-            <div class="flex items-center space-x-4 {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}">
+            <div class="flex items-center space-x-4 <?php echo e(app()->getLocale() === 'ar' ? 'space-x-reverse' : ''); ?>">
                 <!-- Beautiful Language Switcher -->
                 <div class="relative" x-data="{ open: false }">
                     <button 
@@ -1216,9 +1216,10 @@
                         type="button"
                         class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 border border-indigo-100 transition-all duration-200 group"
                     >
-                        <span class="text-lg">{{ app()->getLocale() === 'ar' ? '🇸🇦' : '🇬🇧' }}</span>
+                        <span class="text-lg"><?php echo e(app()->getLocale() === 'ar' ? '🇸🇦' : '🇬🇧'); ?></span>
                         <span class="text-sm font-medium text-gray-700 group-hover:text-indigo-700">
-                            {{ app()->getLocale() === 'ar' ? 'العربية' : 'English' }}
+                            <?php echo e(app()->getLocale() === 'ar' ? 'العربية' : 'English'); ?>
+
                         </span>
                         <i class="ri-arrow-down-s-line text-gray-400 group-hover:text-indigo-500 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
                     </button>
@@ -1231,28 +1232,28 @@
                         x-transition:leave="transition ease-in duration-150"
                         x-transition:leave-start="opacity-100 scale-100"
                         x-transition:leave-end="opacity-0 scale-95"
-                        class="absolute {{ app()->getLocale() === 'ar' ? 'left-0' : 'right-0' }} mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50"
+                        class="absolute <?php echo e(app()->getLocale() === 'ar' ? 'left-0' : 'right-0'); ?> mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50"
                         style="display: none;"
                     >
                         <button
                             onclick="switchLocale('ar')"
-                            class="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-colors {{ app()->getLocale() === 'ar' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700' }}"
+                            class="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-colors <?php echo e(app()->getLocale() === 'ar' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700'); ?>"
                         >
                             <span class="text-xl">🇸🇦</span>
                             <span>العربية</span>
-                            @if(app()->getLocale() === 'ar')
-                                <i class="ri-check-line {{ app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto' }} text-indigo-600"></i>
-                            @endif
+                            <?php if(app()->getLocale() === 'ar'): ?>
+                                <i class="ri-check-line <?php echo e(app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto'); ?> text-indigo-600"></i>
+                            <?php endif; ?>
                         </button>
                         <button
                             onclick="switchLocale('en')"
-                            class="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-colors {{ app()->getLocale() === 'en' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700' }}"
+                            class="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-colors <?php echo e(app()->getLocale() === 'en' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700'); ?>"
                         >
                             <span class="text-xl">🇬🇧</span>
                             <span>English</span>
-                            @if(app()->getLocale() === 'en')
-                                <i class="ri-check-line {{ app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto' }} text-indigo-600"></i>
-                            @endif
+                            <?php if(app()->getLocale() === 'en'): ?>
+                                <i class="ri-check-line <?php echo e(app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto'); ?> text-indigo-600"></i>
+                            <?php endif; ?>
                         </button>
                     </div>
                 </div>
@@ -1260,9 +1261,9 @@
                 <!-- Enhanced User Dropdown -->
                 <div class="relative">
                     <button onclick="toggleUserMenu(event)"
-                            class="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}"
-                            aria-label="{{ __('messages.navigation.open_user_menu') }}">
-                        @php
+                            class="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg <?php echo e(app()->getLocale() === 'ar' ? 'space-x-reverse' : ''); ?>"
+                            aria-label="<?php echo e(__('messages.navigation.open_user_menu')); ?>">
+                        <?php
                             $role = strtolower($currentRole ?? '');
                             $bgColors = [
                                 'teacher' => 'bg-blue-600',
@@ -1270,61 +1271,65 @@
                                 'admin' => 'bg-gray-700',
                             ];
                             $bgColor = $bgColors[$role] ?? 'bg-blue-600';
-                        @endphp
+                        ?>
 
-                        <div class="w-9 h-9 rounded-lg {{ $bgColor }} text-white flex items-center justify-center font-bold text-sm">
-                            @if($role === 'admin')
-                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                            @elseif($role === 'teacher')
+                        <div class="w-9 h-9 rounded-lg <?php echo e($bgColor); ?> text-white flex items-center justify-center font-bold text-sm">
+                            <?php if($role === 'admin'): ?>
+                                <?php echo e(strtoupper(substr(Auth::user()->name, 0, 1))); ?>
+
+                            <?php elseif($role === 'teacher'): ?>
                                 <i class="ri-user-line text-lg"></i>
-                            @elseif($role === 'supervisor')
+                            <?php elseif($role === 'supervisor'): ?>
                                 <i class="ri-user-star-line text-lg"></i>
-                            @else
-                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                            @endif
+                            <?php else: ?>
+                                <?php echo e(strtoupper(substr(Auth::user()->name, 0, 1))); ?>
+
+                            <?php endif; ?>
                         </div>
 
-                        <div class="hidden sm:block text-left {{ app()->getLocale() === 'ar' ? 'text-right' : '' }}">
-                            <p class="text-sm font-bold text-gray-700">{{ Auth::user()->name }}</p>
-                            <p class="text-xs text-gray-500 font-medium">{{ __('messages.roles.' . $role) }}</p>
+                        <div class="hidden sm:block text-left <?php echo e(app()->getLocale() === 'ar' ? 'text-right' : ''); ?>">
+                            <p class="text-sm font-bold text-gray-700"><?php echo e(Auth::user()->name); ?></p>
+                            <p class="text-xs text-gray-500 font-medium"><?php echo e(__('messages.roles.' . $role)); ?></p>
                         </div>
                         <i class="ri-arrow-down-s-line text-gray-400"></i>
                     </button>
 
-                    <div id="userMenuDropdown" class="absolute {{ app()->getLocale() === 'ar' ? 'left-0' : 'right-0' }} mt-2 w-64 dropdown-menu" style="display: none;">
+                    <div id="userMenuDropdown" class="absolute <?php echo e(app()->getLocale() === 'ar' ? 'left-0' : 'right-0'); ?> mt-2 w-64 dropdown-menu" style="display: none;">
                         <!-- User Info Header -->
                         <div class="p-4 bg-gray-50 border-b border-gray-100">
-                            <div class="flex items-center space-x-3 {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}">
-                                <div class="w-12 h-12 rounded-lg {{ $bgColor }} text-white flex items-center justify-center font-bold">
-                                    @if($role === 'admin')
-                                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                    @elseif($role === 'teacher')
+                            <div class="flex items-center space-x-3 <?php echo e(app()->getLocale() === 'ar' ? 'space-x-reverse' : ''); ?>">
+                                <div class="w-12 h-12 rounded-lg <?php echo e($bgColor); ?> text-white flex items-center justify-center font-bold">
+                                    <?php if($role === 'admin'): ?>
+                                        <?php echo e(strtoupper(substr(Auth::user()->name, 0, 1))); ?>
+
+                                    <?php elseif($role === 'teacher'): ?>
                                         <i class="ri-user-line text-xl"></i>
-                                    @elseif($role === 'supervisor')
+                                    <?php elseif($role === 'supervisor'): ?>
                                         <i class="ri-user-star-line text-xl"></i>
-                                    @else
-                                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                    @endif
+                                    <?php else: ?>
+                                        <?php echo e(strtoupper(substr(Auth::user()->name, 0, 1))); ?>
+
+                                    <?php endif; ?>
                                 </div>
 
                                 <div class="flex-1 min-w-0">
-                                    <p class="font-bold text-gray-900">{{ Auth::user()->name }}</p>
-                                    <p class="text-sm text-gray-600 font-semibold">{{ __('messages.roles.' . $role) }}</p>
-                                    <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
+                                    <p class="font-bold text-gray-900"><?php echo e(Auth::user()->name); ?></p>
+                                    <p class="text-sm text-gray-600 font-semibold"><?php echo e(__('messages.roles.' . $role)); ?></p>
+                                    <p class="text-xs text-gray-500"><?php echo e(Auth::user()->email); ?></p>
                                 </div>
                             </div>
                         </div>
 
-                        @if(isset($availableContexts) && $availableContexts->count() > 1)
+                        <?php if(isset($availableContexts) && $availableContexts->count() > 1): ?>
                         <div class="border-t border-gray-100 my-2"></div>
                         <div class="px-3 py-2">
                             <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                                 <i class="ri-swap-line"></i>
-                                @lang('messages.switch_context')
+                                <?php echo app('translator')->get('messages.switch_context'); ?>
                             </label>
                             <div class="space-y-1">
-                                @foreach($availableContexts as $schoolCtx)
-                                    @php
+                                <?php $__currentLoopData = $availableContexts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $schoolCtx): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php
                                         $isCurrent = session('active_school_id') == $schoolCtx->school->id && session('active_role') == $schoolCtx->role;
                                         $roleColors = [
                                             'admin' => 'bg-purple-100 text-purple-700',
@@ -1332,40 +1337,42 @@
                                             'supervisor' => 'bg-green-100 text-green-700',
                                         ];
                                         $roleColor = $roleColors[$schoolCtx->role] ?? 'bg-gray-100 text-gray-700';
-                                    @endphp
+                                    ?>
                                     <form method="POST"
-                                          action="{{ route('switch-context') }}"
+                                          action="<?php echo e(route('switch-context')); ?>"
                                           class="w-full"
                                           onsubmit="return true;">
-                                        @csrf
-                                        <input type="hidden" name="school_id" value="{{ $schoolCtx->school->id }}">
-                                        <input type="hidden" name="role" value="{{ $schoolCtx->role }}">
+                                        <?php echo csrf_field(); ?>
+                                        <input type="hidden" name="school_id" value="<?php echo e($schoolCtx->school->id); ?>">
+                                        <input type="hidden" name="role" value="<?php echo e($schoolCtx->role); ?>">
 
                                         <button type="submit"
-                                                class="flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm transition-all duration-150 {{ $isCurrent ? 'bg-primary/10 border border-primary/30' : 'hover:bg-gray-50' }}">
+                                                class="flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm transition-all duration-150 <?php echo e($isCurrent ? 'bg-primary/10 border border-primary/30' : 'hover:bg-gray-50'); ?>">
                                             <div class="flex items-center gap-2 min-w-0">
-                                                @if($isCurrent)
+                                                <?php if($isCurrent): ?>
                                                     <i class="ri-checkbox-circle-fill text-green-500 flex-shrink-0"></i>
-                                                @else
+                                                <?php else: ?>
                                                     <i class="ri-circle-line text-gray-300 flex-shrink-0"></i>
-                                                @endif
-                                                <span class="truncate font-medium {{ $isCurrent ? 'text-primary' : 'text-gray-700' }}">
-                                                    {{ $schoolCtx->school->name }}
+                                                <?php endif; ?>
+                                                <span class="truncate font-medium <?php echo e($isCurrent ? 'text-primary' : 'text-gray-700'); ?>">
+                                                    <?php echo e($schoolCtx->school->name); ?>
+
                                                 </span>
                                             </div>
-                                            <span class="flex-shrink-0 px-2 py-0.5 text-xs font-medium rounded-full {{ $roleColor }}">
-                                                {{ __('messages.roles.' . $schoolCtx->role) }}
+                                            <span class="flex-shrink-0 px-2 py-0.5 text-xs font-medium rounded-full <?php echo e($roleColor); ?>">
+                                                <?php echo e(__('messages.roles.' . $schoolCtx->role)); ?>
+
                                             </span>
                                         </button>
                                     </form>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </div>
-                        @endif
+                        <?php endif; ?>
 
                         <!-- Menu Items -->
                         <div class="py-1">
-                            @php
+                            <?php
                                 $networkSlug = auth()->user()?->network?->slug;
                                 if ($isMainAdmin) {
                                     $profileUrl = $networkSlug ? route('main-admin.dashboard', ['network' => $networkSlug]) : '#';
@@ -1379,35 +1386,35 @@
                                         $logoutUrl = '#';
                                     }
                                 }
-                            @endphp
-                            <a href="{{ $profileUrl }}"
+                            ?>
+                            <a href="<?php echo e($profileUrl); ?>"
                                class="dropdown-item">
-                                <i class="ri-user-line text-gray-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
-                                <span>{{ __('messages.navigation.profile') }}</span>
+                                <i class="ri-user-line text-gray-500 <?php echo e(app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3'); ?>"></i>
+                                <span><?php echo e(__('messages.navigation.profile')); ?></span>
                             </a>
 
-                            @if($currentRole === 'admin' && $school)
-                                @php
+                            <?php if($currentRole === 'admin' && $school): ?>
+                                <?php
                                     try {
                                         $activityLogsUrl = tenant_route('school.admin.activity-logs.index', $school);
                                     } catch (\Exception $e) {
                                         $activityLogsUrl = '#';
                                     }
-                                @endphp
-                                <a href="{{ $activityLogsUrl }}"
+                                ?>
+                                <a href="<?php echo e($activityLogsUrl); ?>"
                                    class="dropdown-item">
-                                    <i class="ri-history-line text-indigo-500 {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
-                                    <span>{{ __('messages.navigation.activity_logs') }}</span>
+                                    <i class="ri-history-line text-indigo-500 <?php echo e(app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3'); ?>"></i>
+                                    <span><?php echo e(__('messages.navigation.activity_logs')); ?></span>
                                 </a>
-                            @endif
+                            <?php endif; ?>
 
                             <div class="border-t border-gray-100 my-1"></div>
 
-                            <form method="POST" action="{{ $logoutUrl }}">
-                                @csrf
+                            <form method="POST" action="<?php echo e($logoutUrl); ?>">
+                                <?php echo csrf_field(); ?>
                                 <button type="submit" class="dropdown-item text-red-600 w-full">
-                                    <i class="ri-logout-box-line {{ app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3' }}"></i>
-                                    <span>{{ __('messages.auth.logout') }}</span>
+                                    <i class="ri-logout-box-line <?php echo e(app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3'); ?>"></i>
+                                    <span><?php echo e(__('messages.auth.logout')); ?></span>
                                 </button>
                             </form>
                         </div>
@@ -1418,64 +1425,65 @@
     </div>
 </nav>
 
-@if($hasTenantContext || $isMainAdmin)
+<?php if($hasTenantContext || $isMainAdmin): ?>
 <!-- Enhanced Sidebar -->
-<aside id="sidebar" class="sidebar {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
+<aside id="sidebar" class="sidebar <?php echo e(app()->getLocale() === 'ar' ? 'rtl' : ''); ?>">
     <div class="sidebar-content">
-        @php
+        <?php
             $activeSidebarRole = $currentRole;
-        @endphp
+        ?>
 
-        @if($isMainAdmin)
-            @include('layouts.partials.admin-sidebar')
-        @elseif($hasTenantContext && $activeSidebarRole === 'admin')
-            @include('layouts.partials.admin-sidebar')
-        @elseif($hasTenantContext && $activeSidebarRole === 'teacher')
-            @include('layouts.partials.teacher-sidebar')
-        @elseif($hasTenantContext && $activeSidebarRole === 'supervisor')
-            @include('layouts.partials.supervisor-sidebar')
-        @endif
+        <?php if($isMainAdmin): ?>
+            <?php echo $__env->make('layouts.partials.admin-sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+        <?php elseif($hasTenantContext && $activeSidebarRole === 'admin'): ?>
+            <?php echo $__env->make('layouts.partials.admin-sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+        <?php elseif($hasTenantContext && $activeSidebarRole === 'teacher'): ?>
+            <?php echo $__env->make('layouts.partials.teacher-sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+        <?php elseif($hasTenantContext && $activeSidebarRole === 'supervisor'): ?>
+            <?php echo $__env->make('layouts.partials.supervisor-sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+        <?php endif; ?>
 
         <div class="sidebar-footer">
             <div class="sidebar-footer-text">by: Ajw</div>
         </div>
     </div>
 </aside>
-@endif
+<?php endif; ?>
 
 <!-- Enhanced Main Content -->
-<main class="main-content {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
+<main class="main-content <?php echo e(app()->getLocale() === 'ar' ? 'rtl' : ''); ?>">
     <div class="p-6 md:p-8 max-w-7xl mx-auto">
-        @if(Auth::check() && Auth::user()->isMainAdmin() && $currentRole === 'admin' && $activeContextSchool)
+        <?php if(Auth::check() && Auth::user()->isMainAdmin() && $currentRole === 'admin' && $activeContextSchool): ?>
             <!-- Main Admin Viewing Banner -->
             <div class="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl p-4 text-white shadow-lg mb-6">
                 <div class="flex items-center justify-between flex-wrap gap-3">
                     <div class="flex items-center gap-3">
                         <i class="ri-eye-line text-2xl"></i>
                         <div>
-                            <p class="font-semibold">{{ __('messages.main_admin.viewing_as_admin') }}</p>
-                            <p class="text-sm text-yellow-100">{{ $activeContextSchool->name }}</p>
+                            <p class="font-semibold"><?php echo e(__('messages.main_admin.viewing_as_admin')); ?></p>
+                            <p class="text-sm text-yellow-100"><?php echo e($activeContextSchool->name); ?></p>
                         </div>
                     </div>
-                    <a href="{{ route('main-admin.hierarchy', ['network' => ($network->slug ?? $activeContextSchool->network->slug)]) }}" 
+                    <a href="<?php echo e(route('main-admin.hierarchy', ['network' => ($network->slug ?? $activeContextSchool->network->slug)])); ?>" 
                        class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg font-medium transition-all duration-200 whitespace-nowrap">
-                        <i class="ri-arrow-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}-line"></i>
-                        {{ __('messages.main_admin.back_to_dashboard') }}
+                        <i class="ri-arrow-<?php echo e(app()->getLocale() === 'ar' ? 'right' : 'left'); ?>-line"></i>
+                        <?php echo e(__('messages.main_admin.back_to_dashboard')); ?>
+
                     </a>
                 </div>
             </div>
-        @endif
-        @yield('content')
+        <?php endif; ?>
+        <?php echo $__env->yieldContent('content'); ?>
     </div>
 </main>
 
 <script>
 function switchLocale(locale) {
-    fetch("{{ route('locale.update') }}", {
+    fetch("<?php echo e(route('locale.update')); ?>", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+            "X-CSRF-TOKEN": "<?php echo e(csrf_token()); ?>",
             "Accept": "application/json"
         },
         body: JSON.stringify({ locale: locale }),
@@ -1644,7 +1652,7 @@ function switchLocale(locale) {
     // ========================================
     // FILE PREVIEW LOGIC (Unchanged)
     // ========================================
-    @php
+    <?php
         $previewUrl = '#';
         if ($school && $school->network) {
             try {
@@ -1653,8 +1661,8 @@ function switchLocale(locale) {
                 \Log::warning('Failed to generate preview URL', ['error' => $e->getMessage()]);
             }
         }
-    @endphp
-    const previewDataUrlTemplate = @json($previewUrl);
+    ?>
+    const previewDataUrlTemplate = <?php echo json_encode($previewUrl, 15, 512) ?>;
     
     // Show preview modal for non-previewable files
     function showPreviewModal(data) {
@@ -1676,10 +1684,12 @@ function switchLocale(locale) {
                 </div>
                 <div class="flex gap-3 justify-end">
                     <button onclick="this.closest('#previewModal').remove()" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
-                        {{ __('messages.actions.close') }}
+                        <?php echo e(__('messages.actions.close')); ?>
+
                     </button>
                     <a href="${data.downloadUrl || '#'}" class="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">
-                        <i class="ri-download-line"></i> {{ __('messages.files.download_file') }}
+                        <i class="ri-download-line"></i> <?php echo e(__('messages.files.download_file')); ?>
+
                     </a>
                 </div>
             </div>
@@ -1724,15 +1734,15 @@ function switchLocale(locale) {
                 button.innerHTML = originalHTML;
                 button.disabled = false;
 
-                const errorMessage = @json(app()->getLocale() === 'ar'
+                const errorMessage = <?php echo json_encode(app()->getLocale() === 'ar'
                     ? 'حدث خطأ أثناء تحميل معلومات الملف'
                     : 'Error loading file information'
-                );
+                , 15, 512) ?>;
                 alert(errorMessage);
             });
     }
 
-    const networkSlug = '{{ $networkSlug }}';
+    const networkSlug = '<?php echo e($networkSlug); ?>';
 
     function handleTeacherPreviewClick(event, schoolSlug, fileId) {
         event.preventDefault();
@@ -1971,7 +1981,7 @@ function switchLocale(locale) {
     }
 </script>
 
-@stack('scripts')
+<?php echo $__env->yieldPushContent('scripts'); ?>
 
 </body>
-</html>
+</html><?php /**PATH C:\Users\eXtreme\Documents\custom\resources\views\layouts\school.blade.php ENDPATH**/ ?>

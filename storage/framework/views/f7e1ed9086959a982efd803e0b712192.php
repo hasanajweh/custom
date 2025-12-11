@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="<?php echo e(app()->getLocale()); ?>" dir="<?php echo e(app()->getLocale() === 'ar' ? 'rtl' : 'ltr'); ?>" class="<?php echo e(app()->getLocale() === 'ar' ? 'rtl' : 'ltr'); ?>">
+<head>
+    <?php
+        $networkModel = $network ?? request()->route('network') ?? auth()->user()?->network;
+        $networkName = $networkModel?->name ?? config('app.name');
+        $networkSlug = $networkModel?->slug ?? auth()->user()?->network?->slug ?? '';
+        $isMainAdmin = $isMainAdmin ?? (bool) auth()->user()?->is_main_admin;
+        $currentRole = \App\Services\ActiveContext::getRole() ?? auth()->user()?->role;
+        $availableContexts = auth()->user()?->availableContexts();
+        $activeContextSchool = \App\Services\ActiveContext::getSchool();
+        $activeContextRole = $currentRole;
+    ?>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+
+    <!-- ============================================ -->
+    <!-- UNIVERSAL PWA META TAGS - ALL PLATFORMS -->
+    <!-- ============================================ -->
+
+    <!-- Core PWA -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="<?php echo e($networkName); ?>">
+
+    <!-- iOS Safari - CRITICAL FOR iOS PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="<?php echo e($networkName); ?>">
+    <meta name="apple-touch-fullscreen" content="yes">
+
+    <!-- iOS Splash Screens - iPhone (Most Common Models) -->
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iPhone_15_Pro_Max_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iPhone_15_Pro_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iPhone_14_Plus_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iPhone_14_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iPhone_13_mini_portrait.png">
+
+    <!-- iOS Splash Screens - iPad (Most Common Models) -->
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iPad_Pro_12.9_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iPad_Pro_11_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iPad_Air_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iPad_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iPad_9.7_portrait.png">
+
+    <!-- Windows/IE -->
+    <meta name="msapplication-TileColor" content="#3B82F6">
+    <meta name="msapplication-TileImage" content="/Scholder-144.png">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+
+    <!-- Theme Colors - All Browsers -->
+    <meta name="theme-color" content="#3B82F6">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#3B82F6">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1E40AF">
+
+    <!-- Description & Keywords -->
+    <meta name="description" content="Educational platform for <?php echo e($networkName); ?> - Manage files, assignments, and resources">
+    <meta name="keywords" content="education, <?php echo e($networkName); ?>, learning, teaching, resources">
+
+    <title><?php echo $__env->yieldContent('title', $networkName . ' - ' . __('messages.app.name')); ?></title>
+
+    <!-- ============================================ -->
+    <!-- ICONS - ALL PLATFORMS & SIZES -->
+    <!-- ============================================ -->
+
+    <!-- Standard Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/Scholder-192.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/Scholder-192.png">
+    <link rel="shortcut icon" href="/Scholder-192.png">
+
+    <!-- Apple Touch Icons - ALL iOS DEVICES -->
+    <link rel="apple-touch-icon" href="/Scholder-180.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/Scholder-180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/Scholder-152.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/Scholder-144.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/Scholder-128.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/Scholder-128.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/Scholder-96.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/Scholder-72.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/Scholder-72.png">
+    <link rel="apple-touch-icon" sizes="57x57" href="/Scholder-72.png">
+
+    <!-- Safari Pinned Tab -->
+    <link rel="mask-icon" href="/Scholder-192.png" color="#3B82F6">
+
+    <!-- Android/Chrome -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/Scholder-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/Scholder-512.png">
+
+    <!-- Web App Manifest - UNIVERSAL -->
+    <link rel="manifest" href="<?php echo e(url('/manifest.json')); ?>">
+
+    <!-- Enhanced Font Loading with Language Support -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <?php if(app()->getLocale() === 'ar'): ?>
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <?php else: ?>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <?php endif; ?>
+
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
+
+
+    <?php if(app()->getLocale() === 'ar'): ?>
+        <link rel="stylesheet" href="/css/rtl.css">
+    <?php endif; ?>
+
+
+    <style>
+        [x-cloak] { display: none !important; }
+        
+        :root {
+            --primary: #2563EB;
+            --primary-dark: #1E40AF;
+            --primary-light: #DBEAFE;
+            --primary-lighter: #EFF6FF;
+            --secondary: #F8FAFC;
+            --secondary-dark: #F1F5F9;
+            --accent: #7C3AED;
+            --accent-light: #EDE9FE;
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --text-muted: #64748B;
+            --text-light: #94A3B8;
+            --border: #E2E8F0;
+            --border-light: #F1F5F9;
+            --success: #059669;
+            --success-light: #ECFDF5;
+            --warning: #D97706;
+            --warning-light: #FFFBEB;
+            --danger: #DC2626;
+            --danger-light: #FEF2F2;
+            --info: #0284C7;
+            --info-light: #F0F9FF;
+            --sidebar-width: 280px;
+            --sidebar-collapsed: 80px;
+            --navbar-height: 70px;
+            --brand-primary: #2563EB;
+            --brand-text: #0F172A;
+            --brand-text-light: #475569;
+            --brand-background: #F8FAFC;
+            --brand-secondary: #FFFFFF;
+            --brand-border: #E2E8F0;
+        }
+
+        html.rtl {
+            direction: rtl;
+        }
+
+        html.ltr {
+            direction: ltr;
+        }
+
+        .rtl * {
+            font-family: 'Cairo', 'Rubik', 'Segoe UI', system-ui, sans-serif;
+            letter-spacing: 0.02em;
+            line-height: 1.8;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .ltr * {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            letter-spacing: normal;
+            line-height: 1.6;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .rtl .font-heading {
+            font-family: 'Cairo', 'Rubik', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0;
+            line-height: 1.4;
+        }
+
+        .ltr .font-heading {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+        }
+
+        body {
+            overflow-x: hidden;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: #FFFFFF;
+            min-height: 100vh;
+            font-weight: 400;
+            overscroll-behavior-y: none;
+        }
+
+        /* ===== ADDITIONAL MOBILE ENHANCEMENTS ===== */
+        
+        /* Better focus states */
+        *:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        /* Touch-friendly interactions */
+        button, .btn, a.button {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Responsive images */
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Tablet optimizations */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            body {
+                font-size: 15px;
+            }
+        }
+
+        /* Hide mobile-only on desktop */
+        @media (min-width: 769px) {
+            .mobile-only {
+                display: none !important;
+            }
+            
+            .sidebar-header {
+                display: none !important;
+            }
+
+            .mobile-language-switcher {
+                display: none !important;
+            }
+        }
+
+        /* Landscape mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .navbar {
+                height: 56px !important;
+            }
+        }
+
+
+        @supports (padding: max(0px)) {
+            body {
+                padding-left: max(0px, env(safe-area-inset-left));
+                padding-right: max(0px, env(safe-area-inset-right));
+            }
+
+            .navbar {
+                padding-top: max(0px, env(safe-area-inset-top));
+            }
+        }
+
+
+
+        .navbar {
+            background: #FFFFFF;
+            border-bottom: 1px solid var(--border);
+            height: var(--navbar-height);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            position: fixed;
+            z-index: 50;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 16px;
+            border-radius: 10px;
+        }
+
+        .logo-img {
+            height: 42px;
+            width: 42px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .rtl .brand-text {
+            align-items: flex-end;
+        }
+
+        .ltr .brand-text {
+            align-items: flex-start;
+        }
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.1;
+            margin-bottom: 3px;
+        }
+
+        .rtl .brand-name {
+            letter-spacing: 0;
+        }
+
+        .ltr .brand-name {
+            letter-spacing: -0.025em;
+        }
+
+        .school-name {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            line-height: 1.2;
+        }
+
+        .language-switcher {
+            position: relative;
+        }
+
+        .language-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #FFFFFF !important;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            min-width: 140px;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .language-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46a0 100%);
+        }
+
+        .language-btn:active {
+            transform: translateY(0);
+        }
+
+        .language-btn span,
+        .language-btn i {
+            color: #FFFFFF !important;
+        }
+
+        .language-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border: 1px solid #E5E7EB;
+            min-width: 200px;
+            z-index: 1000;
+            overflow: hidden;
+            display: none;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .rtl .language-dropdown {
+            left: 0;
+            right: auto;
+        }
+
+        .ltr .language-dropdown {
+            right: 0;
+            left: auto;
+        }
+
+        .language-dropdown.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .language-option {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            text-decoration: none;
+            color: #374151 !important;
+            background-color: #FFFFFF !important;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #F3F4F6;
+        }
+
+        .rtl .language-option {
+            text-align: right;
+        }
+
+        .ltr .language-option {
+            text-align: left;
+        }
+
+        .language-option:last-child {
+            border-bottom: none;
+        }
+
+        .language-option:hover {
+            background-color: #F9FAFB !important;
+            color: #667eea !important;
+        }
+
+        .rtl .language-option:hover {
+            padding-right: 20px;
+        }
+
+        .ltr .language-option:hover {
+            padding-left: 20px;
+        }
+
+        .language-option.active {
+            background-color: #EEF2FF !important;
+            color: #667eea !important;
+            font-weight: 700;
+        }
+
+        .language-option.active i {
+            color: #667eea !important;
+        }
+
+        .language-option span {
+            color: inherit !important;
+        }
+
+        .flag-icon {
+            width: 24px;
+            height: 18px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: var(--navbar-height);
+            height: calc(100vh - var(--navbar-height));
+            width: var(--sidebar-collapsed);
+            background: #FFFFFF;
+            z-index: 30;
+            display: flex;
+            flex-direction: column;
+            transition: none; /* JS handles animation */
+        }
+
+        .rtl .sidebar {
+            right: 0;
+            left: auto;
+        }
+
+        .ltr .sidebar {
+            left: 0;
+            right: auto;
+        }
+
+        .sidebar.expanded {
+            width: var(--sidebar-width);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 24px 12px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 4px 0;
+            color: #374151;
+            text-decoration: none;
+            border-radius: 10px;
+            position: relative;
+            min-height: 44px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .rtl .sidebar-item {
+            font-size: 15px;
+        }
+
+        .ltr .sidebar-item {
+            font-size: 14px;
+        }
+
+        .sidebar-item:hover {
+            background: #F8FAFC;
+            color: var(--primary);
+        }
+
+        .sidebar-item.active {
+            color: var(--primary);
+            font-weight: 700;
+            background: linear-gradient(to right, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));
+        }
+
+        .rtl .sidebar-item.active {
+            border-right: 4px solid var(--primary);
+            padding-right: 8px;
+        }
+
+        .ltr .sidebar-item.active {
+            border-left: 4px solid var(--primary);
+            padding-left: 8px;
+        }
+
+        .sidebar-item i {
+            min-width: 24px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .rtl .sidebar-item i {
+            margin-left: 12px;
+        }
+
+        .ltr .sidebar-item i {
+            margin-right: 12px;
+        }
+
+        .sidebar-item:nth-child(1) i { color: #3B82F6; }
+        .sidebar-item:nth-child(2) i { color: #8B5CF6; }
+        .sidebar-item:nth-child(3) i { color: #F59E0B; }
+        .sidebar-item:nth-child(4) i { color: #10B981; }
+        .sidebar-item:nth-child(5) i { color: #EF4444; }
+        .sidebar-item:nth-child(7) i { color: #EC4899; }
+        .sidebar-item:nth-child(8) i { color: #06B6D4; }
+
+        .sidebar-item.active i {
+            color: inherit;
+        }
+
+        .sidebar:not(.expanded) .sidebar-item i {
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .sidebar-text {
+            white-space: nowrap;
+            overflow: hidden;
+            max-width: 0;
+            opacity: 0;
+            color: #374151;
+        }
+
+        .rtl .sidebar-text {
+            font-size: 15px;
+        }
+
+        .ltr .sidebar-text {
+            font-size: 14px;
+        }
+
+        .sidebar.expanded .sidebar-text {
+            max-width: 200px;
+            opacity: 1;
+        }
+
+        .rtl .sidebar.expanded .sidebar-text {
+            margin-right: 0;
+        }
+
+        .ltr .sidebar.expanded .sidebar-text {
+            margin-left: 0;
+        }
+
+        .sidebar-item:hover .sidebar-text,
+        .sidebar-item.active .sidebar-text {
+            color: inherit;
+        }
+
+        .sidebar-divider {
+            margin: 20px 0;
+            padding: 0 12px;
+            overflow: hidden;
+        }
+
+        .sidebar:not(.expanded) .sidebar-divider {
+            margin: 12px 0;
+        }
+
+        .sidebar-divider-line {
+            height: 1px;
+            background: var(--border);
+        }
+
+        .sidebar-divider-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 0.05em;
+            margin-top: 12px;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            opacity: 0;
+            max-height: 0;
+        }
+
+        .sidebar.expanded .sidebar-divider-title {
+            opacity: 1;
+            max-height: 30px;
+        }
+
+        .main-content {
+            min-height: calc(100vh - var(--navbar-height));
+            padding-top: var(--navbar-height);
+            background: #FAFBFC;
+            will-change: width, margin;
+        }
+
+        .rtl .main-content {
+            margin-right: var(--sidebar-collapsed);
+            margin-left: 0;
+        }
+
+        .ltr .main-content {
+            margin-left: var(--sidebar-collapsed);
+            margin-right: 0;
+        }
+
+        .rtl .sidebar.expanded ~ .main-content {
+            margin-right: var(--sidebar-width);
+            margin-left: 0;
+        }
+
+        .ltr .sidebar.expanded ~ .main-content {
+            margin-left: var(--sidebar-width);
+            margin-right: 0;
+        }
+
+        .dropdown-menu {
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            z-index: 100;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 10px 16px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .dropdown-item:hover {
+            background-color: #F8FAFC;
+            color: var(--primary);
+        }
+
+        .dropdown-item i {
+            font-size: 20px;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 20px 12px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .sidebar-footer-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        .sidebar.expanded .sidebar-footer-text {
+            opacity: 1;
+        }
+
+        .sidebar:not(.expanded) .sidebar-footer {
+            padding: 12px;
+        }
+
+        /* === MOBILE LANGUAGE SWITCHER STYLES === */
+        .mobile-language-switcher {
+            display: none; /* Hidden by default, shown in media query */
+            padding: 16px 12px;
+        }
+
+        .mobile-language-switcher .language-btn {
+            width: 100%;
+            background: var(--primary-lighter);
+            color: var(--primary) !important;
+            box-shadow: none;
+        }
+        
+        .mobile-language-switcher .language-btn:hover {
+            background: var(--primary-light);
+            transform: none; /* Disable hover transform */
+        }
+        
+        .mobile-language-switcher .language-btn span,
+        .mobile-language-switcher .language-btn i {
+            color: var(--primary) !important;
+        }
+        
+        .mobile-language-switcher .language-dropdown {
+            /* Adjust dropdown for sidebar */
+            position: relative; /* Unset absolute */
+            top: auto;
+            left: auto;
+            right: auto;
+            width: 100%;
+            margin-top: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            opacity: 1; /* Always visible when toggled */
+            transform: none; /* No animation */
+        }
+
+
+        @media (max-width: 768px) {
+            .navbar {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border-bottom: 1px solid var(--border);
+                height: 60px;
+                padding: 0 16px;
+            }
+
+            /* === HIDE DESKTOP LANGUAGE SWITCHER === */
+            .navbar .desktop-language-switcher {
+                display: none !important;
+            }
+
+            /* HIDE SIDEBAR BY DEFAULT ON MOBILE */
+            .sidebar {
+                position: fixed;
+                top: 0;
+                height: 100vh;
+                width: var(--sidebar-width); /* Use expanded width */
+                background: #FFFFFF;
+                z-index: 1000;
+                display: flex;
+                flex-direction: column;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .rtl .sidebar {
+                right: 0;
+                left: auto;
+            }
+
+            .ltr .sidebar {
+                left: 0;
+                right: auto;
+            }
+
+            /* RTL: Hide sidebar to the right */
+            .rtl .sidebar {
+                transform: translateX(100%);
+            }
+
+            /* Show sidebar when mobile-open class is added */
+            .sidebar.mobile-open {
+                transform: translateX(0) !important;
+            }
+
+            /* REMOVE SIDEBAR MARGIN FROM MAIN CONTENT ON MOBILE */
+            .main-content {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                padding-top: 60px;
+                width: 100%;
+                min-width: 100%;
+            }
+
+            /* Mobile overlay backdrop */
+            .mobile-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .mobile-overlay.show {
+                display: block;
+                opacity: 1;
+            }
+
+
+            /* Sidebar header visible on mobile */
+            .sidebar-header {
+                display: flex !important;
+                justify-content: space-between;
+                align-items: center;
+                padding: 16px;
+                border-bottom: 1px solid var(--border);
+                /* Match navbar height roughly */
+                height: 60px;
+            }
+
+            /* === SHOW MOBILE LANGUAGE SWITCHER === */
+            .sidebar .mobile-language-switcher {
+                display: block !important;
+            }
+
+            /* === SHOW SIDEBAR LABELS ON MOBILE === */
+            .sidebar .sidebar-text {
+                max-width: 200px;
+                opacity: 1;
+            }
+
+            .sidebar .sidebar-divider-title {
+                opacity: 1;
+                max-height: 30px;
+            }
+
+            /* Fix icon margin on mobile (resetting desktop collapsed rule) */
+            .sidebar:not(.expanded) .sidebar-item i {
+                margin-right: 12px;
+                margin-left: 0;
+            }
+            .rtl .sidebar:not(.expanded) .sidebar-item i {
+                margin-left: 12px;
+                margin-right: 0;
+            }
+            /* === END SIDEBAR LABEL FIX === */
+
+
+            /* Better touch targets */
+            button:not(.language-option):not(.dropdown-item), a.btn {
+                min-height: 44px;
+                padding: 12px 16px;
+            }
+
+            /* Prevent iOS zoom on inputs */
+            input[type="text"],
+            input[type="email"],
+            input[type="password"],
+            input[type="number"],
+            input[type="tel"],
+            input[type="search"],
+            select,
+            textarea {
+                font-size: 16px !important;
+            }
+
+            /* Full width dropdowns */
+            #userMenuDropdown {
+                position: fixed !important;
+                left: 16px !important;
+                right: 16px !important;
+                width: calc(100vw - 32px) !important;
+                max-width: calc(100vw - 32px) !important;
+            }
+
+            /* Better content padding */
+            .main-content > div {
+                padding: 16px !important;
+            }
+
+            /* Hide desktop elements */
+            .desktop-only {
+                display: none !important;
+            }
+
+            /* Logo adjustments */
+            .brand-name {
+                font-size: 18px !important;
+            }
+
+            .school-name {
+                font-size: 12px !important;
+            }
+
+            /* Responsive tables */
+            table {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Better spacing */
+            body {
+                font-size: 16px;
+            }
+
+            /* Prevent body scroll when sidebar open */
+            body.sidebar-open {
+                overflow: hidden;
+            }
+        }
+
+        select,
+        select option {
+            color: #1F2937 !important;
+            background-color: #FFFFFF !important;
+        }
+
+        select:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="search"],
+        input[type="date"],
+        input[type="datetime-local"],
+        input[type="time"],
+        textarea {
+            color: #1F2937 !important;
+            background-color: #FFFFFF !important;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.5);
+            cursor: pointer;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #9CA3AF !important;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            thead th,
+            tbody td {
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+
+            .rtl thead th:first-child,
+            .rtl tbody td:first-child {
+                padding-right: 16px;
+            }
+
+            .ltr thead th:first-child,
+            .ltr tbody td:first-child {
+                padding-left: 16px;
+            }
+
+            .rtl thead th:last-child,
+            .rtl tbody td:last-child {
+                padding-left: 16px;
+            }
+
+            .ltr thead th:last-child,
+            .ltr tbody td:last-child {
+                padding-right: 16px;
+            }
+
+            tbody td .btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+        }
+
+        table.table-striped tbody tr:nth-child(even) {
+            background-color: #F9FAFB;
+        }
+
+        table.table-striped tbody tr:nth-child(even):hover {
+            background-color: #F3F4F6;
+        }
+
+        table.table-bordered {
+            border: 1px solid #E5E7EB;
+        }
+
+        table.table-bordered thead th,
+        table.table-bordered tbody td {
+            border-right: 1px solid #E5E7EB;
+        }
+
+        table.table-bordered thead th:last-child,
+        table.table-bordered tbody td:last-child {
+            border-right: none;
+        }
+
+        .rtl table.table-bordered thead th,
+        .rtl table.table-bordered tbody td {
+            border-right: none;
+            border-left: 1px solid #E5E7EB;
+        }
+
+        .rtl table.table-bordered thead th:last-child,
+        .rtl table.table-bordered tbody td:last-child {
+            border-left: none;
+        }
+
+        table.table-compact thead th,
+        table.table-compact tbody td {
+            padding: 10px 16px;
+            font-size: 13px;
+        }
+
+        table th.checkbox-col,
+        table td.checkbox-col {
+            width: 50px;
+            text-align: center;
+            padding: 16px 10px;
+        }
+
+        table th.actions-col,
+        table td.actions-col {
+            width: auto;
+            white-space: nowrap;
+        }
+
+        table td.actions-col {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .rtl table td.actions-col {
+            justify-content: flex-start;
+        }
+
+        .ltr table td.actions-col {
+            justify-content: flex-end;
+        }
+
+        .dropdown-item,
+        [role="option"],
+        [role="menuitem"] {
+            color: #1F2937 !important;
+            background-color: #FFFFFF !important;
+        }
+
+        .dropdown-item:hover,
+        [role="option"]:hover,
+        [role="menuitem"]:hover {
+            background-color: #F3F4F6 !important;
+            color: var(--primary) !important;
+        }
+    
+</style>
+    <?php echo $__env->yieldPushContent('styles'); ?>
+
+</head>
+<body class="bg-white <?php echo e(app()->getLocale() === 'ar' ? 'rtl' : ''); ?>">
+<?php if(auth()->guard()->check()): ?>
+
+
+<!-- Mobile Overlay -->
+<div id="mobileOverlay" class="mobile-overlay" onclick="closeMobileSidebar()"></div>
+
+<!-- Enhanced Navigation -->
+<?php if(auth()->guard()->check()): ?>
+<nav class="navbar fixed w-full top-0 z-50">
+    <div class="px-6 sm:px-8 lg:px-10 h-full">
+        <div class="flex justify-between items-center h-full">
+            <div class="flex items-center">
+                <!-- Mobile Menu Toggle -->
+                <button onclick="toggleMobileSidebar()"
+                        class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg md:hidden"
+                        aria-label="<?php echo e(__('messages.navigation.open_sidebar')); ?>">
+                    <i class="ri-menu-line text-xl"></i>
+                </button>
+
+                <!-- Desktop Sidebar Toggle -->
+                <button onclick="toggleSidebar()"
+                        class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg hidden md:block"
+                        aria-label="<?php echo e(__('messages.navigation.open_sidebar')); ?>">
+                    <i class="ri-menu-line text-xl"></i>
+                </button>
+
+                <!-- Enhanced Logo -->
+                <div class="logo-container <?php echo e(app()->getLocale() === 'ar' ? 'mr-4' : 'ml-4'); ?>">
+                    <img src="/WayUp.png" alt="<?php echo e(__('messages.app.name')); ?>" class="logo-img">
+                    <div class="brand-text">
+                        <h1 class="brand-name font-heading"><?php echo e(__('messages.app.name')); ?></h1>
+                        <span class="school-name"><?php echo e($networkName); ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Navigation -->
+            <div class="flex items-center space-x-4 <?php echo e(app()->getLocale() === 'ar' ? 'space-x-reverse' : ''); ?>">
+                <!-- Beautiful Language Switcher -->
+                <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                    <button 
+                        @click="open = !open"
+                        type="button"
+                        class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 border border-indigo-100 transition-all duration-200 group"
+                    >
+                        <span class="text-lg"><?php echo e(app()->getLocale() === 'ar' ? '🇸🇦' : '🇬🇧'); ?></span>
+                        <span class="text-sm font-medium text-gray-700 group-hover:text-indigo-700">
+                            <?php echo e(app()->getLocale() === 'ar' ? 'العربية' : 'English'); ?>
+
+                        </span>
+                        <i class="ri-arrow-down-s-line text-gray-400 group-hover:text-indigo-500 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
+                    </button>
+                    
+                    <div 
+                        x-show="open"
+                        x-cloak
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        class="absolute <?php echo e(app()->getLocale() === 'ar' ? 'left-0' : 'right-0'); ?> mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50"
+                    >
+                        <button
+                            onclick="switchLocale('ar'); open = false;"
+                            class="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-colors <?php echo e(app()->getLocale() === 'ar' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700'); ?>"
+                        >
+                            <span class="text-xl">🇸🇦</span>
+                            <span>العربية</span>
+                            <?php if(app()->getLocale() === 'ar'): ?>
+                                <i class="ri-check-line <?php echo e(app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto'); ?> text-indigo-600"></i>
+                            <?php endif; ?>
+                        </button>
+                        <button
+                            onclick="switchLocale('en'); open = false;"
+                            class="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-colors <?php echo e(app()->getLocale() === 'en' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700'); ?>"
+                        >
+                            <span class="text-xl">🇬🇧</span>
+                            <span>English</span>
+                            <?php if(app()->getLocale() === 'en'): ?>
+                                <i class="ri-check-line <?php echo e(app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto'); ?> text-indigo-600"></i>
+                            <?php endif; ?>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Enhanced User Dropdown -->
+                <div class="relative">
+                    <button onclick="toggleUserMenu(event)"
+                            class="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg <?php echo e(app()->getLocale() === 'ar' ? 'space-x-reverse' : ''); ?>"
+                            aria-label="<?php echo e(__('messages.navigation.open_user_menu')); ?>">
+                        <?php
+                            $role = strtolower($currentRole ?? '');
+                            $bgColors = [
+                                'teacher' => 'bg-blue-600',
+                                'supervisor' => 'bg-indigo-600',
+                                'admin' => 'bg-gray-700',
+                            ];
+                            $bgColor = $bgColors[$role] ?? 'bg-blue-600';
+                        ?>
+
+                        <div class="w-9 h-9 rounded-lg <?php echo e($bgColor); ?> text-white flex items-center justify-center font-bold text-sm">
+                            <?php if($role === 'admin'): ?>
+                                <?php echo e(strtoupper(substr(Auth::user()->name, 0, 1))); ?>
+
+                            <?php elseif($role === 'teacher'): ?>
+                                <i class="ri-user-line text-lg"></i>
+                            <?php elseif($role === 'supervisor'): ?>
+                                <i class="ri-user-star-line text-lg"></i>
+                            <?php else: ?>
+                                <?php echo e(strtoupper(substr(Auth::user()->name, 0, 1))); ?>
+
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="hidden sm:block text-left <?php echo e(app()->getLocale() === 'ar' ? 'text-right' : ''); ?>">
+                            <p class="text-sm font-bold text-gray-700"><?php echo e(Auth::user()->name); ?></p>
+                            <p class="text-xs text-gray-500 font-medium"><?php echo e($currentRole ? __('messages.roles.' . $currentRole) : ''); ?></p>
+                        </div>
+                        <i class="ri-arrow-down-s-line text-gray-400"></i>
+                    </button>
+
+                    <div id="userMenuDropdown" class="absolute <?php echo e(app()->getLocale() === 'ar' ? 'left-0' : 'right-0'); ?> mt-2 w-64 dropdown-menu" style="display: none;">
+                        <!-- User Info Header -->
+                        <div class="p-4 bg-gray-50 border-b border-gray-100">
+                            <div class="flex items-center space-x-3 <?php echo e(app()->getLocale() === 'ar' ? 'space-x-reverse' : ''); ?>">
+                                <div class="w-12 h-12 rounded-lg <?php echo e($bgColor); ?> text-white flex items-center justify-center font-bold">
+                                    <?php if($role === 'admin'): ?>
+                                        <?php echo e(strtoupper(substr(Auth::user()->name, 0, 1))); ?>
+
+                                    <?php elseif($role === 'teacher'): ?>
+                                        <i class="ri-user-line text-xl"></i>
+                                    <?php elseif($role === 'supervisor'): ?>
+                                        <i class="ri-user-star-line text-xl"></i>
+                                    <?php else: ?>
+                                        <?php echo e(strtoupper(substr(Auth::user()->name, 0, 1))); ?>
+
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-bold text-gray-900"><?php echo e(Auth::user()->name); ?></p>
+                                    <p class="text-sm text-gray-600 font-semibold"><?php echo e($currentRole ? __('messages.roles.' . $currentRole) : ''); ?></p>
+                                    <p class="text-xs text-gray-500"><?php echo e(Auth::user()->email); ?></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <?php if(isset($availableContexts) && $availableContexts->count() > 1): ?>
+                        <div class="border-t border-gray-100 my-2"></div>
+                        <div class="px-3 py-2">
+                            <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                                <i class="ri-swap-line"></i>
+                                <?php echo app('translator')->get('messages.switch_context'); ?>
+                            </label>
+                            <div class="space-y-1">
+                                <?php $__currentLoopData = $availableContexts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $schoolCtx): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php
+                                        $isCurrent = session('active_school_id') == $schoolCtx->school->id && session('active_role') == $schoolCtx->role;
+                                        $roleColors = [
+                                            'admin' => 'bg-purple-100 text-purple-700',
+                                            'teacher' => 'bg-blue-100 text-blue-700',
+                                            'supervisor' => 'bg-green-100 text-green-700',
+                                        ];
+                                        $roleColor = $roleColors[$schoolCtx->role] ?? 'bg-gray-100 text-gray-700';
+                                    ?>
+                                    <form method="POST"
+                                          action="<?php echo e(route('switch-context')); ?>"
+                                          class="w-full"
+                                          onsubmit="return true;">
+                                        <?php echo csrf_field(); ?>
+                                        <input type="hidden" name="school_id" value="<?php echo e($schoolCtx->school->id); ?>">
+                                        <input type="hidden" name="role" value="<?php echo e($schoolCtx->role); ?>">
+
+                                        <button type="submit"
+                                                class="flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm transition-all duration-150 <?php echo e($isCurrent ? 'bg-primary/10 border border-primary/30' : 'hover:bg-gray-50'); ?>">
+                                            <div class="flex items-center gap-2 min-w-0">
+                                                <?php if($isCurrent): ?>
+                                                    <i class="ri-checkbox-circle-fill text-green-500 flex-shrink-0"></i>
+                                                <?php else: ?>
+                                                    <i class="ri-circle-line text-gray-300 flex-shrink-0"></i>
+                                                <?php endif; ?>
+                                                <span class="truncate font-medium <?php echo e($isCurrent ? 'text-primary' : 'text-gray-700'); ?>">
+                                                    <?php echo e($schoolCtx->school->name); ?>
+
+                                                </span>
+                                            </div>
+                                            <span class="flex-shrink-0 px-2 py-0.5 text-xs font-medium rounded-full <?php echo e($roleColor); ?>">
+                                                <?php echo e(__('messages.roles.' . $schoolCtx->role)); ?>
+
+                                            </span>
+                                        </button>
+                                    </form>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
+                        <!-- Menu Items -->
+                        <div class="py-1">
+                            <?php
+                                $networkSlug = $networkSlug ?? auth()->user()?->network?->slug;
+                                $profileUrl = $networkSlug ? route('main-admin.profile.edit', ['network' => $networkSlug]) : '#';
+                                $logoutUrl = $networkSlug ? route('main-admin.logout', ['network' => $networkSlug]) : '#';
+                            ?>
+                            <a href="<?php echo e($profileUrl); ?>"
+                               class="dropdown-item">
+                                <i class="ri-user-line text-gray-500 <?php echo e(app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3'); ?>"></i>
+                                <span><?php echo e(__('messages.navigation.profile')); ?></span>
+                            </a>
+                            <div class="border-t border-gray-100 my-1"></div>
+
+                            <form method="POST" action="<?php echo e($logoutUrl); ?>">
+                                <?php echo csrf_field(); ?>
+                                <button type="submit" class="dropdown-item text-red-600 w-full">
+                                    <i class="ri-logout-box-line <?php echo e(app()->getLocale() === 'ar' ? 'ml-3' : 'mr-3'); ?>"></i>
+                                    <span><?php echo e(__('messages.auth.logout')); ?></span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+<?php endif; ?>
+
+<?php if(auth()->guard()->check()): ?>
+<?php if($isMainAdmin): ?>
+<!-- Enhanced Sidebar with Mobile Support -->
+<aside id="sidebar" class="sidebar <?php echo e(app()->getLocale() === 'ar' ? 'rtl' : ''); ?>">
+    <!-- Mobile Sidebar Header -->
+    <div class="sidebar-header md:hidden">
+        <div class="flex items-center space-x-3 <?php echo e(app()->getLocale() === 'ar' ? 'space-x-reverse' : ''); ?>">
+            <img src="/WayUp.png" alt="<?php echo e(__('messages.app.name')); ?>" class="w-8 h-8 rounded-lg">
+            <h2 class="font-bold text-lg"><?php echo e(__('messages.navigation.menu')); ?></h2>
+        </div>
+        <button onclick="closeMobileSidebar()" class="p-2 hover:bg-gray-100 rounded-lg">
+            <i class="ri-close-line text-xl"></i>
+        </button>
+    </div>
+
+    <div class="sidebar-content">
+        <nav class="space-y-1">
+            <?php
+                $networkSlug = $networkSlug ?? auth()->user()?->network?->slug;
+                $dashboardUrl = $networkSlug ? route('main-admin.dashboard', ['network' => $networkSlug]) : '#';
+            ?>
+            <a href="<?php echo e($dashboardUrl); ?>"
+               class="sidebar-item <?php echo e(request()->routeIs('main-admin.dashboard') ? 'active' : ''); ?>">
+                <i class="ri-dashboard-3-line"></i>
+                <span class="sidebar-text"><?php echo e(__('messages.navigation.dashboard')); ?></span>
+            </span></a>
+
+            <div class="sidebar-divider">
+                <div class="sidebar-divider-line"></div>
+                <div class="sidebar-divider-title">
+                    <?php echo e(__('messages.main_admin.navigation.section')); ?>
+
+                </div>
+            </div>
+
+            <a href="<?php echo e($networkSlug ? route('main-admin.users.index', ['network' => $networkSlug]) : '#'); ?>"
+               class="sidebar-item <?php echo e(request()->routeIs('main-admin.users.*') ? 'active' : ''); ?>">
+                <i class="ri-team-line"></i>
+                <span class="sidebar-text"><?php echo e(__('messages.main_admin.navigation.users')); ?></span>
+            </span></a>
+
+            <a href="<?php echo e($networkSlug ? route('main-admin.hierarchy', ['network' => $networkSlug]) : '#'); ?>"
+               class="sidebar-item <?php echo e(request()->routeIs('main-admin.hierarchy') ? 'active' : ''); ?>">
+                <i class="ri-git-branch-line"></i>
+                <span class="sidebar-text"><?php echo e(__('messages.main_admin.navigation.hierarchy')); ?></span>
+            </span></a>
+
+            <a href="<?php echo e($networkSlug ? route('main-admin.subjects-grades', ['network' => $networkSlug]) : '#'); ?>"
+               class="sidebar-item <?php echo e(request()->routeIs('main-admin.subjects-grades*') ? 'active' : ''); ?>">
+                <i class="ri-book-2-line"></i>
+                <span class="sidebar-text"><?php echo e(__('messages.main_admin.navigation.subjects_grades')); ?></span>
+            </span></a>
+        </nav>
+
+        <!-- Mobile Language Switcher -->
+        <div class="mobile-language-switcher p-4">
+            <div class="flex gap-2">
+                <button
+                    onclick="switchLocale('ar')"
+                    class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-200 <?php echo e(app()->getLocale() === 'ar' ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'); ?>"
+                >
+                    <span class="text-lg">🇸🇦</span>
+                    <span class="font-medium">العربية</span>
+                </button>
+                <button
+                    onclick="switchLocale('en')"
+                    class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-200 <?php echo e(app()->getLocale() === 'en' ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'); ?>"
+                >
+                    <span class="text-lg">🇬🇧</span>
+                    <span class="font-medium">English</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-footer-text">by: Ajw</div>
+        </div>
+    </div>
+</aside>
+<?php endif; ?>
+<?php endif; ?>
+
+<!-- Enhanced Main Content -->
+<main class="main-content <?php echo e(app()->getLocale() === 'ar' ? 'rtl' : ''); ?>">
+    <div class="p-6 md:p-8 max-w-7xl mx-auto">
+        <?php echo $__env->yieldContent('content'); ?>
+    </div>
+</main>
+
+<script>
+    function switchLocale(locale) {
+        fetch("<?php echo e(route('locale.update')); ?>", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "<?php echo e(csrf_token()); ?>",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ locale: locale }),
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            setTimeout(() => {
+                window.location.reload();
+            }, 100);
+        })
+        .catch(error => {
+            console.error('Language switch error:', error);
+            setTimeout(() => {
+                window.location.reload();
+            }, 100);
+        });
+    }
+
+    // ========================================
+    // SIDEBAR INITIALIZATION
+    // ========================================
+    function initializeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const main = document.querySelector('.main-content');
+        const savedState = localStorage.getItem('sidebarExpanded');
+        const isDesktop = window.innerWidth > 768;
+        const isRTL = getComputedStyle(document.documentElement).direction === 'rtl';
+
+        if (isDesktop) {
+            const expanded = savedState !== 'false';
+            sidebar.classList.toggle('expanded', expanded);
+
+            if (isRTL) {
+                main.style.marginRight = expanded ? '280px' : '80px';
+                main.style.marginLeft = '0px';
+            } else {
+                main.style.marginLeft = expanded ? '280px' : '80px';
+                main.style.marginRight = '0px';
+            }
+        } else {
+            sidebar.classList.remove('expanded');
+            main.style.marginLeft = '0px';
+            main.style.marginRight = '0px';
+        }
+    }
+
+    // ========================================
+    // TOGGLE SIDEBAR (Desktop)
+    // ========================================
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const main = document.querySelector('.main-content');
+        const isRTL = getComputedStyle(document.documentElement).direction === 'rtl';
+        const expanded = sidebar.classList.contains('expanded');
+
+        // Set start/end values
+        const startWidth = expanded ? 280 : 80;
+        const endWidth = expanded ? 80 : 280;
+
+        const startMargin = expanded ? 280 : 80;
+        const endMargin = expanded ? 80 : 280;
+
+        const duration = 200; // ms
+        const startTime = performance.now();
+
+        sidebar.classList.toggle('expanded', !expanded);
+        localStorage.setItem('sidebarExpanded', (!expanded).toString());
+
+        function animate(time) {
+            const progress = Math.min((time - startTime) / duration, 1);
+            const ease = 1 - Math.pow(1 - progress, 3); // cubic ease-out
+
+            const currentWidth = startWidth + (endWidth - startWidth) * ease;
+            const currentMargin = startMargin + (endMargin - startMargin) * ease;
+
+            sidebar.style.width = currentWidth + 'px';
+
+            if (isRTL) {
+                main.style.marginRight = currentMargin + 'px';
+                main.style.marginLeft = '0px';
+            } else {
+                main.style.marginLeft = currentMargin + 'px';
+                main.style.marginRight = '0px';
+            }
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                // Cleanup inline styles
+                sidebar.style.width = '';
+                main.style.marginLeft = '';
+                main.style.marginRight = '';
+            }
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    // ========================================
+    // MOBILE SIDEBAR & DROPDOWN LOGIC
+    // ========================================
+    function toggleMobileSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobileOverlay');
+
+        sidebar.classList.toggle('mobile-open');
+        overlay.classList.toggle('show');
+
+        document.body.classList.toggle('sidebar-open');
+    }
+
+    function closeMobileSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobileOverlay');
+
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('show');
+        document.body.classList.remove('sidebar-open');
+    }
+
+    function toggleLanguageDropdown(event, dropdownId) {
+        event.stopPropagation();
+        const dropdown = document.getElementById(dropdownId);
+        if (!dropdown) return;
+
+        // Close the other dropdown if it exists
+        const otherDropdownId = dropdownId === 'languageDropdown' ? 'languageDropdownMobile' : 'languageDropdown';
+        const otherDropdown = document.getElementById(otherDropdownId);
+        if (otherDropdown) {
+            otherDropdown.style.display = 'none';
+            otherDropdown.classList.remove('show');
+        }
+
+        // Close user menu
+        document.getElementById('userMenuDropdown').style.display = 'none';
+
+        const isCurrentlyOpen = dropdown.classList.contains('show');
+        if (isCurrentlyOpen) {
+            dropdown.style.display = 'none';
+            dropdown.classList.remove('show');
+        } else {
+            dropdown.style.display = 'block';
+            // Apply 'show' class for animations (desktop) or just visibility
+            setTimeout(() => dropdown.classList.add('show'), 10);
+        }
+    }
+
+    function toggleUserMenu(event) {
+        event.stopPropagation();
+        const dropdown = document.getElementById('userMenuDropdown');
+        if (!dropdown) return;
+
+        // Close language dropdowns
+        const langDropdown = document.getElementById('languageDropdown');
+        if (langDropdown) {
+            langDropdown.style.display = 'none';
+            langDropdown.classList.remove('show');
+        }
+        const langDropdownMobile = document.getElementById('languageDropdownMobile');
+        if (langDropdownMobile) {
+            langDropdownMobile.style.display = 'none';
+            langDropdownMobile.classList.remove('show');
+        }
+
+        const isCurrentlyOpen = dropdown.style.display === 'block';
+        dropdown.style.display = isCurrentlyOpen ? 'none' : 'block';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initializeSidebar();
+
+        // Global click listener to close dropdowns
+        document.addEventListener('click', function (event) {
+            const langDropdown = document.getElementById('languageDropdown');
+            const langDropdownMobile = document.getElementById('languageDropdownMobile');
+            const langSwitcher = event.target.closest('.language-switcher');
+            
+            if (!langSwitcher) {
+                if (langDropdown) {
+                    langDropdown.style.display = 'none';
+                    langDropdown.classList.remove('show');
+                }
+                if (langDropdownMobile) {
+                    langDropdownMobile.style.display = 'none';
+                    langDropdownMobile.classList.remove('show');
+                }
+            }
+
+            const userMenuDropdown = document.getElementById('userMenuDropdown');
+            const userMenuButton = event.target.closest('[onclick*="toggleUserMenu"]');
+            if (!userMenuButton && userMenuDropdown && !userMenuDropdown.contains(event.target)) {
+                userMenuDropdown.style.display = 'none';
+            }
+        });
+
+        // Resize handler
+        window.addEventListener('resize', function () {
+            if (window.innerWidth <= 768) {
+                closeMobileSidebar();
+            } else {
+                initializeSidebar();
+            }
+        });
+
+        // Auto-hide alerts
+        setTimeout(function () {
+            document.querySelectorAll('.alert').forEach(function (alert) {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.style.display = 'none', 300);
+            });
+        }, 5000);
+    });
+
+    window.addEventListener('beforeunload', function () {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && window.innerWidth > 768) {
+            const isExpanded = sidebar.classList.contains('expanded');
+            localStorage.setItem('sidebarExpanded', isExpanded.toString());
+        }
+    });
+</script>
+
+
+<?php echo $__env->make('layouts.partials.service-worker-cleanup', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+<?php echo $__env->yieldPushContent('scripts'); ?>
+
+<?php endif; ?>
+
+</body>
+</html>
+<?php /**PATH C:\Users\eXtreme\Documents\custom\resources\views\layouts\network.blade.php ENDPATH**/ ?>

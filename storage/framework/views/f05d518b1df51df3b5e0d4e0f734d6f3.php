@@ -1,0 +1,2 @@
+<img src="<?php echo e(asset('logo.png')); ?>" alt="aJw Logo" <?php echo e($attributes); ?>>
+<?php /**PATH C:\Users\eXtreme\Documents\custom\resources\views\components\application-logo.blade.php ENDPATH**/ ?>
