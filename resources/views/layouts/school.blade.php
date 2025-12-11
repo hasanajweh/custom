@@ -1147,7 +1147,6 @@
 
 </head>
 <body class="bg-white {{ app()->getLocale() === 'ar' ? 'rtl' : '' }}">
-@auth
 
 <!-- Chrome/Edge/Brave/Opera Install Banner -->
 <div id="pwaInstallBanner" class="pwa-install-banner">
@@ -1971,8 +1970,6 @@ function switchLocale(locale) {
 </script>
 
 @stack('scripts')
-
-@endauth
 
 </body>
 </html>
