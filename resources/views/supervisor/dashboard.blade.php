@@ -199,7 +199,14 @@
                 <div class="p-6 border-b border-gray-100">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-semibold text-gray-900">{{ __('messages.dashboard.files_to_review') }}</h2>
-                        <a href="{{ tenant_route('supervisor.reviews.index', $school) }}"
+                        @php
+                            try {
+                                $reviewsUrl = tenant_route('supervisor.reviews.index', $school);
+                            } catch (\Exception $e) {
+                                $reviewsUrl = '#';
+                            }
+                        @endphp
+                        <a href="{{ $reviewsUrl }}"
                            class="text-sm text-green-600 hover:text-green-800 font-medium">{{ __('messages.actions.view_all') }}</a>
                     </div>
                 </div>
@@ -223,7 +230,14 @@
                                         </p>
                                     </div>
                                 </div>
-                                <a href="{{ tenant_route('supervisor.reviews.show', $school, ['fileSubmission' => $file->id]) }}"
+                                @php
+                                    try {
+                                        $reviewUrl = tenant_route('supervisor.reviews.show', $school, ['fileSubmission' => $file->id]);
+                                    } catch (\Exception $e) {
+                                        $reviewUrl = '#';
+                                    }
+                                @endphp
+                                <a href="{{ $reviewUrl }}"
                                    class="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-medium hover:bg-green-200 transition-colors whitespace-nowrap ml-3">
                                     {{ __('messages.actions.review') }}
                                 </a>
