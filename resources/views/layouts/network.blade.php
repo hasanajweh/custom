@@ -106,8 +106,6 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
 
 
     @if(app()->getLocale() === 'ar')
@@ -152,37 +150,45 @@
             --brand-border: #E2E8F0;
         }
 
-        * {
-            @if(app()->getLocale() === 'ar')
-                font-family: 'Cairo', 'Rubik', 'Segoe UI', system-ui, sans-serif;
-            @else
-                font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            @endif
+        html.rtl {
+            direction: rtl;
+        }
+
+        html.ltr {
+            direction: ltr;
+        }
+
+        .rtl * {
+            font-family: 'Cairo', 'Rubik', 'Segoe UI', system-ui, sans-serif;
+            letter-spacing: 0.02em;
+            line-height: 1.8;
             text-rendering: optimizeLegibility;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
 
-        @if(app()->getLocale() === 'ar')
-        * {
-            letter-spacing: 0.02em;
-            line-height: 1.8;
+        .ltr * {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            letter-spacing: normal;
+            line-height: 1.6;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        .font-heading {
+        .rtl .font-heading {
             font-family: 'Cairo', 'Rubik', sans-serif;
             font-weight: 700;
             letter-spacing: 0;
             line-height: 1.4;
         }
-        @else
-        .font-heading {
+
+        .ltr .font-heading {
             font-family: 'Inter', sans-serif;
             font-weight: 700;
             letter-spacing: -0.02em;
             line-height: 1.3;
         }
-        @endif
 
         body {
             overflow-x: hidden;
@@ -264,24 +270,6 @@
         }
 
 
-        .rtl {
-            direction: rtl;
-        }
-
-        .rtl .sidebar {
-            right: 0;
-            left: auto;
-        }
-
-        .rtl .main-content {
-            margin-right: var(--sidebar-collapsed);
-            margin-left: 0;
-        }
-
-        .rtl .sidebar.expanded ~ .main-content {
-            margin-right: var(--sidebar-width);
-            margin-left: 0;
-        }
 
         .navbar {
             background: #FFFFFF;
@@ -310,17 +298,31 @@
         .brand-text {
             display: flex;
             flex-direction: column;
-            align-items: {{ app()->getLocale() === 'ar' ? 'flex-end' : 'flex-start' }};
             line-height: 1.2;
+        }
+
+        .rtl .brand-text {
+            align-items: flex-end;
+        }
+
+        .ltr .brand-text {
+            align-items: flex-start;
         }
 
         .brand-name {
             font-size: 20px;
             font-weight: 800;
             color: var(--primary);
-            letter-spacing: {{ app()->getLocale() === 'ar' ? '0' : '-0.025em' }};
             line-height: 1.1;
             margin-bottom: 3px;
+        }
+
+        .rtl .brand-name {
+            letter-spacing: 0;
+        }
+
+        .ltr .brand-name {
+            letter-spacing: -0.025em;
         }
 
         .school-name {
@@ -370,7 +372,6 @@
         .language-dropdown {
             position: absolute;
             top: calc(100% + 8px);
-        {{ app()->getLocale() === 'ar' ? 'left' : 'right' }}: 0;
             background: #FFFFFF;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
@@ -382,6 +383,16 @@
             opacity: 0;
             transform: translateY(-10px);
             transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .rtl .language-dropdown {
+            left: 0;
+            right: auto;
+        }
+
+        .ltr .language-dropdown {
+            right: 0;
+            left: auto;
         }
 
         .language-dropdown.show {
@@ -401,11 +412,18 @@
             border: none;
             cursor: pointer;
             width: 100%;
-            text-align: {{ app()->getLocale() === 'ar' ? 'right' : 'left' }};
             font-weight: 600;
             font-size: 14px;
             transition: all 0.2s ease;
             border-bottom: 1px solid #F3F4F6;
+        }
+
+        .rtl .language-option {
+            text-align: right;
+        }
+
+        .ltr .language-option {
+            text-align: left;
         }
 
         .language-option:last-child {
@@ -415,7 +433,14 @@
         .language-option:hover {
             background-color: #F9FAFB !important;
             color: #667eea !important;
-            padding-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}: 20px;
+        }
+
+        .rtl .language-option:hover {
+            padding-right: 20px;
+        }
+
+        .ltr .language-option:hover {
+            padding-left: 20px;
         }
 
         .language-option.active {
@@ -441,7 +466,6 @@
 
         .sidebar {
             position: fixed;
-        {{ app()->getLocale() === 'ar' ? 'right' : 'left' }}: 0;
             top: var(--navbar-height);
             height: calc(100vh - var(--navbar-height));
             width: var(--sidebar-collapsed);
@@ -450,6 +474,16 @@
             display: flex;
             flex-direction: column;
             transition: none; /* JS handles animation */
+        }
+
+        .rtl .sidebar {
+            right: 0;
+            left: auto;
+        }
+
+        .ltr .sidebar {
+            left: 0;
+            right: auto;
         }
 
         .sidebar.expanded {
@@ -476,8 +510,15 @@
             position: relative;
             min-height: 44px;
             font-weight: 600;
-            font-size: {{ app()->getLocale() === 'ar' ? '15px' : '14px' }};
             white-space: nowrap;
+        }
+
+        .rtl .sidebar-item {
+            font-size: 15px;
+        }
+
+        .ltr .sidebar-item {
+            font-size: 14px;
         }
 
         .sidebar-item:hover {
@@ -489,8 +530,16 @@
             color: var(--primary);
             font-weight: 700;
             background: linear-gradient(to right, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));
-            border-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}: 4px solid var(--primary);
-            padding-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}: 8px;
+        }
+
+        .rtl .sidebar-item.active {
+            border-right: 4px solid var(--primary);
+            padding-right: 8px;
+        }
+
+        .ltr .sidebar-item.active {
+            border-left: 4px solid var(--primary);
+            padding-left: 8px;
         }
 
         .sidebar-item i {
@@ -500,9 +549,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}: 12px;
             font-size: 20px;
             flex-shrink: 0;
+        }
+
+        .rtl .sidebar-item i {
+            margin-left: 12px;
+        }
+
+        .ltr .sidebar-item i {
+            margin-right: 12px;
         }
 
         .sidebar-item:nth-child(1) i { color: #3B82F6; }
@@ -518,11 +574,11 @@
         }
 
         .sidebar:not(.expanded) .sidebar-item i {
-            margin-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}: 0;
+            margin-left: 0;
+            margin-right: 0;
         }
 
         .sidebar-text {
-            font-size: {{ app()->getLocale() === 'ar' ? '15px' : '14px' }};
             white-space: nowrap;
             overflow: hidden;
             max-width: 0;
@@ -530,10 +586,25 @@
             color: #374151;
         }
 
+        .rtl .sidebar-text {
+            font-size: 15px;
+        }
+
+        .ltr .sidebar-text {
+            font-size: 14px;
+        }
+
         .sidebar.expanded .sidebar-text {
             max-width: 200px;
             opacity: 1;
-            margin-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}: 0;
+        }
+
+        .rtl .sidebar.expanded .sidebar-text {
+            margin-right: 0;
+        }
+
+        .ltr .sidebar.expanded .sidebar-text {
+            margin-left: 0;
         }
 
         .sidebar-item:hover .sidebar-text,
@@ -576,15 +647,30 @@
         }
 
         .main-content {
-            margin-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}: var(--sidebar-collapsed);
             min-height: calc(100vh - var(--navbar-height));
             padding-top: var(--navbar-height);
             background: #FAFBFC;
             will-change: width, margin;
         }
 
-        .sidebar.expanded ~ .main-content {
-            margin-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}: var(--sidebar-width);
+        .rtl .main-content {
+            margin-right: var(--sidebar-collapsed);
+            margin-left: 0;
+        }
+
+        .ltr .main-content {
+            margin-left: var(--sidebar-collapsed);
+            margin-right: 0;
+        }
+
+        .rtl .sidebar.expanded ~ .main-content {
+            margin-right: var(--sidebar-width);
+            margin-left: 0;
+        }
+
+        .ltr .sidebar.expanded ~ .main-content {
+            margin-left: var(--sidebar-width);
+            margin-right: 0;
         }
 
         .dropdown-menu {
@@ -695,7 +781,6 @@
             .sidebar {
                 position: fixed;
                 top: 0;
-            {{ app()->getLocale() === 'ar' ? 'right' : 'left' }}: 0;
                 height: 100vh;
                 width: var(--sidebar-width); /* Use expanded width */
                 background: #FFFFFF;
@@ -705,6 +790,16 @@
                 box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
                 transform: translateX(-100%);
                 transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .rtl .sidebar {
+                right: 0;
+                left: auto;
+            }
+
+            .ltr .sidebar {
+                left: 0;
+                right: auto;
             }
 
             /* RTL: Hide sidebar to the right */
@@ -893,14 +988,24 @@
                 font-size: 13px;
             }
 
-            thead th:first-child,
-            tbody td:first-child {
-                padding-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}: 16px;
+            .rtl thead th:first-child,
+            .rtl tbody td:first-child {
+                padding-right: 16px;
             }
 
-            thead th:last-child,
-            tbody td:last-child {
-                padding-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}: 16px;
+            .ltr thead th:first-child,
+            .ltr tbody td:first-child {
+                padding-left: 16px;
+            }
+
+            .rtl thead th:last-child,
+            .rtl tbody td:last-child {
+                padding-left: 16px;
+            }
+
+            .ltr thead th:last-child,
+            .ltr tbody td:last-child {
+                padding-right: 16px;
             }
 
             tbody td .btn {
@@ -923,12 +1028,23 @@
 
         table.table-bordered thead th,
         table.table-bordered tbody td {
-            border-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}: 1px solid #E5E7EB;
+            border-right: 1px solid #E5E7EB;
         }
 
         table.table-bordered thead th:last-child,
         table.table-bordered tbody td:last-child {
-            border-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}: none;
+            border-right: none;
+        }
+
+        .rtl table.table-bordered thead th,
+        .rtl table.table-bordered tbody td {
+            border-right: none;
+            border-left: 1px solid #E5E7EB;
+        }
+
+        .rtl table.table-bordered thead th:last-child,
+        .rtl table.table-bordered tbody td:last-child {
+            border-left: none;
         }
 
         table.table-compact thead th,
@@ -953,8 +1069,15 @@
         table td.actions-col {
             display: flex;
             gap: 8px;
-            justify-content: {{ app()->getLocale() === 'ar' ? 'flex-start' : 'flex-end' }};
             align-items: center;
+        }
+
+        .rtl table td.actions-col {
+            justify-content: flex-start;
+        }
+
+        .ltr table td.actions-col {
+            justify-content: flex-end;
         }
 
         .dropdown-item,
