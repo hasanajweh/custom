@@ -6,7 +6,7 @@
 @endphp
 @extends('layouts.school')
 
-@section('title', __('messages.supervisors.title') . ' - Scholder')
+@section('title', __('messages.supervisors.title') . ' - ' . __('messages.app.name'))
 
 @section('content')
     <div class="space-y-6">

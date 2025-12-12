@@ -35,8 +35,6 @@ class PlansController extends Controller
                 abort(403);
             }
         }
-            abort(403);
-        }
 
         $school = $branch;
 
