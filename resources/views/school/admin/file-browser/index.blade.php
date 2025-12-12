@@ -112,19 +112,21 @@
 
                         <!-- Date From -->
                         <div class="xl:col-span-1">
-                            <input type="date"
+                            <input type="text"
                                    name="date_from"
                                    id="date_from"
                                    value="{{ request('date_from') }}"
+                                   placeholder="{{ __('messages.filters.date_placeholder') }}"
                                    class="compact-select">
                         </div>
 
                         <!-- Date To -->
                         <div class="xl:col-span-1">
-                            <input type="date"
+                            <input type="text"
                                    name="date_to"
                                    id="date_to"
                                    value="{{ request('date_to') }}"
+                                   placeholder="{{ __('messages.filters.date_placeholder') }}"
                                    class="compact-select">
                         </div>
                     </div>

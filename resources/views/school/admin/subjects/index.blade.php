@@ -32,6 +32,7 @@
                         </label>
                         <input type="text" id="name" name="name" required
                             placeholder="{{ __('messages.subjects.subject_placeholder') }}"
+                            oninvalid="this.setCustomValidity('{{ __('messages.validation.required') }}')" oninput="setCustomValidity('')"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                         @error('name')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

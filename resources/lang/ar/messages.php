@@ -452,6 +452,7 @@ return [
 
     // Files Management
     'files' => [
+        'file' => 'ملف',
         'title' => 'إدارة الملفات',
         'file_management' => 'إدارة الملفات',
         'browse_files' => 'تصفح الملفات',
@@ -462,6 +463,7 @@ return [
         'upload_resource' => 'رفع مورد',
         'share_resource' => 'مشاركة مورد تعليمي جديد مع مدرستك',
         'file_upload' => 'رفع الملف',
+        'uploads' => 'الرفوعات',
         'quick_simple_upload' => 'رفع سريع وبسيط للملفات للمشرفين',
         'file_name' => 'اسم الملف',
         'mb_abbr' => 'ميجابايت',
@@ -743,6 +745,7 @@ return [
     'filters' => [
         'filter_by_date' => 'تصفية حسب التاريخ',
         'file_type' => 'نوع الملف',
+        'date_placeholder' => 'يوم/شهر/سنة',
     ],
 
     // Notifications

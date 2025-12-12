@@ -416,6 +416,7 @@ return [
 
     // Files Management
     'files' => [
+        'file' => 'File',
         'title' => 'File Management',
         'file_management' => 'File Management',
         'browse_files' => 'Browse Files',
@@ -426,6 +427,7 @@ return [
         'upload_resource' => 'Upload Resource',
         'share_resource' => 'Share a new educational resource with your school',
         'file_upload' => 'File Upload',
+        'uploads' => 'Uploads',
         'quick_simple_upload' => 'Quick and simple file upload for supervisors',
         'file_name' => 'File Name',
         'file_title' => 'File Title',
@@ -1233,6 +1235,7 @@ return [
     'filters' => [
         'filter_by_date' => 'Filter by Date',
         'file_type' => 'File Type',
+        'date_placeholder' => 'dd/mm/yyyy',
     ],
 
     'pwa' => [

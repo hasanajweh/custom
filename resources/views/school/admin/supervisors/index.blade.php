@@ -92,9 +92,12 @@
                                 <!-- Subject -->
                                 <div class="flex items-center justify-between">
                                     <span class="text-sm text-gray-500">{{ __('messages.users.subject') }}:</span>
+                                    @php
+                                        $subjectLabel = localizedSubject($supervisor->subject) ?: __('messages.subjects.not_specified');
+                                    @endphp
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                                         <i class="ri-book-line mr-1"></i>
-                                        {{ $supervisor->subject }}
+                                        {{ $subjectLabel }}
                                     </span>
                                 </div>
 

@@ -124,19 +124,21 @@
 
                         <div>
                             <label for="date_from" class="block text-sm font-medium text-gray-700 mb-3">{{ __('messages.files.from_date') }}</label>
-                            <input type="date"
+                            <input type="text"
                                    name="date_from"
                                    id="date_from"
                                    value="{{ request('date_from') }}"
+                                   placeholder="{{ __('messages.filters.date_placeholder') }}"
                                    class="w-full px-4 py-3 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
                         </div>
 
                         <div>
                             <label for="date_to" class="block text-sm font-medium text-gray-700 mb-3">{{ __('messages.files.to_date') }}</label>
-                            <input type="date"
+                            <input type="text"
                                    name="date_to"
                                    id="date_to"
                                    value="{{ request('date_to') }}"
+                                   placeholder="{{ __('messages.filters.date_placeholder') }}"
                                    class="w-full px-4 py-3 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
                         </div>
                     </div>
@@ -162,7 +164,7 @@
                     <table class="w-full">
                         <thead class="bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200">
                         <tr>
-                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">{{ __('messages.files.title_file') }}</th>
+                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">{{ __('messages.files.file') }}</th>
                             <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">{{ __('messages.plans.type') }}</th>
                             <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">{{ __('messages.plans.teacher') }}</th>
                             <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">{{ __('messages.plans.uploaded') }}</th>

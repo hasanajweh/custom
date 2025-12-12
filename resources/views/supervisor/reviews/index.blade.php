@@ -232,11 +232,11 @@
                             // FIXED: Safely get all attributes with fallbacks
                             $fileIcon = $file->file_icon ?? ['bg-gray-100', 'text-gray-600', 'ri-file-line'];
                             $teacherName = $file->teacher_name ?? $file->user->name ?? 'Unknown';
-                            $typeInfo = $file->type_info ?? ['label' => 'File', 'classes' => 'bg-gray-100 text-gray-800', 'icon' => 'ri-file-line'];
+                            $typeInfo = $file->type_info ?? ['label' => __('messages.files.file'), 'classes' => 'bg-gray-100 text-gray-800', 'icon' => 'ri-file-line'];
                             $subjectName = $file->subject_name ?? 'Not specified';
                             $gradeName = $file->grade_name ?? 'Not specified';
-                            $subjectLabel = localizedSubject($subjectName);
-                            $gradeLabel = localizedGrade($gradeName);
+                            $subjectLabel = localizedSubject($subjectName) ?: __('messages.subjects.not_specified');
+                            $gradeLabel = localizedGrade($gradeName) ?: __('messages.grades.not_specified');
                             $formattedSize = $file->formatted_file_size ?? '0 B';
                         @endphp
                         <tr class="hover:bg-gray-50 transition-colors">

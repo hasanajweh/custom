@@ -172,10 +172,10 @@
 
                                 <td class="px-6 py-6">
                                     @if($user->role === 'supervisor' && $user->supervisor_subjects)
-                                        <div class="text-sm font-semibold text-gray-900">{{ $user->supervisor_subjects }}</div>
+                                        <div class="text-sm font-semibold text-gray-900">{{ localizedSubject($user->supervisor_subjects) }}</div>
                                         <div class="text-xs text-gray-500">{{ __('messages.users.subject') }}</div>
                                     @else
-                                        <span class="text-sm text-gray-400">—</span>
+                                        <span class="text-sm text-gray-400">{{ __('messages.subjects.not_specified') }}</span>
                                     @endif
                                 </td>
 
