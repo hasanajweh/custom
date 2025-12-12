@@ -1188,28 +1188,15 @@
                 <!-- Enhanced User Dropdown -->
                 <div class="relative">
                     <button onclick="toggleUserMenu(event)"
-                            class="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}"
+                            class="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 rounded-xl border border-transparent hover:border-gray-200 transition {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}"
                             aria-label="{{ __('messages.navigation.open_user_menu') }}">
                         @php
                             $role = strtolower($currentRole ?? '');
-                            $bgColors = [
-                                'teacher' => 'bg-blue-600',
-                                'supervisor' => 'bg-indigo-600',
-                                'admin' => 'bg-gray-700',
-                            ];
-                            $bgColor = $bgColors[$role] ?? 'bg-blue-600';
+                            $roleIcon = getRoleIcon($role);
                         @endphp
 
-                        <div class="w-9 h-9 rounded-lg {{ $bgColor }} text-white flex items-center justify-center font-bold text-sm">
-                            @if($role === 'admin')
-                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                            @elseif($role === 'teacher')
-                                <i class="ri-user-line text-lg"></i>
-                            @elseif($role === 'supervisor')
-                                <i class="ri-user-star-line text-lg"></i>
-                            @else
-                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                            @endif
+                        <div class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center overflow-hidden">
+                            <img src="{{ $roleIcon }}" alt="{{ __('messages.roles.' . ($currentRole ?? 'admin')) }}" class="w-8 h-8 object-contain">
                         </div>
 
                         <div class="hidden sm:block text-left {{ app()->getLocale() === 'ar' ? 'text-right' : '' }}">
@@ -1219,20 +1206,12 @@
                         <i class="ri-arrow-down-s-line text-gray-400"></i>
                     </button>
 
-                    <div id="userMenuDropdown" class="absolute {{ app()->getLocale() === 'ar' ? 'left-0' : 'right-0' }} mt-2 w-64 dropdown-menu" style="display: none;">
+                    <div id="userMenuDropdown" class="absolute {{ app()->getLocale() === 'ar' ? 'left-0' : 'right-0' }} mt-2 w-64 dropdown-menu shadow-xl rounded-2xl border border-gray-100" style="display: none;">
                         <!-- User Info Header -->
-                        <div class="p-4 bg-gray-50 border-b border-gray-100">
+                        <div class="p-4 bg-white rounded-t-2xl">
                             <div class="flex items-center space-x-3 {{ app()->getLocale() === 'ar' ? 'space-x-reverse' : '' }}">
-                                <div class="w-12 h-12 rounded-lg {{ $bgColor }} text-white flex items-center justify-center font-bold">
-                                    @if($role === 'admin')
-                                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                    @elseif($role === 'teacher')
-                                        <i class="ri-user-line text-xl"></i>
-                                    @elseif($role === 'supervisor')
-                                        <i class="ri-user-star-line text-xl"></i>
-                                    @else
-                                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                    @endif
+                                <div class="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center overflow-hidden">
+                                    <img src="{{ $roleIcon }}" alt="{{ __('messages.roles.' . ($currentRole ?? 'admin')) }}" class="w-10 h-10 object-contain">
                                 </div>
 
                                 <div class="flex-1 min-w-0">
