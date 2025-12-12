@@ -90,8 +90,10 @@
                                                 'supervisor' => 'bg-green-100 text-green-700',
                                                 'teacher' => 'bg-blue-100 text-blue-700',
                                             ];
+                                            $icon = getRoleIcon($role->role);
                                         @endphp
-                                        <span class="px-2 py-1 text-xs font-medium rounded-full {{ $roleColors[$role->role] ?? 'bg-gray-100 text-gray-700' }}">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full {{ $roleColors[$role->role] ?? 'bg-gray-100 text-gray-700' }} inline-flex items-center gap-1">
+                                            <img src="{{ $icon }}" alt="{{ __('messages.roles.' . $role->role) }}" class="w-4 h-4">
                                             {{ __('messages.roles.' . $role->role) }}
                                         </span>
                                     @endforeach

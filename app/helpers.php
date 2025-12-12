@@ -269,6 +269,23 @@ if (!function_exists('getRoleBadgeClass')) {
     }
 }
 
+if (!function_exists('getRoleIcon')) {
+    /**
+     * Get public icon path for a given role.
+     */
+    function getRoleIcon(string $role): string
+    {
+        $map = [
+            'teacher' => '/teacher.png',
+            'supervisor' => '/supervisor.png',
+            'admin' => '/admin.png',
+            'main_admin' => '/admin.png',
+        ];
+
+        return asset($map[$role] ?? '/admin.png');
+    }
+}
+
 if (!function_exists('isRtl')) {
     /**
      * Check if current locale is RTL

@@ -29,7 +29,12 @@ class PlansController extends Controller
             if ($branch->network_id !== $user->network_id) {
                 abort(403, 'School does not belong to your network.');
             }
-        } elseif ($user->school_id !== $branch->id) {
+        } else {
+            $hasBranchRole = $user->schoolRoles()->where('school_id', $branch->id)->exists();
+            if ($user->school_id !== $branch->id && !$hasBranchRole) {
+                abort(403);
+            }
+        }
             abort(403);
         }
 
@@ -136,8 +141,11 @@ class PlansController extends Controller
             if ($branch->network_id !== $user->network_id) {
                 abort(403, 'School does not belong to your network.');
             }
-        } elseif ($user->school_id !== $branch->id) {
-            abort(403);
+        } else {
+            $hasBranchRole = $user->schoolRoles()->where('school_id', $branch->id)->exists();
+            if ($user->school_id !== $branch->id && !$hasBranchRole) {
+                abort(403);
+            }
         }
 
         $school = $branch;
@@ -170,8 +178,11 @@ class PlansController extends Controller
             if ($branch->network_id !== $user->network_id) {
                 abort(403, 'School does not belong to your network.');
             }
-        } elseif ($user->school_id !== $branch->id) {
-            abort(403);
+        } else {
+            $hasBranchRole = $user->schoolRoles()->where('school_id', $branch->id)->exists();
+            if ($user->school_id !== $branch->id && !$hasBranchRole) {
+                abort(403);
+            }
         }
 
         $school = $branch;
@@ -202,8 +213,11 @@ class PlansController extends Controller
             if ($branch->network_id !== $user->network_id) {
                 abort(403, 'School does not belong to your network.');
             }
-        } elseif ($user->school_id !== $branch->id) {
-            abort(403);
+        } else {
+            $hasBranchRole = $user->schoolRoles()->where('school_id', $branch->id)->exists();
+            if ($user->school_id !== $branch->id && !$hasBranchRole) {
+                abort(403);
+            }
         }
 
         $school = $branch;

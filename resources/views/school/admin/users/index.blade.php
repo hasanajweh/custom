@@ -165,9 +165,9 @@
                                         $roleData = $roleStyles[$user->role] ?? [__('messages.roles.user'), 'bg-gray-100 text-gray-800', 'ri-user-line'];
                                     @endphp
                                     <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold {{ $roleData[1] }} shadow-sm">
-                                            <i class="{{ $roleData[2] }} {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>
-                                            {{ $roleData[0] }}
-                                        </span>
+                                        <img src="{{ getRoleIcon($user->role) }}" alt="{{ $roleData[0] }}" class="w-4 h-4 {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}">
+                                        {{ $roleData[0] }}
+                                    </span>
                                 </td>
 
                                 <td class="px-6 py-6">

@@ -35,8 +35,9 @@ class FileBrowserController extends Controller
             return $branch;
         }
 
-        // Regular admin: must belong to this school
-        if ($user->school_id !== $branch->id) {
+        // Regular admin: allow if primary school matches OR has role assignment on this branch
+        $hasBranchRole = $user->schoolRoles()->where('school_id', $branch->id)->exists();
+        if ($user->school_id !== $branch->id && !$hasBranchRole) {
             abort(403);
         }
 

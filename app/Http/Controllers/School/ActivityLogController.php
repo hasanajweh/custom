@@ -19,7 +19,9 @@ class ActivityLogController extends Controller
             abort(404);
         }
 
-        if (Auth::user()->school_id !== $branch->id) {
+        $user = Auth::user();
+        $hasBranchRole = $user->schoolRoles()->where('school_id', $branch->id)->exists();
+        if ($user->school_id !== $branch->id && !$hasBranchRole && !$user->isMainAdmin()) {
             abort(403);
         }
 

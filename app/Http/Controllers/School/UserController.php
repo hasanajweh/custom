@@ -19,6 +19,11 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    private function hasBranchRole(User $user, School $branch): bool
+    {
+        return $user->schoolRoles()->where('school_id', $branch->id)->exists();
+    }
+
     private function validateContext(Network $network, School $branch): School
     {
         if ($branch->network_id !== $network->id) {
@@ -35,8 +40,8 @@ class UserController extends Controller
             return $branch;
         }
 
-        // Regular admin: must belong to this school
-        if ($user->school_id !== $branch->id) {
+        // Regular admin: allow if primary school matches OR has role assignment on this branch
+        if ($user->school_id !== $branch->id && !$this->hasBranchRole($user, $branch)) {
             abort(403);
         }
 
@@ -242,7 +247,7 @@ class UserController extends Controller
         
         // Main admin exception: can update any user in their network
         $currentUser = Auth::user();
-        if (!$currentUser->isMainAdmin() && $user->school_id !== $school->id) {
+        if (!$currentUser->isMainAdmin() && $user->school_id !== $school->id && !$this->hasBranchRole($currentUser, $school)) {
             abort(404);
         }
 
@@ -280,7 +285,7 @@ class UserController extends Controller
         
         // Main admin exception: can update any user in their network
         $currentUser = Auth::user();
-        if (!$currentUser->isMainAdmin() && $user->school_id !== $school->id) {
+        if (!$currentUser->isMainAdmin() && $user->school_id !== $school->id && !$this->hasBranchRole($currentUser, $school)) {
             abort(404);
         }
 
@@ -400,7 +405,7 @@ class UserController extends Controller
         
         // Main admin exception: can update any user in their network
         $currentUser = Auth::user();
-        if (!$currentUser->isMainAdmin() && $user->school_id !== $school->id) {
+        if (!$currentUser->isMainAdmin() && $user->school_id !== $school->id && !$this->hasBranchRole($currentUser, $school)) {
             abort(404);
         }
 
@@ -429,7 +434,7 @@ class UserController extends Controller
         
         // Main admin exception: can update any user in their network
         $currentUser = Auth::user();
-        if (!$currentUser->isMainAdmin() && $user->school_id !== $school->id) {
+        if (!$currentUser->isMainAdmin() && $user->school_id !== $school->id && !$this->hasBranchRole($currentUser, $school)) {
             abort(404);
         }
 
