@@ -10,12 +10,13 @@
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
                     <div class="text-center">
-                        <div class="h-24 w-24 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center font-bold text-white text-3xl mx-auto">
-                            {{ mb_substr($user->name, 0, 1) }}
+                        <div class="h-24 w-24 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center font-bold text-white text-3xl mx-auto overflow-hidden">
+                            <img src="{{ getRoleIcon('main_admin') }}" alt="{{ __('messages.roles.main_admin') }}" class="w-full h-full object-contain">
                         </div>
                         <h3 class="mt-4 text-xl font-semibold text-gray-900">{{ $user->name }}</h3>
                         <p class="text-sm text-gray-500">{{ $user->email }}</p>
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 mt-2">
+                            <img src="{{ getRoleIcon('main_admin') }}" alt="{{ __('messages.roles.main_admin') }}" class="w-4 h-4 {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}">
                             {{ __('messages.roles.main_admin') }}
                         </span>
                     </div>
