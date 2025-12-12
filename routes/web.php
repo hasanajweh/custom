@@ -376,7 +376,7 @@ Route::prefix('{network:slug}/{branch:slug}')
 // BRANCH ADMIN ROUTES
 // ===========================
 Route::prefix('{network:slug}/{branch:slug}/admin')
-    ->middleware(['setlocale', 'setNetwork', 'setBranch', 'ensure.school.network.match', 'verify.tenant.access', 'auth', 'role:admin'])
+    ->middleware(['setlocale', 'setNetwork', 'setBranch', 'ensure.school.network.match', 'verify.tenant.access', 'auth', 'role:admin,main_admin'])
     ->name('school.admin.')
     ->scopeBindings()
     ->group(function () {
