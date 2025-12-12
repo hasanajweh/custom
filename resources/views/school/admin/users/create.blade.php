@@ -79,11 +79,13 @@
 
             <!-- Supervisor Subjects -->
             <div id="supervisorSubjectField" class="{{ in_array('supervisor', $oldRoles) ? '' : 'hidden' }}">
-                <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.users.subjects') }}</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ __('messages.main_admin.users.supervisor_subjects') }}
+                </label>
                 <div x-data="multiSelect({options: {{ $subjects->map(fn($s)=>['id'=>$s->id,'name'=>$s->name]) }}, name:'subject_ids', old:{{ json_encode(old('subject_ids', [])) }}})" class="space-y-2">
                     <div class="flex items-center gap-4 text-sm text-blue-600 font-medium">
-                        <button type="button" @click="selectAll" class="hover:underline">Select All</button>
-                        <button type="button" @click="deselectAll" class="hover:underline">Deselect All</button>
+                        <button type="button" @click="selectAll" class="hover:underline">{{ __('messages.actions.select_all') }}</button>
+                        <button type="button" @click="deselectAll" class="hover:underline">{{ __('messages.actions.deselect_all') }}</button>
                     </div>
                     <div class="flex flex-wrap gap-2">
                         <template x-for="opt in options" :key="opt.id">
@@ -103,11 +105,13 @@
 
             <!-- Teacher Grades -->
             <div id="teacherGradeField" class="{{ in_array('teacher', $oldRoles) ? '' : 'hidden' }}">
-                <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.users.grades') }}</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ __('messages.main_admin.users.teacher_grades') }}
+                </label>
                 <div x-data="multiSelect({options: {{ $grades->map(fn($g)=>['id'=>$g->id,'name'=>$g->name]) }}, name:'teacher_grade_ids', old:{{ json_encode(old('teacher_grade_ids', [])) }}})" class="space-y-2">
                     <div class="flex items-center gap-4 text-sm text-green-600 font-medium">
-                        <button type="button" @click="selectAll" class="hover:underline">Select All</button>
-                        <button type="button" @click="deselectAll" class="hover:underline">Deselect All</button>
+                        <button type="button" @click="selectAll" class="hover:underline">{{ __('messages.actions.select_all') }}</button>
+                        <button type="button" @click="deselectAll" class="hover:underline">{{ __('messages.actions.deselect_all') }}</button>
                     </div>
                     <div class="flex flex-wrap gap-2">
                         <template x-for="opt in options" :key="opt.id">
@@ -127,11 +131,13 @@
 
             <!-- Teacher Subjects -->
             <div id="teacherSubjectField" class="{{ in_array('teacher', $oldRoles) ? '' : 'hidden' }}">
-                <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.users.subjects') }}</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ __('messages.main_admin.users.teacher_subjects') }}
+                </label>
                 <div x-data="multiSelect({options: {{ $subjects->map(fn($s)=>['id'=>$s->id,'name'=>$s->name]) }}, name:'teacher_subject_ids', old:{{ json_encode(old('teacher_subject_ids', [])) }}})" class="space-y-2">
                     <div class="flex items-center gap-4 text-sm text-purple-600 font-medium">
-                        <button type="button" @click="selectAll" class="hover:underline">Select All</button>
-                        <button type="button" @click="deselectAll" class="hover:underline">Deselect All</button>
+                        <button type="button" @click="selectAll" class="hover:underline">{{ __('messages.actions.select_all') }}</button>
+                        <button type="button" @click="deselectAll" class="hover:underline">{{ __('messages.actions.deselect_all') }}</button>
                     </div>
                     <div class="flex flex-wrap gap-2">
                         <template x-for="opt in options" :key="opt.id">
